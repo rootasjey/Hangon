@@ -1,0 +1,50 @@
+﻿<Page
+    x:Class="Hangon.Views.PhotoPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+        <FlyoutPresenter x:Name="FlyoutNotification" 
+                         Visibility="Collapsed"
+                         Canvas.ZIndex="2"
+                         Foreground="White"
+                         Background="{ThemeResource SystemControlHighlightAccentBrush}" 
+                         Height="20" VerticalAlignment="Top">
+            <StackPanel>
+                <TextBlock x:Name="FlyoutText" Text="downloading photo..."/>
+                <Grid>
+                    <ProgressBar x:Name="ProgressIndeterminate"
+                                 Foreground="White"
+                                 FlowDirection="RightToLeft" IsIndeterminate="True" Canvas.ZIndex="1"/>
+                    <ProgressBar x:Name="ProgressDeterminate" IsIndeterminate="False" Foreground="White"/>
+                </Grid>
+            </StackPanel>
+        </FlyoutPresenter>
+        
+        <Image x:Name="PhotoView" Stretch="UniformToFill"
+               VerticalAlignment="Center" HorizontalAlignment="Center">
+        </Image>
+
+        <Grid x:Name="ViewInfos">
+            
+        </Grid>
+
+        <CommandBar x:Name="AppBar"
+                    VerticalAlignment="Bottom">
+            <AppBarButton x:Name="CmdCrop" Label="crop" Icon="Crop" Tapped="CmdCrop_Tapped"/>
+            <AppBarButton x:Name="CmdDownload" Label="download" Icon="Download" Tapped="CmdDownload_Tapped"/>
+            <AppBarButton x:Name="CmdSetAs" Label="set as..." Icon="SetLockScreen">
+                <AppBarButton.Flyout>
+                    <MenuFlyout>
+                        <MenuFlyoutItem Text="wallpaper" Tapped="CmdSetWallpaper"/>
+                        <MenuFlyoutItem Text="lockscreen" Tapped="CmdSetLockscreen"/>
+                    </MenuFlyout>
+                </AppBarButton.Flyout>
+            </AppBarButton>
+        </CommandBar>
+    </Grid>
+</Page>

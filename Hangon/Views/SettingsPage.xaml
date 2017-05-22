@@ -1,0 +1,73 @@
+﻿<Page
+    x:Class="Hangon.Views.SettingsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Hangon.Views"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <Pivot x:Name="PivotSettings">
+            <PivotItem Header="configuration">
+                <ScrollViewer>
+                    <StackPanel Margin="0,0,0,40">
+                        <TextBlock FontWeight="Light" FontSize="34" Typography.Capitals="AllSmallCaps" Text="wallpaper"/>
+                        <TextBlock Text="Periodically update wallpaper" 
+                                       TextWrapping="Wrap"/>
+                        <ToggleSwitch x:Name="WallSwitch"
+                                      Toggled="WallSwitch_Toggled"/>
+
+                        <ComboBox x:Name="ComboboxTimeWall"
+                                  Visibility="Collapsed"
+                                  Margin="0, 20"
+                                  SelectedIndex="2"
+                                  SelectionChanged="ComboboxTimeWall_SelectionChanged">
+                            <ComboBoxItem Content="15"/>
+                            <ComboBoxItem Content="30"/>
+                            <ComboBoxItem Content="60"/>
+                            <ComboBoxItem Content="120"/>
+                            <ComboBoxItem Content="360"/>
+                        </ComboBox>
+
+                        <StackPanel x:Name="WallTaskInfos" Margin="0,10" Visibility="Collapsed">
+                            <TextBlock x:Name="LastUpdatedTask" Text="Never run"/>
+                            <TextBlock x:Name="LastError" Text="No error"/>
+                        </StackPanel>
+                    </StackPanel>
+                </ScrollViewer>
+            </PivotItem>
+
+            <PivotItem Header="about">
+                <ScrollViewer Margin="0,20,0,0">
+                    <StackPanel>
+                        <RichTextBlock x:Name="FeedbackBox">
+                            <Paragraph FontWeight="SemiLight" FontSize="24">feedback</Paragraph>
+                            <Paragraph Margin="0,0,0,0">
+                                Send an email if you encounter issues or if you've suggestions
+                            </Paragraph>
+                        </RichTextBlock>
+                        <Button x:Name="FeedbackButton" Content="send a suggestion" Margin="0,12,0,40" Click="FeedbackButton_Click"/>
+
+                        <RichTextBlock x:Name="NoteBox" Margin="0,0,0,0">
+                            <Paragraph FontWeight="SemiLight" FontSize="24">notation</Paragraph>
+                            <Paragraph>
+                                Don't forgt to give the app a note on the store ;)
+                            </Paragraph>
+                        </RichTextBlock>
+                        <Button x:Name="NoteButton" Content="give a note" Margin="0,12,0,40" Click="NoteButton_Click"/>
+
+                        <RichTextBlock x:Name="ImagesBox" Margin="0,0,0,40">
+                            <Paragraph FontWeight="SemiLight" FontSize="24">images</Paragraph>
+                            <Paragraph>
+                                Images sources
+                                <Hyperlink NavigateUri="https://unsplash.com/">Unsplash</Hyperlink>
+                            </Paragraph>
+                        </RichTextBlock>
+                    </StackPanel>
+                </ScrollViewer>
+            </PivotItem>
+        </Pivot>
+
+    </Grid>
+</Page>
