@@ -13,9 +13,6 @@
         <controls:AdaptiveGridView x:Name="RecentView"
                                    DesiredWidth="300"
                                    ItemHeight="300"
-                                  HorizontalAlignment="Center"
-                                  HorizontalContentAlignment="Stretch"
-                                  ItemContainerStyle="{StaticResource GridViewItemFill}"
                                   animations:ReorderGridAnimation.Duration="300">
             <GridView.ItemTemplate>
                 <DataTemplate x:DataType="data:Photo">

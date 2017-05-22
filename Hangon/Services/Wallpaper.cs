@@ -59,7 +59,7 @@ namespace Hangon.Services {
         /// <param name="photo">Pepresents my image model, you can replace it by a string</param>
         /// <param name="httpProgressCallback">A function callback which will be fired when the HTTP progression is updated</param>
         /// <returns></returns>
-        public static async Task SaveToPicturesLibrary(Photo photo, Action<HttpProgress> httpProgressCallback) {
+        public static async Task SaveToPicturesLibrary(Photo photo, Action<HttpProgress> httpProgressCallback, string url = "") {
             var savePicker = new Windows.Storage.Pickers.FileSavePicker() {
                 SuggestedStartLocation = Windows.Storage.Pickers.PickerLocationId.PicturesLibrary
             };
@@ -73,12 +73,14 @@ namespace Hangon.Services {
                 // Prevent updates to the remote version of the file until
                 // we finish making changes and call CompleteUpdatesAsync.
                 CachedFileManager.DeferUpdates(file);
-                
+
+                var _url = string.IsNullOrEmpty(url) ? photo.Urls.Raw : url;
+
                 var client = new HttpClient();
                 Progress<HttpProgress> progressCallback = new Progress<HttpProgress>(httpProgressCallback);
                 var tokenSource = new CancellationTokenSource();
 
-                var request = new HttpRequestMessage(HttpMethod.Get, new Uri(photo.Urls.Raw));
+                var request = new HttpRequestMessage(HttpMethod.Get, new Uri(_url));
                 HttpResponseMessage response = await client.SendRequestAsync(request)
                     .AsTask(tokenSource.Token, progressCallback);
 

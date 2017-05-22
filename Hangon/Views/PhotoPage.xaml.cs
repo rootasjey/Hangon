@@ -71,6 +71,7 @@ namespace Hangon.Views {
 
 
         void ShowProgress(string message = "") {
+            ProgressDeterminate.Value = 0;
             FlyoutNotification.Visibility = Visibility.Visible;
 
             if (string.IsNullOrEmpty(message)) return;
@@ -89,6 +90,36 @@ namespace Hangon.Views {
             ProgressDeterminate.Value = progress.BytesReceived;
         }
 
+        async void Download(string size = "") {
+            ShowProgress(); // show progress flyout
+
+            if (string.IsNullOrEmpty(size)) {
+                await Wallpaper.SaveToPicturesLibrary(CurrentPhoto, HttpProgressCallback);
+
+            } else {
+                string url = getURL();
+                await Wallpaper.SaveToPicturesLibrary(CurrentPhoto, HttpProgressCallback, url);
+            }
+
+            HideProgress(); // hide show progress flyout
+
+            string getURL()
+            {
+                switch (size) {
+                    case "raw":
+                        return CurrentPhoto.Urls.Raw;
+                    case "full":
+                        return CurrentPhoto.Urls.Full;
+                    case "regular":
+                        return CurrentPhoto.Urls.Regular;
+                    case "small":
+                        return CurrentPhoto.Urls.Small;
+                    default:
+                        return CurrentPhoto.Urls.Regular;
+                }
+            }
+        }
+
         #region commandbar
         private void CmdSetWallpaper(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e) {
             Wallpaper.SetAsWallpaper(CurrentPhoto);
@@ -98,10 +129,21 @@ namespace Hangon.Views {
             Wallpaper.SetAsLockscreen(CurrentPhoto);
         }
 
-        private async void CmdDownload_Tapped(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e) {
-            ShowProgress(); // show progress flyout
-            await Wallpaper.SaveToPicturesLibrary(CurrentPhoto, HttpProgressCallback);
-            HideProgress(); // hide show progress flyout
+        private void CmdDownload_Tapped(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e) {
+            if (Settings.UseDefaultDownloadResolution()) {
+                var resolution = Settings.GetDefaultDownloadResolution();
+                Download(resolution);
+                return;
+            }
+
+            var cmd = (AppBarButton)sender;
+            FlyoutDownload.ShowAt(cmd);
+        }
+
+        private void CmdDownloadResolution_Tapped(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e) {
+            var cmd = (MenuFlyoutItem)sender;
+            var resolution = cmd.Text;
+            Download(resolution);
         }
 
         private void CmdCrop_Tapped(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e) {
@@ -109,5 +151,6 @@ namespace Hangon.Views {
         }
 
         #endregion commandbar
+        
     }
 }

@@ -66,6 +66,11 @@ namespace Hangon.Services {
                 (bool)settingsValues[UseDefaultDownloadResolutionKey] : false;
         }
 
+        public static string GetDefaultDownloadResolution() {
+            var settingsValues = ApplicationData.Current.LocalSettings.Values;
+            return settingsValues.ContainsKey(DefaultDownloadResolutionKey) ?
+                (string)settingsValues[DefaultDownloadResolutionKey] : null;
+        }
         #endregion resolution
     }
 }

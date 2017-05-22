@@ -153,10 +153,12 @@ namespace Hangon.Views {
         private void CmdSettings_Tapped(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e) {
             Frame.Navigate(typeof(SettingsPage));
         }
-        #endregion commandbar
 
         private void CmdRefresh_Tapped(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e) {
-
+            PageDataSource.Recent.Clear();
+            LoadData();
         }
+        #endregion commandbar
+
     }
 }

@@ -6,6 +6,15 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
+    <Page.Resources>
+        <MenuFlyout x:Name="FlyoutDownload">
+            <MenuFlyoutItem Text="raw" Tapped="CmdDownloadResolution_Tapped"/>
+            <MenuFlyoutItem Text="full" Tapped="CmdDownloadResolution_Tapped"/>
+            <MenuFlyoutItem Text="regular" Tapped="CmdDownloadResolution_Tapped"/>
+            <MenuFlyoutItem Text="small" Tapped="CmdDownloadResolution_Tapped"/>
+        </MenuFlyout>
+    </Page.Resources>
+    
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
         <FlyoutPresenter x:Name="FlyoutNotification" 
@@ -30,12 +39,12 @@
         </Image>
 
         <Grid x:Name="ViewInfos">
-            
+
         </Grid>
 
         <CommandBar x:Name="AppBar"
                     VerticalAlignment="Bottom">
-            <AppBarButton x:Name="CmdCrop" Label="crop" Icon="Crop" Tapped="CmdCrop_Tapped"/>
+            <AppBarButton x:Name="CmdCrop" Visibility="Collapsed" Label="crop" Icon="Crop" Tapped="CmdCrop_Tapped"/>
             <AppBarButton x:Name="CmdDownload" Label="download" Icon="Download" Tapped="CmdDownload_Tapped"/>
             <AppBarButton x:Name="CmdSetAs" Label="set as..." Icon="SetLockScreen">
                 <AppBarButton.Flyout>
