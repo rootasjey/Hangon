@@ -30,7 +30,7 @@ namespace Hangon.Services {
         #endregion keys
 
         #region path
-        public static void UpdateMustUseDefaultDownloadPath(bool whatever) {
+        public static void UpdateUseDefaultDownloadPath(bool whatever) {
             var settingsValues = ApplicationData.Current.LocalSettings.Values;
             settingsValues[UseDefaultDownloadPathKey] = whatever;
         }
@@ -55,7 +55,7 @@ namespace Hangon.Services {
         #endregion path
 
         #region resolution
-        public static void UpdateMustUseDefaultResolution(bool whatever) {
+        public static void UpdateUseDefaultResolution(bool whatever) {
             var settingsValues = ApplicationData.Current.LocalSettings.Values;
             settingsValues[UseDefaultDownloadResolutionKey] = whatever;
         }

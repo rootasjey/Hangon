@@ -58,7 +58,7 @@ namespace Hangon.Views {
                 };                
             }
 
-            PhotoView.Source = new BitmapImage(new System.Uri(photo.Urls.Regular));
+            PhotoView.Source = new BitmapImage(new Uri(photo.Urls.Regular));
         }
 
         private void FetchData(Photo wall) {
@@ -121,12 +121,24 @@ namespace Hangon.Views {
         }
 
         #region commandbar
-        private void CmdSetWallpaper(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e) {
-            Wallpaper.SetAsWallpaper(CurrentPhoto);
+        private async void CmdSetWallpaper(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e) {
+            ShowProgress("Setting wallpaper");
+            var success = await Wallpaper.SetAsWallpaper(CurrentPhoto, HttpProgressCallback);
+            HideProgress();
+
+            if (!success) {
+                DataTransfer.ShowLocalToast("Ops. There I couldn't set your wellpaper. Try again or contact the developer.");
+            }
         }
 
-        private void CmdSetLockscreen(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e) {
-            Wallpaper.SetAsLockscreen(CurrentPhoto);
+        private async void CmdSetLockscreen(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e) {
+            ShowProgress("Setting lockscreen background");
+            var success = await Wallpaper.SetAsLockscreen(CurrentPhoto, HttpProgressCallback);
+            HideProgress();
+
+            if (!success) {
+                DataTransfer.ShowLocalToast("Ops. There I couldn't set your lockscreen background. Try again or contact the developer.");
+            }
         }
 
         private void CmdDownload_Tapped(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e) {

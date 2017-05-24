@@ -1,7 +1,6 @@
 ﻿using Hangon.Services;
 using System;
 using Windows.ApplicationModel.Email;
-using Windows.Storage;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 
@@ -15,33 +14,28 @@ namespace Hangon.Views {
 
         private void LoadData() {
             WallSwitch.IsOn = BackgroundTask.IsWallTaskActive();
-            GetLastUpdatedTask();
-            GetLastError();
+            LockscreenSwitch.IsOn = BackgroundTask.IsLockscreenTaskActive();
+            UpdateWallTaskActivityText();
+            UpdateLockscreenTaskActivityText();
         }
 
-        private void GetLastUpdatedTask() {
-            ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
-            if (localSettings.Values.ContainsKey("wallstats")) {
-                ApplicationDataCompositeValue stats = (ApplicationDataCompositeValue)localSettings.Values["wallstats"];
+        private void UpdateWallTaskActivityText() {
+            var activity = BackgroundTask.GetWallTaskActivity();
+            if (activity == null) return;
+            LastUpdatedTask.Text = "Wallpaper task last run on: " + activity["DateTime"];
 
-                if (stats["date"] == null) {
-                    return;
-                }
-
-                LastUpdatedTask.Text = "Task last run on: " + stats["date"];
+            if (activity["Exception"] != null) {
+                LastWallTaskError.Text = activity["Exception"].ToString();
             }
         }
 
-        private void GetLastError() {
-            ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
-            if (localSettings.Values.ContainsKey("wallerror")) {
-                ApplicationDataCompositeValue stats = (ApplicationDataCompositeValue)localSettings.Values["wallerror"];
+        private void UpdateLockscreenTaskActivityText() {
+            var activity = BackgroundTask.GetLockscreenTaskActivity();
+            if (activity == null) return;
+            LastUpdatedLockscreenTask.Text = "Wallpaper task last run on: " + activity["DateTime"];
 
-                if (stats["date"] == null) {
-                    return;
-                }
-
-                LastError.Text = "Last error on: " + stats["date"] + " " + " - due to: " + stats["error"];
+            if (activity["Exception"] != null) {
+                LastLockscreenTaskError.Text = activity["Exception"].ToString();
             }
         }
 
@@ -53,16 +47,16 @@ namespace Hangon.Views {
         private void WallSwitch_Toggled(object sender, RoutedEventArgs e) {
             var toggle = (ToggleSwitch)sender;
             if (toggle.IsOn) {
-                ShowWallTaskConfig();
+                ShowWallTaskActivity();
 
                 if (BackgroundTask.IsWallTaskActive()) {
                     return;
                 }
                 
-                BackgroundTask.RegisterWallTask(GetTimeWallInterval());
+                BackgroundTask.RegisterWallTask(GetWallIntervalUpdate());
 
             } else {
-                HideWallTaskConfig();
+                HideWallTaskActivity();
                 BackgroundTask.UnregisterWallTask();
             }
         }
@@ -81,30 +75,72 @@ namespace Hangon.Views {
             var op = await Windows.System.Launcher.LaunchUriAsync(new Uri("ms-windows-store://review/?ProductId=" + appID));
         }
 
-        private void ShowWallTaskConfig() {
-            ComboboxTimeWall.Visibility = Visibility.Visible;
-            WallTaskInfos.Visibility = Visibility.Visible;
+        private void ShowWallTaskActivity() {
+            WallIntervalUpdates.Visibility = Visibility.Visible;
+            WallTaskActivity.Visibility = Visibility.Visible;
         }
 
-        private void HideWallTaskConfig() {
-            ComboboxTimeWall.Visibility = Visibility.Collapsed;
-            WallTaskInfos.Visibility = Visibility.Collapsed;
+        private void HideWallTaskActivity() {
+            WallIntervalUpdates.Visibility = Visibility.Collapsed;
+            WallTaskActivity.Visibility = Visibility.Collapsed;
         }
 
-        private void ComboboxTimeWall_SelectionChanged(object sender, SelectionChangedEventArgs e) {
+        private void WallIntervalUpdates_SelectionChanged(object sender, SelectionChangedEventArgs e) {
             if (!WallSwitch.IsOn) {
                 return;
             }
 
             BackgroundTask.UnregisterWallTask();
-            BackgroundTask.RegisterWallTask(GetTimeWallInterval());
+            BackgroundTask.RegisterWallTask(GetWallIntervalUpdate());
         }
 
-        private uint GetTimeWallInterval() {
-            var item = (ComboBoxItem)ComboboxTimeWall.SelectedItem;
-            string value = (string)item.Content;
+        private uint GetWallIntervalUpdate() {
+            var item = (ComboBoxItem)WallIntervalUpdates.SelectedItem;
+            string value = (string)item.Tag;
             return uint.Parse(value);
         }
 
+        private void LockscreenSwitch_Toggled(object sender, RoutedEventArgs e) {
+            var toggle = (ToggleSwitch)sender;
+
+            if (toggle.IsOn) {
+                ShowLockscreenTaskActivity();
+
+                if (BackgroundTask.IsLockscreenTaskActive()) {
+                    return;
+                }
+
+                BackgroundTask.RegisterLockscreenTask(GetLockscreenIntervalUpdates());
+
+            } else {
+                HideLockscreenTaskActivity();
+                BackgroundTask.UnregisterLockscreenTask();
+            }
+        }
+
+        private void ShowLockscreenTaskActivity() {
+            LockscreenIntervalUpdates.Visibility = Visibility.Visible;
+            LockscreenTaskActivity.Visibility = Visibility.Visible;
+        }
+
+        private void HideLockscreenTaskActivity() {
+            LockscreenIntervalUpdates.Visibility = Visibility.Collapsed;
+            LockscreenTaskActivity.Visibility = Visibility.Collapsed;
+        }
+
+        private void LockscreenIntervalUpdate_SelectionChanged(object sender, SelectionChangedEventArgs e) {
+            if (!LockscreenSwitch.IsOn) {
+                return;
+            }
+
+            BackgroundTask.UnregisterLockscreenTask();
+            BackgroundTask.RegisterLockscreenTask(GetLockscreenIntervalUpdates());
+        }
+
+        private uint GetLockscreenIntervalUpdates() {
+            var item = (ComboBoxItem)LockscreenIntervalUpdates.SelectedItem;
+            string value = (string)item.Tag;
+            return uint.Parse(value);
+        }
     }
 }

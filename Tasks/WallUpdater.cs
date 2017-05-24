@@ -13,49 +13,75 @@ namespace Tasks {
     public sealed class WallUpdater : IBackgroundTask {
         BackgroundTaskDeferral _deferral;
         volatile bool _cancelRequested = false;
-        private string unsplashURL = "https://unsplash.it/1500?random";
 
-        private void OnCanceled(IBackgroundTaskInstance sender, BackgroundTaskCancellationReason reason) {
-            // Indicate that the background task is canceled.
-            _cancelRequested = true;
-
-            ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
-            ApplicationDataCompositeValue stats = new ApplicationDataCompositeValue {
-                ["date"] = DateTime.Now,
-                ["error"] = reason.ToString()
-            };
-
-            localSettings.Values["wallerror"] = stats;
+        private static string WallTaskName {
+            get {
+                return "WallUpdaterTask";
+            }
         }
 
+        private static string LockscreenTaskName {
+            get {
+                return "LockscreenUpdaterTask";
+            }
+        }
+
+        /// <summary>
+        /// Task's Entry Point
+        /// </summary>
+        /// <param name="taskInstance">Task starting the method</param>
         async void IBackgroundTask.Run(IBackgroundTaskInstance taskInstance) {
             taskInstance.Canceled += OnCanceled;
             var deferral = taskInstance.GetDeferral();
 
-            SaveTime();
+            SaveTime(taskInstance);
 
-            Wallpaper paper = await GetRandom();
+            Wallpaper photo = await GetRandom();
 
-            StorageFile wall = await DownloadImagefromServer(paper.URLRegular, paper.Id);
-            await SetWallpaperAsync(wall);
+            StorageFile file = await DownloadImagefromServer(photo.URLRegular, photo.Id);
+
+            if (taskInstance.Task.Name == WallTaskName) {
+                await SetWallpaperAsync(file);
+            } else {
+                await SetLockscreenAsync(file);
+            }
+            
             //SaveLockscreenBackgroundName(lockImage.Name);
             //SaveAppBackground(lockImage);
             deferral.Complete();
         }
 
-        private void SaveTime() {
+        string GetActivityKey(IBackgroundTaskInstance instance) {
+            string key = instance.Task.Name == WallTaskName ? WallTaskName : LockscreenTaskName;
+            key += "Activity";
+            return key;
+        }
+
+        private void OnCanceled(IBackgroundTaskInstance sender, BackgroundTaskCancellationReason reason) {
+            // Indicate that the background task is canceled.
+            _cancelRequested = true;
+
+            string key = GetActivityKey(sender);
+
             ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
-            ApplicationDataCompositeValue stats = new ApplicationDataCompositeValue {
-                ["date"] = DateTime.Now.ToString(),
-                ["date"] = "",
-                ["error"] = ""
+            ApplicationDataCompositeValue activityError = new ApplicationDataCompositeValue {
+                ["DateTime"] = DateTime.Now.ToLocalTime(),
+                ["Exception"] = reason.ToString()
             };
 
-            localSettings.Values["wallstats"] = stats;
+            localSettings.Values[key] = activityError;
+        }
 
-            // Empty error
-            ApplicationDataCompositeValue error = new ApplicationDataCompositeValue();
-            localSettings.Values["wallerror"] = error;
+        private void SaveTime(IBackgroundTaskInstance instance) {
+            var key = GetActivityKey(instance);
+
+            ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
+            ApplicationDataCompositeValue stats = new ApplicationDataCompositeValue {
+                ["DateTime"] = DateTime.Now.ToString(),
+                ["Exception"] = null
+            };
+
+            localSettings.Values[key] = stats;
         }
 
         private async Task<Wallpaper> GetRandom() {

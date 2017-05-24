@@ -1,5 +1,6 @@
 ﻿using System;
 using Windows.ApplicationModel.Background;
+using Windows.Storage;
 
 namespace Hangon.Services {
     public class BackgroundTask {        
@@ -78,7 +79,8 @@ namespace Hangon.Services {
 
             BackgroundExecutionManager.RemoveAccess();
             BackgroundAccessStatus status = await BackgroundExecutionManager.RequestAccessAsync();
-            if (status == BackgroundAccessStatus.Denied) {
+            if (status == BackgroundAccessStatus.DeniedByUser ||
+                status == BackgroundAccessStatus.DeniedBySystemPolicy) {
                 return;
             }
 
@@ -105,5 +107,16 @@ namespace Hangon.Services {
             }
         }
 
+        public static ApplicationDataCompositeValue GetWallTaskActivity() {
+            var key = "WallUpdaterTask" + "Activity";
+            var settingsValues = ApplicationData.Current.LocalSettings.Values;
+            return settingsValues.ContainsKey(key) ? (ApplicationDataCompositeValue)settingsValues[key] : null;
+        }
+
+        public static ApplicationDataCompositeValue GetLockscreenTaskActivity() {
+            var key = "LockscreenUpdaterTask" + "Activity";
+            var settingsValues = ApplicationData.Current.LocalSettings.Values;
+            return settingsValues.ContainsKey(key) ? (ApplicationDataCompositeValue)settingsValues[key] : null;
+        }
     }
 }

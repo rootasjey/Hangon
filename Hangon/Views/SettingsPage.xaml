@@ -9,30 +9,60 @@
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <Pivot x:Name="PivotSettings">
-            <PivotItem Header="configuration">
+            <PivotItem Header="background tasks">
                 <ScrollViewer>
                     <StackPanel Margin="0,0,0,40">
-                        <TextBlock FontWeight="Light" FontSize="34" Typography.Capitals="AllSmallCaps" Text="wallpaper"/>
-                        <TextBlock Text="Periodically update wallpaper" 
+                        <StackPanel>
+                            <TextBlock FontSize="24" Text="wallpaper"/>
+                            <TextBlock Text="Periodically update wallpaper" 
                                        TextWrapping="Wrap"/>
-                        <ToggleSwitch x:Name="WallSwitch"
+                            <ToggleSwitch x:Name="WallSwitch"
                                       Toggled="WallSwitch_Toggled"/>
 
-                        <ComboBox x:Name="ComboboxTimeWall"
-                                  Visibility="Collapsed"
-                                  Margin="0, 20"
-                                  SelectedIndex="2"
-                                  SelectionChanged="ComboboxTimeWall_SelectionChanged">
-                            <ComboBoxItem Content="15"/>
-                            <ComboBoxItem Content="30"/>
-                            <ComboBoxItem Content="60"/>
-                            <ComboBoxItem Content="120"/>
-                            <ComboBoxItem Content="360"/>
-                        </ComboBox>
+                            <ComboBox x:Name="WallIntervalUpdates"
+                                      Header="period"
+                                      Visibility="Collapsed"
+                                      Margin="0, 20"
+                                      SelectedIndex="2"
+                                      SelectionChanged="WallIntervalUpdates_SelectionChanged">
+                                <ComboBoxItem Content="15 min" Tag="15"/>
+                                <ComboBoxItem Content="half an hour" Tag="30"/>
+                                <ComboBoxItem Content="every hour" Tag="60"/>
+                                <ComboBoxItem Content="every 3 hours" Tag="180"/>
+                                <ComboBoxItem Content="every day" Tag="1380"/>
+                            </ComboBox>
 
-                        <StackPanel x:Name="WallTaskInfos" Margin="0,10" Visibility="Collapsed">
-                            <TextBlock x:Name="LastUpdatedTask" Text="Never run"/>
-                            <TextBlock x:Name="LastError" Text="No error"/>
+                            <StackPanel x:Name="WallTaskActivity" Margin="0,10" Visibility="Collapsed">
+                                <TextBlock x:Name="LastUpdatedTask" Text="Never run"/>
+                                <TextBlock x:Name="LastWallTaskError" Text="No error"/>
+                            </StackPanel>
+                        </StackPanel>
+
+                        <StackPanel>
+                            <TextBlock FontSize="24" Text="lockscreen"/>
+                            <TextBlock Text="Periodically update lockscreen background" 
+                                       TextWrapping="Wrap"/>
+                            <ToggleSwitch x:Name="LockscreenSwitch"
+                                      Toggled="LockscreenSwitch_Toggled"/>
+
+
+                            <ComboBox x:Name="LockscreenIntervalUpdates"
+                                      Header="period"
+                                      Visibility="Collapsed"
+                                      Margin="0, 20"
+                                      SelectedIndex="2"
+                                      SelectionChanged="LockscreenIntervalUpdate_SelectionChanged">
+                                <ComboBoxItem Content="15 min" Tag="15"/>
+                                <ComboBoxItem Content="half an hour" Tag="30"/>
+                                <ComboBoxItem Content="every hour" Tag="60"/>
+                                <ComboBoxItem Content="every 3 hours" Tag="180"/>
+                                <ComboBoxItem Content="every day" Tag="1380"/>
+                            </ComboBox>
+
+                            <StackPanel x:Name="LockscreenTaskActivity" Margin="0,10" Visibility="Collapsed">
+                                <TextBlock x:Name="LastUpdatedLockscreenTask" Text="Never run"/>
+                                <TextBlock x:Name="LastLockscreenTaskError" Text="No error"/>
+                            </StackPanel>
                         </StackPanel>
                     </StackPanel>
                 </ScrollViewer>
