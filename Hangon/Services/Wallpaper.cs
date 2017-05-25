@@ -133,7 +133,7 @@ namespace Hangon.Services {
             async Task<StorageFile> GetFileFromDefaultLocation()
             {
                 StorageFolder storageFolder = KnownFolders.SavedPictures;
-                return await storageFolder.CreateFileAsync(photo.Id, CreationCollisionOption.ReplaceExisting);
+                return await storageFolder.CreateFileAsync(string.Format("{0}.jpg", photo.Id), CreationCollisionOption.ReplaceExisting);
             }
 
             async Task<StorageFile> GetFileFromPicker()

@@ -27,6 +27,12 @@ namespace Hangon.Services {
                 return "DefaultDownloadResolution";
             }
         }
+
+        private static string LanguageKey {
+            get {
+                return "Language";
+            }
+        }
         #endregion keys
 
         #region path
@@ -69,8 +75,29 @@ namespace Hangon.Services {
         public static string GetDefaultDownloadResolution() {
             var settingsValues = ApplicationData.Current.LocalSettings.Values;
             return settingsValues.ContainsKey(DefaultDownloadResolutionKey) ?
-                (string)settingsValues[DefaultDownloadResolutionKey] : null;
+                (string)settingsValues[DefaultDownloadResolutionKey] : "raw";
+        }
+
+        public static void SaveDefaultDownloadResolution(string resolution) {
+            var settingsValues = ApplicationData.Current.LocalSettings.Values;
+            settingsValues[DefaultDownloadResolutionKey] = resolution;
         }
         #endregion resolution
+
+        #region lang
+        public static void SaveAppCurrentLanguage(string language) {
+            var settingsValues = ApplicationData.Current.LocalSettings.Values;
+            settingsValues[LanguageKey] = language;
+        }
+
+        public static string GetAppCurrentLanguage() {
+            var settingsValues = ApplicationData.Current.LocalSettings.Values;
+            return settingsValues.ContainsKey(LanguageKey) ? (string)settingsValues[LanguageKey] : null;
+        }
+        #endregion lang
+
+        #region downloads
+
+        #endregion downloads
     }
 }

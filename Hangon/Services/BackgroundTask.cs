@@ -3,7 +3,8 @@ using Windows.ApplicationModel.Background;
 using Windows.Storage;
 
 namespace Hangon.Services {
-    public class BackgroundTask {        
+    public class BackgroundTask {
+        #region variables
         private static string WallTaskName {
             get {
                 return "WallUpdaterTask";
@@ -13,6 +14,12 @@ namespace Hangon.Services {
         private static string WallTaskEntryPoint {
             get {
                 return "Tasks.WallUpdater";
+            }
+        }
+
+        private static string WallTaskInterval {
+            get {
+                return "WallTaskInterval";
             }
         }
 
@@ -27,7 +34,15 @@ namespace Hangon.Services {
                 return "Tasks.WallUpdater";
             }
         }
-        
+
+        private static string LockscreenTaskInterval {
+            get {
+                return "LockscreenTaskInterval";
+            }
+        }
+        #endregion variables
+
+        #region wall task
         public static bool IsWallTaskActive() {
             foreach (var task in BackgroundTaskRegistration.AllTasks) {
                 if (task.Value.Name == WallTaskName) {
@@ -49,6 +64,24 @@ namespace Hangon.Services {
             UnregisterBackgroundTask(WallTaskName);
         }
 
+        public static void SaveWallTaskInterval(uint interval) {
+            var settingsValues = ApplicationData.Current.LocalSettings.Values;
+            settingsValues[WallTaskInterval] = interval;
+        }
+
+        public static uint GetWallTaskInterval() {
+            var settingsValues = ApplicationData.Current.LocalSettings.Values;
+            return settingsValues.ContainsKey(WallTaskInterval) ? (uint)settingsValues[WallTaskInterval] : 60;
+        }
+
+        public static ApplicationDataCompositeValue GetWallTaskActivity() {
+            var key = "WallUpdaterTask" + "Activity";
+            var settingsValues = ApplicationData.Current.LocalSettings.Values;
+            return settingsValues.ContainsKey(key) ? (ApplicationDataCompositeValue)settingsValues[key] : null;
+        }
+        #endregion wall task
+
+        #region lockscreen task
         public static bool IsLockscreenTaskActive() {
             foreach (var task in BackgroundTaskRegistration.AllTasks) {
                 if (task.Value.Name == LockscreenTaskName) {
@@ -56,6 +89,16 @@ namespace Hangon.Services {
                 }
             }
             return false;
+        }
+
+        public static void SaveLockscreenTaskInterval(uint interval) {
+            var settingsValues = ApplicationData.Current.LocalSettings.Values;
+            settingsValues[LockscreenTaskInterval] = interval;
+        }
+
+        public static uint GetLockscreenTaskInterval() {
+            var settingsValues = ApplicationData.Current.LocalSettings.Values;
+            return settingsValues.ContainsKey(LockscreenTaskInterval) ? (uint)settingsValues[LockscreenTaskInterval] : 60;
         }
 
         public static void RegisterLockscreenTask(uint interval) {
@@ -70,7 +113,15 @@ namespace Hangon.Services {
             UnregisterBackgroundTask(LockscreenTaskName);
         }
 
-        public static async void RegisterBackgroundTask(string taskName, string entryPoint, uint interval) {
+        public static ApplicationDataCompositeValue GetLockscreenTaskActivity() {
+            var key = "LockscreenUpdaterTask" + "Activity";
+            var settingsValues = ApplicationData.Current.LocalSettings.Values;
+            return settingsValues.ContainsKey(key) ? (ApplicationDataCompositeValue)settingsValues[key] : null;
+        }
+
+        #endregion lockscreen task
+
+        private static async void RegisterBackgroundTask(string taskName, string entryPoint, uint interval) {
             foreach (var task in BackgroundTaskRegistration.AllTasks) {
                 if (task.Value.Name == taskName) {
                     return;
@@ -107,16 +158,5 @@ namespace Hangon.Services {
             }
         }
 
-        public static ApplicationDataCompositeValue GetWallTaskActivity() {
-            var key = "WallUpdaterTask" + "Activity";
-            var settingsValues = ApplicationData.Current.LocalSettings.Values;
-            return settingsValues.ContainsKey(key) ? (ApplicationDataCompositeValue)settingsValues[key] : null;
-        }
-
-        public static ApplicationDataCompositeValue GetLockscreenTaskActivity() {
-            var key = "LockscreenUpdaterTask" + "Activity";
-            var settingsValues = ApplicationData.Current.LocalSettings.Values;
-            return settingsValues.ContainsKey(key) ? (ApplicationDataCompositeValue)settingsValues[key] : null;
-        }
     }
 }
