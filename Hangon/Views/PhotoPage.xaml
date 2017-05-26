@@ -4,6 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:data="using:Hangon.Models"
     mc:Ignorable="d">
 
     <Page.Resources>
@@ -15,7 +16,7 @@
         </MenuFlyout>
     </Page.Resources>
     
-    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    <Grid Background="Black">
 
         <FlyoutPresenter x:Name="FlyoutNotification" 
                          Visibility="Collapsed"
@@ -33,16 +34,109 @@
                 </Grid>
             </StackPanel>
         </FlyoutPresenter>
-        
-        <Image x:Name="PhotoView" Stretch="UniformToFill"
-               VerticalAlignment="Center" HorizontalAlignment="Center">
-        </Image>
 
-        <Grid x:Name="ViewInfos">
+        <Grid x:Name="PhotoViewContainer" Loaded="PhotoViewContainer_Loaded">
+            <Image x:Name="PhotoView" Stretch="UniformToFill"
+                   VerticalAlignment="Center" HorizontalAlignment="Center">
+            </Image>
 
+            <Grid x:Name="PhotoDimmer"/>
         </Grid>
+        
+        <ScrollViewer x:Name="PhotoCaption"
+                      Opacity="0"
+                      Margin="0,0,0,0"
+                      Canvas.ZIndex="1"
+                      Padding="0,40">
+
+            <Grid x:Name="PhotoCaptionContent" 
+                  Loaded="PhotoCaptionContent_Loaded"
+                  Unloaded="PhotoCaptionContent_Unloaded">
+                <Grid.RowDefinitions>
+                    <RowDefinition x:Name="RowSpacing" Height="500"/>
+                    <RowDefinition x:Name="RowUser" Height="200"/>
+                    <RowDefinition x:Name="RowStats" Height="150"/>
+                    <RowDefinition x:Name="RowExif" Height="Auto"/>
+                    <RowDefinition x:Name="RowDate" Height="70"/>
+                    <RowDefinition Height="60"/>
+                </Grid.RowDefinitions>
+                
+                <StackPanel x:Name="UserView"
+                            Grid.Row="1"
+                            HorizontalAlignment="Center"
+                            Margin="0,0"
+                            Padding="12">
+                    <Ellipse x:Name="UserAvatar" 
+                            Grid.Column="0" 
+                            Height="60" Width="60"
+                            PointerEntered="UserView_PointerEntered"
+                            PointerExited="UserView_PointerExited"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center">
+                        <Ellipse.Fill>
+                            <ImageBrush Stretch="UniformToFill">
+                                <ImageBrush.ImageSource>
+                                    <BitmapImage x:Name="UserImageSource" />
+                                </ImageBrush.ImageSource>
+                            </ImageBrush>
+                        </Ellipse.Fill>
+                    </Ellipse>
+
+                    <Grid Background="{ThemeResource SystemControlHighlightAccentBrush}"
+                          Margin="0,20,0,0" 
+                          Padding="10"
+                          Height="40">
+                        <TextBlock x:Name="UserName" 
+                                   FontSize="20"
+                                   Foreground="White"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"/>
+                    </Grid>
+                    <TextBlock x:Name="UserLocation" Opacity=".6" Foreground="White" TextAlignment="Center" />
+                </StackPanel>
+
+                <StackPanel x:Name="StatsPanel" Grid.Row="2" HorizontalAlignment="Center"
+                            Margin="0,20">
+                    <StackPanel Orientation="Horizontal">
+                        <FontIcon Glyph="&#xE118;" FontSize="28" Foreground="White"/>
+                        <TextBlock x:Name="StatsDownloads" FontSize="26" Foreground="White"
+                                   TextAlignment="Center"
+                                   Margin="20,0"/>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                        <FontIcon Glyph="&#xE006;" FontSize="28" Foreground="White"/>
+                        <TextBlock x:Name="StatsLikes" FontSize="26" Foreground="White"
+                                   TextAlignment="Center"
+                                   Margin="20,0"/>
+                    </StackPanel>
+                </StackPanel>
+
+                <StackPanel x:Name="ExifPanel" Grid.Row="3" HorizontalAlignment="Center">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="70"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <FontIcon x:Name="IconCamera" Glyph="&#xE114;" FontSize="30" Foreground="White"/>
+                        <StackPanel Grid.Column="1">
+                            <TextBlock x:Name="ExifMake" FontSize="24" Foreground="White"/>
+                            <TextBlock x:Name="ExifModel" Foreground="White"/>
+                        </StackPanel>
+                    </Grid>
+                </StackPanel>
+
+                <TextBlock x:Name="PublishedOn" Foreground="White" 
+                           Grid.Row="4" HorizontalAlignment="Center"
+                           FontSize="24"
+                           Opacity=".6"/>
+            </Grid>
+
+        </ScrollViewer>
 
         <CommandBar x:Name="AppBar"
+                    Canvas.ZIndex="2"
                     VerticalAlignment="Bottom">
             <AppBarButton x:Name="CmdCrop" Visibility="Collapsed" Label="crop" Icon="Crop" Tapped="CmdCrop_Tapped"/>
             <AppBarButton x:Name="CmdDownload" Label="download" Icon="Download" Tapped="CmdDownload_Tapped"/>

@@ -4,52 +4,17 @@ namespace Hangon.Models {
     public class Photo {
 
         #region simple properties
-        private string _Id;
-        public string Id {
-            get {
-                return _Id;
-            }
-            set {
-                if (_Id != value) {
-                    _Id = value;
-                }
-            }
-        }
+        public string Id { get; set; }
 
-        private string _CreatedAt;
+        public string CreatedAt { get; set; }
 
-        public string CreatedAt {
-            get { return _CreatedAt; }
-            set { _CreatedAt = value; }
-        }
+        public string UpdatedAt { get; set; }
 
-        private string _UpdatedAt;
+        public int Width { get; set; }
 
-        public string UpdatedAt {
-            get { return _UpdatedAt; }
-            set { _UpdatedAt = value; }
-        }
+        public int Height { get; set; }
 
-        private int _Width;
-
-        public int Width {
-            get { return _Width; }
-            set { _Width = value; }
-        }
-
-        private int _Height;
-
-        public int Height {
-            get { return _Height; }
-            set { _Height = value; }
-        }
-
-        private string _Color;
-
-        public string Color {
-            get { return _Color; }
-            set { _Color = value; }
-        }
+        public string Color { get; set; }
 
         private int _Downloads;
 
@@ -82,33 +47,19 @@ namespace Hangon.Models {
         #endregion simple properties
 
         #region composed properties
-        private List<Collection> _CurrentUserCollection;
+        public List<Collection> CurrentUserCollection { get; set; }
 
-        public List<Collection> CurrentUserCollection {
-            get { return _CurrentUserCollection; }
-            set { _CurrentUserCollection = value; }
-        }
+        public Urls Urls { get; set; }
 
-        private Urls _Urls;
+        public List<Categories> Categories { get; set; }
 
-        public Urls Urls {
-            get { return _Urls; }
-            set { _Urls = value; }
-        }
+        public User User { get; set; }
 
-        private List<Categories> _Categories;
+        public Exif Exif { get; set; }
 
-        public List<Categories> Categories {
-            get { return _Categories; }
-            set { _Categories = value; }
-        }
+        public Location Location { get; set; }
 
-        private User _User;
-
-        public User User {
-            get { return _User; }
-            set { _User = value; }
-        }
+        public PhotoLinks Links { get; set; }
 
         #endregion composed properties
     }
@@ -123,47 +74,17 @@ namespace Hangon.Models {
     }
 
     public class Exif {
-        private string _Make;
+        public string Make { get; set; }
 
-        public string Make {
-            get { return _Make; }
-            set { _Make = value; }
-        }
+        public string Model { get; set; }
 
-        private string _Model;
+        public string ExposureTime { get; set; }
 
-        public string Model {
-            get { return _Model; }
-            set { _Model = value; }
-        }
+        public string Aperture { get; set; }
 
-        private string _ExposureTime;
+        public string FocalLength { get; set; }
 
-        public string ExposureTime {
-            get { return _ExposureTime; }
-            set { _ExposureTime = value; }
-        }
-
-        private string _Aperture;
-
-        public string Aperture {
-            get { return _Aperture; }
-            set { _Aperture = value; }
-        }
-
-        private string _FocalLength;
-
-        public string FocalLength {
-            get { return _FocalLength; }
-            set { _FocalLength = value; }
-        }
-
-        private int _Iso;
-
-        public int Iso {
-            get { return _Iso; }
-            set { _Iso = value; }
-        }
+        public int? Iso { get; set; }
     }
 
     public class Location {

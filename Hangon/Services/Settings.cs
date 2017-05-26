@@ -1,5 +1,4 @@
-﻿using System;
-using Windows.Storage;
+﻿using Windows.Storage;
 
 namespace Hangon.Services {
     public class Settings {
@@ -95,9 +94,6 @@ namespace Hangon.Services {
             return settingsValues.ContainsKey(LanguageKey) ? (string)settingsValues[LanguageKey] : null;
         }
         #endregion lang
-
-        #region downloads
-
-        #endregion downloads
+        
     }
 }
