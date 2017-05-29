@@ -7,6 +7,10 @@
 
         public string Name { get; set; }
 
+        public string FirstName { get; set; }
+
+        public string LastName { get; set; }
+
         public string PortfolioUrl { get; set; }
 
         public string Bio { get; set; }
@@ -18,6 +22,8 @@
         public int TotalPhotos { get; set; }
 
         public int TotalCollections { get; set; }
+
+        public string UpdatedAt { get; set; }
 
         private bool _FollowedByUser;
 

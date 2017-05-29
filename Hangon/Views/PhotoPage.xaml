@@ -45,6 +45,7 @@
         
         <ScrollViewer x:Name="PhotoCaption"
                       Opacity="0"
+                      RequestedTheme="Dark"
                       Margin="0,0,0,0"
                       Canvas.ZIndex="1"
                       Padding="0,40">
@@ -55,6 +56,7 @@
                 <Grid.RowDefinitions>
                     <RowDefinition x:Name="RowSpacing" Height="500"/>
                     <RowDefinition x:Name="RowUser" Height="200"/>
+                    <RowDefinition x:Name="RowUnsplashAttribution" Height="50"/>
                     <RowDefinition x:Name="RowStats" Height="150"/>
                     <RowDefinition x:Name="RowExif" Height="Auto"/>
                     <RowDefinition x:Name="RowDate" Height="70"/>
@@ -65,8 +67,9 @@
                             Grid.Row="1"
                             HorizontalAlignment="Center"
                             Margin="0,0"
-                            Padding="12">
-                    <Ellipse x:Name="UserAvatar" 
+                            Padding="12"
+                            Tapped="UserView_Tapped">
+                    <Ellipse x:Name="UserProfileImage" 
                             Grid.Column="0" 
                             Height="60" Width="60"
                             PointerEntered="UserView_PointerEntered"
@@ -92,10 +95,19 @@
                                    HorizontalAlignment="Center"
                                    VerticalAlignment="Center"/>
                     </Grid>
-                    <TextBlock x:Name="UserLocation" Opacity=".6" Foreground="White" TextAlignment="Center" />
+                    <TextBlock x:Name="UserLocation" Opacity=".6" TextAlignment="Center" />
                 </StackPanel>
 
-                <StackPanel x:Name="StatsPanel" Grid.Row="2" HorizontalAlignment="Center"
+                <TextBlock x:Name="UnsplashAttribution" 
+                           Text="Unsplash"
+                           HorizontalAlignment="Center"
+                           Opacity=".6"
+                           FontSize="20"
+                           FontWeight="Bold" 
+                           Grid.Row="2"
+                           Tapped="OpenPhotoInBrowser_Tapped"/>
+
+                <StackPanel x:Name="StatsPanel" Grid.Row="3" HorizontalAlignment="Center"
                             Margin="0,20">
                     <StackPanel Orientation="Horizontal">
                         <FontIcon Glyph="&#xE118;" FontSize="28" Foreground="White"/>
@@ -112,7 +124,7 @@
                     </StackPanel>
                 </StackPanel>
 
-                <StackPanel x:Name="ExifPanel" Grid.Row="3" HorizontalAlignment="Center">
+                <StackPanel x:Name="ExifPanel" Grid.Row="4" HorizontalAlignment="Center">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="70"/>
@@ -128,7 +140,7 @@
                 </StackPanel>
 
                 <TextBlock x:Name="PublishedOn" Foreground="White" 
-                           Grid.Row="4" HorizontalAlignment="Center"
+                           Grid.Row="5" HorizontalAlignment="Center"
                            FontSize="24"
                            Opacity=".6"/>
             </Grid>

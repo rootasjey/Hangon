@@ -107,7 +107,7 @@
     <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Models\Wallpaper.cs" />
+    <Compile Include="Models\Photo.cs" />
     <Compile Include="WallUpdater.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

@@ -1,5 +1,5 @@
 ﻿namespace Tasks.Models {
-    public sealed class Wallpaper {
+    public sealed class Photo {
         private string _id { get; set; }
         private int _likes { get; set; }
         private string _urlRaw { get; set; }

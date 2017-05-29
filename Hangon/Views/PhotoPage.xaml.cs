@@ -62,8 +62,7 @@ namespace Hangon.Views {
                 Frame.GoBack();
             }
         }
-
-
+        
         #endregion navigation
 
         #region data
@@ -229,7 +228,7 @@ namespace Hangon.Views {
 
         #region photo caption
         private void UpdatePhotoCaptionPosition() {
-            var height = Window.Current.Bounds.Height - 100;
+            var height = Window.Current.Bounds.Height - 150;
             RowSpacing.Height = new GridLength(height);
         }
 
@@ -332,5 +331,16 @@ namespace Hangon.Views {
 
 
         #endregion image composition
+
+        private void UserView_Tapped(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e) {
+            ConnectedAnimationService.GetForCurrentView().PrepareToAnimate("UserProfileImage", UserProfileImage);
+            Frame.Navigate(typeof(UserPage), CurrentPhoto);
+        }
+
+        private async void OpenPhotoInBrowser_Tapped(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e) {
+            var tracking = "?utm_source=Hangon&utm_medium=referral&utm_campaign=" + Unsplash.ApplicationId;
+            var photoUri = new Uri(string.Format("{0}{1}", CurrentPhoto.Links.Html, tracking));
+            var success = await Windows.System.Launcher.LaunchUriAsync(photoUri);
+        }
     }
 }

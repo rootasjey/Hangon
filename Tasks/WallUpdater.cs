@@ -36,7 +36,7 @@ namespace Tasks {
 
             SaveTime(taskInstance);
 
-            Wallpaper photo = await GetRandom();
+            Photo photo = await GetRandom();
 
             StorageFile file = await DownloadImagefromServer(photo.URLRegular, photo.Id);
 
@@ -84,8 +84,8 @@ namespace Tasks {
             localSettings.Values[key] = stats;
         }
 
-        private async Task<Wallpaper> GetRandom() {
-            Wallpaper paper = new Wallpaper();
+        private async Task<Photo> GetRandom() {
+            Photo paper = new Photo();
 
             HttpClient http = new HttpClient();
             http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Client-ID", "16246a4d58baa698a0a720106aab4ecedfe241c72205586da6ab9393424894a8");

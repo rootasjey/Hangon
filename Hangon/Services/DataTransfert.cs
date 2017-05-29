@@ -34,19 +34,15 @@ namespace Hangon.Services {
             //request.Data.SetText(text);
         }
 
-        //public static void Copy(Quote quote) {
-        //    DataPackage dataPackage = new DataPackage() {
-        //        RequestedOperation = DataPackageOperation.Copy
-        //    };
+        public static void Copy(string text) {
+            DataPackage dataPackage = new DataPackage() {
+                RequestedOperation = DataPackageOperation.Copy
+            };
 
-        //    dataPackage.SetText(quote.Content + " - " + quote.Author);
-        //    Clipboard.SetContent(dataPackage);
+            dataPackage.SetText(text);
+            Clipboard.SetContent(dataPackage);
 
-        //    ShowShareCompleted();
-        //}
-
-        public static void ShowShareCompleted() {
-            ShowLocalToast("Data copied!");
+            ShowLocalToast("User link copied!");
         }
 
         public static void ShowLocalToast(string message) {

@@ -10,16 +10,42 @@
     mc:Ignorable="d">
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <!-- Loading -->
+        <Grid x:Name="LoadingView" 
+              VerticalAlignment="Center" 
+              HorizontalAlignment="Center"
+              Visibility="Collapsed">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="20"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <ProgressBar x:Name="ProgressPage" IsIndeterminate="True"/>
+            <TextBlock Text="Loading photos from Unsplash..." FontSize="20" Grid.Row="1"/>
+        </Grid>
+
+        <StackPanel x:Name="EmptyView"
+              Visibility="Collapsed"
+              VerticalAlignment="Center"
+              HorizontalAlignment="Center">
+            <TextBlock Text="Sorry, I couldn't get data from Unsplash :("
+                       FontSize="20"
+                       TextWrapping="Wrap"/>
+            <Button x:Name="ButtonTryAgain" Content="try again" 
+                    Margin="0,20"
+                    HorizontalAlignment="Center"/>
+        </StackPanel>
+        
+        <!-- Data -->
         <controls:AdaptiveGridView x:Name="RecentView"
                                    DesiredWidth="300"
                                    ItemHeight="300"
-                                  animations:ReorderGridAnimation.Duration="300">
+                                   animations:ReorderGridAnimation.Duration="300">
             <GridView.ItemTemplate>
                 <DataTemplate x:DataType="data:Photo">
                     <StackPanel x:Name="WallItem"
                                 Opacity="0" 
-                                Tapped="WallItem_Tapped"
-                                Loaded="WallItem_Loaded">
+                                Tapped="PhotoItem_Tapped"
+                                Loaded="PhotoItem_Loaded">
                         
                         <controls:DropShadowPanel BlurRadius="10"
                                                 ShadowOpacity="0"

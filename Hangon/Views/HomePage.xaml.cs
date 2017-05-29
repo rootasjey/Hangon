@@ -7,6 +7,7 @@ using Windows.UI.Core;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Navigation;
+using Windows.UI.Xaml;
 
 namespace Hangon.Views {
     public sealed partial class HomePage : Page {
@@ -82,19 +83,35 @@ namespace Hangon.Views {
         }
 
         private async void LoadData() {
-            if (PageDataSource.Recent?.Count > 0) {
-                RecentView.ItemsSource = PageDataSource.Recent;
+            if (PageDataSource.NewPhotos?.Count > 0) {
+                RecentView.ItemsSource = PageDataSource.NewPhotos;
                 return;
             }
 
+            ShowLoadingView();
+
             var added = await PageDataSource.FetchRecent();
 
+            HideLoadingView();
+
             if (added>0) {
-                RecentView.ItemsSource = PageDataSource.Recent;
+                RecentView.ItemsSource = PageDataSource.NewPhotos;
+            } else {
+                EmptyView.Visibility = Visibility.Visible;
+            }
+
+            void ShowLoadingView()
+            {
+                LoadingView.Visibility = Visibility.Visible;
+            }
+
+            void HideLoadingView()
+            {
+                LoadingView.Visibility = Visibility.Collapsed;
             }
         }
 
-        private void WallItem_Tapped(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e) {
+        private void PhotoItem_Tapped(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e) {
             var item = (StackPanel)sender;
             var wallpaper = (Photo)item.DataContext;
             _LastSelectedWallpaper = wallpaper;
@@ -108,7 +125,7 @@ namespace Hangon.Views {
             Frame.Navigate(typeof(PhotoPage), wallpaper);
         }
 
-        private void WallItem_Loaded(object sender, Windows.UI.Xaml.RoutedEventArgs e) {
+        private void PhotoItem_Loaded(object sender, Windows.UI.Xaml.RoutedEventArgs e) {
             var wallItem = (StackPanel)sender;
 
             var data = (Photo)wallItem.DataContext;
@@ -155,7 +172,7 @@ namespace Hangon.Views {
         }
 
         private void CmdRefresh_Tapped(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e) {
-            PageDataSource.Recent.Clear();
+            PageDataSource.NewPhotos.Clear();
             LoadData();
         }
         #endregion commandbar

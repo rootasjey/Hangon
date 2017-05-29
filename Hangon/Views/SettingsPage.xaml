@@ -129,26 +129,25 @@
             <PivotItem Header="about">
                 <ScrollViewer Margin="0,20,0,0">
                     <StackPanel>
-                        <RichTextBlock x:Name="FeedbackBox">
-                            <Paragraph FontWeight="SemiLight" FontSize="24">feedback</Paragraph>
-                            <Paragraph Margin="0,0,0,0">
-                                Send an email if you encounter issues or if you've suggestions
-                            </Paragraph>
-                        </RichTextBlock>
+                        <TextBlock Text="feedback" FontSize="24"/>
+                        <TextBlock Text="Send an email if you encounter issues or if you've suggestions"
+                                   Opacity=".6" TextWrapping="Wrap"/>
                         <Button x:Name="FeedbackButton" Content="send a suggestion" Margin="0,12,0,40" Click="FeedbackButton_Click"/>
 
-                        <RichTextBlock x:Name="NoteBox" Margin="0,0,0,0">
-                            <Paragraph FontWeight="SemiLight" FontSize="24">notation</Paragraph>
-                            <Paragraph>
-                                Don't forgt to give the app a note on the store ;)
-                            </Paragraph>
-                        </RichTextBlock>
-                        <Button x:Name="NoteButton" Content="give a note" Margin="0,12,0,40" Click="NoteButton_Click"/>
+                        <TextBlock Text="notation" FontSize="24"/>
+                        <TextBlock Text="Don't forgt to give the app a note on the store ;)"
+                                   TextWrapping="Wrap"
+                                   Opacity=".6"/>
+                        
+                        <Button x:Name="NoteButton" 
+                                Content="give a note" 
+                                Margin="0,12,0,40" 
+                                Click="NoteButton_Click"/>
 
-                        <RichTextBlock x:Name="ImagesBox" Margin="0,0,0,40">
-                            <Paragraph FontWeight="SemiLight" FontSize="24">images</Paragraph>
+                        <TextBlock Text="images" FontSize="24"/>
+                        <RichTextBlock x:Name="ImagesBox" Margin="0,0,0,40" Opacity=".6">
                             <Paragraph>
-                                Images sources
+                                All photos are from
                                 <Hyperlink NavigateUri="https://unsplash.com/">Unsplash</Hyperlink>
                             </Paragraph>
                         </RichTextBlock>

@@ -7,25 +7,43 @@ using System.Threading.Tasks;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using Newtonsoft.Json.Linq;
+using System.Collections.Generic;
 
 namespace Hangon.Data {
     public class Unsplash {
-        public RecentWallpapers Recent { get; set; }
-
-        private static string _APIKEY {
+        public static string ApplicationId {
             get {
                 return "16246a4d58baa698a0a720106aab4ecedfe241c72205586da6ab9393424894a8";
             }
         }
 
-        private static string _BaseURI {
+        private static string BaseURI {
             get {
-                return "https://api.unsplash.com/photos";
+                return "https://api.unsplash.com/";
+            }
+        }
+
+        private static IDictionary<string, string> Endpoints = new Dictionary<string, string>() {
+            {"photos", "photos" },
+            {"search", "search" },
+            {"users", "users" }
+        };
+
+        public static string GetUrl(string type) {
+            switch (type) {
+                case "photos":
+                    return BaseURI + Endpoints["photos"];
+                case "users":
+                    return BaseURI + Endpoints["users"];
+                case "search":
+                    return BaseURI + Endpoints["search"];
+                default:
+                    return null;
             }
         }
 
         public static async Task<Photo> GetPhoto(string id) {
-            var url = string.Format("{0}/{1}", _BaseURI, id);
+            var url = string.Format("{0}/{1}/{2}", BaseURI, Endpoints["photos"], id);
             var response = await Fetch(url);
 
             if (response == null) return null;
@@ -99,9 +117,60 @@ namespace Hangon.Data {
             return photo;
         }
 
+        public static async Task<User> GetUser(string username) {
+            var url = string.Format("{0}/{1}/{2}", BaseURI, Endpoints["users"], username);
+            var response = await Fetch(url);
+
+            if (response == null) return null;
+            var parsedResponse = JObject.Parse(response);
+
+            var user = new User() {
+                Id = (string)parsedResponse["id"],
+                UpdatedAt = (string)parsedResponse["updated_at"],
+                FirstName = (string)parsedResponse["first_name"],
+                LastName = (string)parsedResponse["last_name"],
+                PortfolioUrl = (string)parsedResponse["portfolio_url"],
+                Bio = (string)parsedResponse["bio"],
+                Location = (string)parsedResponse["location"],
+                TotalLikes = (int)parsedResponse["total_likes"],
+                TotalPhotos = (int)parsedResponse["total_photos"],
+                TotalCollections = (int)parsedResponse["total_collections"],
+                FollowedByUser = (bool)parsedResponse["followed_by_user"],
+                FollowersCount=(int)parsedResponse["followers_count"],
+                FollowingCount=(int)parsedResponse["following_count"],
+
+                ProfileImage = new ProfileImage() {
+                    Small = (string)parsedResponse["profile_image"]["small"],
+                    Medium = (string)parsedResponse["profile_image"]["medium"],
+                    Large = (string)parsedResponse["profile_image"]["large"]
+                },
+
+                Badge = parsedResponse["badge"].Type == JTokenType.String || 
+                        parsedResponse["badge"].Type == JTokenType.Null ? 
+                        null : 
+                        new Badge() {
+                            Title = (string)parsedResponse["badge"]["title"],
+                            Primary = (bool)parsedResponse["badge"]["primary"],
+                            Slug = (string)parsedResponse["badge"]["slug"],
+                            Link = (string)parsedResponse["badge"]["link"],
+                        },
+
+                Links = new UserLinks() {
+                    Self = (string)parsedResponse["links"]["self"],
+                    Html = (string)parsedResponse["links"]["html"],
+                    Photos = (string)parsedResponse["links"]["photos"],
+                    Likes = (string)parsedResponse["links"]["likes"],
+                    Portfolio = (string)parsedResponse["links"]["portfolio"],
+                }
+            };
+
+            return user;
+        }
+
         private static async Task<string> Fetch(string url) {
             HttpClient http = new HttpClient();
-            http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Client-ID", "16246a4d58baa698a0a720106aab4ecedfe241c72205586da6ab9393424894a8");
+            http.DefaultRequestHeaders.Authorization = 
+                new AuthenticationHeaderValue("Client-ID", Unsplash.ApplicationId);
             HttpResponseMessage response = null;
 
             try {
@@ -114,27 +183,47 @@ namespace Hangon.Data {
                 return null;
             }
         }
-    }
 
-    public class RecentWallpapers: ObservableCollection<Photo>, ISupportIncrementalLoading {
-        public string URL {
-            get {
-                return "https://api.unsplash.com/photos";
+        public static List<Categories> ExtractCategories(JArray data) {
+            var categories = new List<Categories>();
+
+            if (data == null || data.Count == 0) return categories;
+
+            foreach (JObject item in data) {
+                var category = new Categories() {
+                    Id = (string)item["id"],
+                    Title = (string)item["title"],
+                    PhotoCount = (int)item["photo_count"],
+                    Links = new CategoriesLinks() {
+                        Self = (string)item["links"]["self"],
+                        Photos = (string)item["links"]["photos"],
+                    }
+                };
+
+                categories.Add(category);
             }
+
+            return categories;
         }
 
-        public int Page { get; set; }
+    }
 
-        public async Task<int> FetchRecent() {
+    public class PhotosCollection: ObservableCollection<Photo>, ISupportIncrementalLoading {
+        public string Url { get; set; }
+        public int Page { get; set; }
+        public bool HasMoreItems { get; set; }
+
+        public async Task<int> Fetch() {
             HttpClient http = new HttpClient();
-            http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Client-ID", "16246a4d58baa698a0a720106aab4ecedfe241c72205586da6ab9393424894a8");
+            http.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue("Client-ID", Unsplash.ApplicationId);
             HttpResponseMessage response = null;
 
             HasMoreItems = true;
 
             Page++;
             int added = 0;
-            string fetchURL = string.Format("{0}?page={1}", URL, Page);
+            string fetchURL = string.Format("{0}?page={1}", Url, Page);
 
             try {
                 response = await http.GetAsync(fetchURL);
@@ -143,19 +232,59 @@ namespace Hangon.Data {
 
                 JArray jsonList = JArray.Parse(responseBodyAsText);
 
-                foreach (JObject jsonItem in jsonList) {
-                    var wallpaper = new Photo() {
-                        Id = (string)jsonItem.GetValue("id"),
+                foreach (JObject item in jsonList) {
+                    var photo = new Photo() {
+                        Id = (string)item["cover_photo"]["id"],
+                        Width = (int)item["cover_photo"]["width"],
+                        Height = (int)item["cover_photo"]["height"],
+                        Color = (string)item["cover_photo"]["color"],
+                        Likes = (int)item["cover_photo"]["likes"],
+                        LikedByUser = (bool)item["cover_photo"]["liked_by_user"],
+
+                        User = new User() {
+                            Id = (string)item["cover_photo"]["user"]["id"],
+                            Username = (string)item["cover_photo"]["user"]["username"],
+                            Name = (string)item["cover_photo"]["user"]["name"],
+                            PortfolioUrl = (string)item["cover_photo"]["user"]["portfolio_url"],
+                            Bio = (string)item["cover_photo"]["user"]["bio"],
+                            Location = (string)item["cover_photo"]["user"]["location"],
+                            TotalLikes = (int)item["cover_photo"]["user"]["total_likes"],
+                            TotalPhotos = (int)item["cover_photo"]["user"]["total_photos"],
+                            TotalCollections = (int)item["cover_photo"]["user"]["total_collections"],
+
+                            ProfileImage = new ProfileImage() {
+                                Small = (string)item["cover_photo"]["user"]["profile_image"]["small"],
+                                Medium = (string)item["cover_photo"]["user"]["profile_image"]["medium"],
+                                Large = (string)item["cover_photo"]["user"]["profile_image"]["large"],
+                            },
+
+                            Links = new UserLinks() {
+                                Self = (string)item["cover_photo"]["user"]["links"]["self"],
+                                Html = (string)item["cover_photo"]["user"]["links"]["html"],
+                                Photos = (string)item["cover_photo"]["user"]["links"]["photos"],
+                                Likes = (string)item["cover_photo"]["user"]["links"]["likes"],
+                                Portfolio = (string)item["cover_photo"]["user"]["links"]["portfolio"],
+                            }
+                        },
+
                         Urls = new Urls() {
-                            Raw = (string)jsonItem["urls"]["raw"],
-                            Regular = (string)jsonItem["urls"]["regular"],
-                            Thumbnail = (string)jsonItem["urls"]["thumb"],
-                            Full = (string)jsonItem["urls"]["full"],
-                            Small = (string)jsonItem["urls"]["small"]
+                            Raw = (string)item["cover_photo"]["urls"]["raw"],
+                            Full = (string)item["cover_photo"]["urls"]["full"],
+                            Regular = (string)item["cover_photo"]["urls"]["regular"],
+                            Small = (string)item["cover_photo"]["urls"]["small"],
+                            Thumbnail = (string)item["cover_photo"]["urls"]["thumb"],
+                        },
+
+                        Categories = Unsplash.ExtractCategories((JArray)item["cover_photo"]["categories"]),
+
+                        Links = new PhotoLinks() {
+                            Self = (string)item["cover_photo"]["links"]["self"],
+                            Html = (string)item["cover_photo"]["links"]["html"],
+                            Download = (string)item["cover_photo"]["links"]["download"],
                         }
                     };
 
-                    Add(wallpaper);
+                    Add(photo);
                     added++;
                 }
 
@@ -167,17 +296,162 @@ namespace Hangon.Data {
                 return 0;
             }
         }
-        
-        public bool HasMoreItems { get; set; }
 
         IAsyncOperation<LoadMoreItemsResult> ISupportIncrementalLoading.LoadMoreItemsAsync(uint count) {
             return LoadMore(count).AsAsyncOperation();
         }
 
         public virtual async Task<LoadMoreItemsResult> LoadMore(uint count) {
-            var added = await FetchRecent();
+            var added = await Fetch();
             return new LoadMoreItemsResult() { Count = (uint)added };
+        }
+    }
 
+    public class CollectionsCollection: ObservableCollection<Collection>, ISupportIncrementalLoading {
+        public string Url { get; set; }
+        public int Page { get; set; }
+        public bool HasMoreItems { get; set; }
+
+        public async Task<int> Fetch() {
+            HttpClient http = new HttpClient();
+            http.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue("Client-ID", Unsplash.ApplicationId);
+            HttpResponseMessage response = null;
+
+            HasMoreItems = true;
+
+            Page++;
+            int added = 0;
+            string fetchURL = string.Format("{0}?page={1}", Url, Page);
+
+            try {
+                response = await http.GetAsync(fetchURL);
+                response.EnsureSuccessStatusCode();
+                string responseBodyAsText = await response.Content.ReadAsStringAsync();
+
+                JArray jsonList = JArray.Parse(responseBodyAsText);
+
+                foreach (JObject item in jsonList) {
+                    var collection = new Collection() {
+                        Id = (string)item["id"],
+                        Title = (string)item["title"],
+                        Description = (string)item["description"],
+                        PublishedAt = (string)item["published_at"],
+                        UpdatedAt = (string)item["updated_at"],
+                        IsCurrated = (bool)item["curated"],
+                        TotalPhotos = (int)item["total_photos"],
+                        IsPrivate=(bool)item["private"],
+                        ShareKey = (string)item["share_key"],
+
+                        CoverPhoto = item["cover_photo"].Type == JTokenType.Null ||
+                                     item["cover_photo"].Type == JTokenType.String ?
+                                    null :
+                                    new Photo() {
+                                        Id = (string)item["cover_photo"]["id"],
+                                        Width = (int)item["cover_photo"]["width"],
+                                        Height = (int)item["cover_photo"]["height"],
+                                        Color = (string)item["cover_photo"]["color"],
+                                        Likes = (int)item["cover_photo"]["likes"],
+                                        LikedByUser = (bool)item["cover_photo"]["liked_by_user"],
+
+                                        User = new User() {
+                                            Id = (string)item["cover_photo"]["user"]["id"],
+                                            Username = (string)item["cover_photo"]["user"]["username"],
+                                            Name = (string)item["cover_photo"]["user"]["name"],
+                                            PortfolioUrl = (string)item["cover_photo"]["user"]["portfolio_url"],
+                                            Bio = (string)item["cover_photo"]["user"]["bio"],
+                                            Location = (string)item["cover_photo"]["user"]["location"],
+                                            TotalLikes = (int)item["cover_photo"]["user"]["total_likes"],
+                                            TotalPhotos = (int)item["cover_photo"]["user"]["total_photos"],
+                                            TotalCollections = (int)item["cover_photo"]["user"]["total_collections"],
+
+                                            ProfileImage = new ProfileImage() {
+                                                Small = (string)item["cover_photo"]["user"]["profile_image"]["small"],
+                                                Medium = (string)item["cover_photo"]["user"]["profile_image"]["medium"],
+                                                Large = (string)item["cover_photo"]["user"]["profile_image"]["large"],
+                                            },
+
+                                            Links = new UserLinks() {
+                                                Self = (string)item["cover_photo"]["user"]["links"]["self"],
+                                                Html = (string)item["cover_photo"]["user"]["links"]["html"],
+                                                Photos = (string)item["cover_photo"]["user"]["links"]["photos"],
+                                                Likes = (string)item["cover_photo"]["user"]["links"]["likes"],
+                                                Portfolio = (string)item["cover_photo"]["user"]["links"]["portfolio"],
+                                            }
+                                        },
+
+                                        Urls = new Urls() {
+                                            Raw = (string)item["cover_photo"]["urls"]["raw"],
+                                            Full = (string)item["cover_photo"]["urls"]["full"],
+                                            Regular = (string)item["cover_photo"]["urls"]["regular"],
+                                            Small = (string)item["cover_photo"]["urls"]["small"],
+                                            Thumbnail = (string)item["cover_photo"]["urls"]["thumb"],
+                                        },
+
+                                        Categories =  Unsplash.ExtractCategories((JArray)item["cover_photo"]["categories"]),
+
+                                        Links = new PhotoLinks() {
+                                            Self = (string)item["cover_photo"]["links"]["self"],
+                                            Html = (string)item["cover_photo"]["links"]["html"],
+                                            Download = (string)item["cover_photo"]["links"]["download"],
+                                        }
+                                    },
+
+                        User = new User() {
+                            Id = (string)item["user"]["id"],
+                            UpdatedAt = (string)item["user"]["updated_at"],
+                            Username = (string)item["user"]["username"],
+                            Name = (string)item["user"]["name"],
+                            PortfolioUrl = (string)item["user"]["portfolio_url"],
+                            Bio = (string)item["user"]["bio"],
+                            Location = (string)item["user"]["location"],
+                            TotalLikes = (int)item["user"]["total_likes"],
+                            TotalPhotos = (int)item["user"]["total_photos"],
+                            TotalCollections = (int)item["user"]["total_collections"],
+
+                            ProfileImage = new ProfileImage() {
+                                Small = (string)item["user"]["profile_image"]["small"],
+                                Medium = (string)item["user"]["profile_image"]["mediuim"],
+                                Large = (string)item["user"]["profile_image"]["large"],
+                            },
+
+                            Links = new UserLinks() {
+                                Self = (string)item["user"]["links"]["self"],
+                                Html = (string)item["user"]["links"]["html"],
+                                Photos = (string)item["user"]["links"]["photos"],
+                                Likes = (string)item["user"]["links"]["likes"],
+                                Portfolio = (string)item["user"]["links"]["portfolio"],
+                            }
+                        },
+
+                        Links = new CollectionLinks() {
+                            Self = (string)item["links"]["self"],
+                            Html = (string)item["links"]["html"],
+                            Photos = (string)item["links"]["photos"],
+                            Related = (string)item["links"]["related"],
+                        }
+                    };
+
+                    Add(collection);
+                    added++;
+                }
+
+                if (added == 0) HasMoreItems = false;
+                return added;
+
+            } catch /*(HttpRequestException hre)*/ {
+                HasMoreItems = false;
+                return 0;
+            }
+        }
+
+        IAsyncOperation<LoadMoreItemsResult> ISupportIncrementalLoading.LoadMoreItemsAsync(uint count) {
+            return LoadMore(count).AsAsyncOperation();
+        }
+
+        public virtual async Task<LoadMoreItemsResult> LoadMore(uint count) {
+            var added = await Fetch();
+            return new LoadMoreItemsResult() { Count = (uint)added };
         }
     }
 }

@@ -40,5 +40,6 @@
         public string Self { get; set; }
         public string Html { get; set; }
         public string Photos { get; set; }
+        public string Related { get; set; }
     }
 }
