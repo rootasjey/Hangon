@@ -18,6 +18,7 @@ using Windows.UI.ViewManagement;
 using Windows.Graphics.Display;
 using Windows.Foundation;
 using System.Globalization;
+using System.Threading;
 
 namespace Hangon.Views {
     public sealed partial class PhotoPage : Page {
@@ -30,17 +31,20 @@ namespace Hangon.Views {
         private Compositor _backgroundCompositor { get; set; }
         private ScrollViewer _ScrollViewer { get; set; }
         private CompositionPropertySet _ScrollerPropertySet { get; set; }
+
+        CoreDispatcher UIDispatcher { get; set; }
         #endregion variables
 
         public PhotoPage() {
             InitializeComponent();
             PageDataSource = App.AppDataSource;
+            UIDispatcher = CoreWindow.GetForCurrentThread().Dispatcher;
         }
 
         #region navigation
 
         protected override void OnNavigatingFrom(NavigatingCancelEventArgs e) {
-            ConnectedAnimationService.GetForCurrentView().PrepareToAnimate("WallpaperImage", PhotoView);
+            ConnectedAnimationService.GetForCurrentView().PrepareToAnimate("PhotoImage", PhotoView);
             CoreWindow.GetForCurrentThread().KeyDown -= Page_KeyDown;
             base.OnNavigatingFrom(e);
         }
@@ -79,15 +83,15 @@ namespace Hangon.Views {
 
             void PopulateUSer()
             {
-                UserImageSource.UriSource = new Uri(CurrentPhoto.User.ProfileImage.Medium);
+                UserImageSource.UriSource = new Uri(Unsplash.GetProfileImageLink(CurrentPhoto.User));
                 UserName.Text = CurrentPhoto.User.Name;
                 UserLocation.Text = CurrentPhoto.User.Location ?? "";
             }
 
             void PopulateStats()
             {
-                StatsDownloads.Text = CurrentPhoto.Downloads.ToString();
-                StatsLikes.Text = CurrentPhoto.Likes.ToString();
+                DownloadsCount.Text = CurrentPhoto.Downloads.ToString();
+                LikesCount.Text = CurrentPhoto.Likes.ToString();
             }
 
             void PopulateExif()
@@ -110,8 +114,8 @@ namespace Hangon.Views {
             {
                 PhotoCaption.Offset(0, 30, 0)
                     .Then()
-                    .Fade(1, 500, 1000)
-                    .Offset(0, 0, 500, 1000)
+                    .Fade(1, 500, 500)
+                    .Offset(0, 0, 500, 500)
                     .Start();
             }
         }
@@ -141,17 +145,21 @@ namespace Hangon.Views {
         }
 
         async void Download(string size = "") {
-            ShowProgress(); // show progress flyout
+            ShowProgress();
+            var result = false;
 
             if (string.IsNullOrEmpty(size)) {
-                await Wallpaper.SaveToPicturesLibrary(CurrentPhoto, HttpProgressCallback);
+                result = await Wallpaper.SaveToPicturesLibrary(CurrentPhoto, HttpProgressCallback);
 
             } else {
                 string url = getURL();
-                await Wallpaper.SaveToPicturesLibrary(CurrentPhoto, HttpProgressCallback, url);
+                result = await Wallpaper.SaveToPicturesLibrary(CurrentPhoto, HttpProgressCallback, url);
             }
 
-            HideProgress(); // hide show progress flyout
+            HideProgress();
+
+            if (result) Notify("The photo was saved."); 
+            else Notify("The photo couldn't be saved :(");
 
             string getURL()
             {
@@ -178,9 +186,8 @@ namespace Hangon.Views {
             var success = await Wallpaper.SetAsWallpaper(CurrentPhoto, HttpProgressCallback);
             HideProgress();
 
-            if (!success) {
-                DataTransfer.ShowLocalToast("Ops. There I couldn't set your wellpaper. Try again or contact the developer.");
-            }
+            if (success) Notify("The photo has been correctly set has your wallpaper!");
+            else Notify("Ops. There I couldn't set your wallpaper :( Try again or contact the developer.");
         }
 
         private async void CmdSetLockscreen(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e) {
@@ -188,9 +195,8 @@ namespace Hangon.Views {
             var success = await Wallpaper.SetAsLockscreen(CurrentPhoto, HttpProgressCallback);
             HideProgress();
 
-            if (!success) {
-                DataTransfer.ShowLocalToast("Ops. There I couldn't set your lockscreen background. Try again or contact the developer.");
-            }
+            if (success) Notify("The photo has been correctly set has your locksreen background!");
+            else Notify("Ops. There I couldn't set your lockscreen background :( Try again or contact the developer.");
         }
 
         private void CmdDownload_Tapped(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e) {
@@ -216,6 +222,7 @@ namespace Hangon.Views {
 
         #endregion commandbar
 
+        #region micro-interactions
         private void UserView_PointerEntered(object sender, Windows.UI.Xaml.Input.PointerRoutedEventArgs e) {
             var panel = (Ellipse)sender;
             panel.Scale(1.1f, 1.1f).Start();
@@ -226,34 +233,15 @@ namespace Hangon.Views {
             panel.Scale(1f, 1f).Start();
         }
 
-        #region photo caption
-        private void UpdatePhotoCaptionPosition() {
-            var height = Window.Current.Bounds.Height - 150;
-            RowSpacing.Height = new GridLength(height);
-        }
-
-        private void PhotoCaptionContent_Loaded(object sender, RoutedEventArgs e) {
-            UpdatePhotoCaptionPosition();
-            Window.Current.SizeChanged += Current_SizeChanged;
-        }
-
-        private void Current_SizeChanged(object sender, WindowSizeChangedEventArgs e) {
-            UpdatePhotoCaptionPosition();
-        }
-
-        private void PhotoCaptionContent_Unloaded(object sender, RoutedEventArgs e) {
-            Window.Current.SizeChanged -= Current_SizeChanged;
-        }
-
-        #endregion photo caption
+        #endregion micro-interactions
 
         #region image composition
         private void HandleConnectedAnimation(Photo photo) {
             if (photo == null) return;
 
-            var animation = ConnectedAnimationService.GetForCurrentView().GetAnimation("WallpaperImage");
+            var animation = ConnectedAnimationService.GetForCurrentView().GetAnimation("PhotoImage");
             if (animation != null) {
-                PhotoView.Opacity = 0;
+                //PhotoView.Opacity = 0;
                 PhotoView.ImageOpened += (s, e) => {
                     PhotoView.Opacity = 1;
                     animation.TryStart(PhotoView);
@@ -332,6 +320,21 @@ namespace Hangon.Views {
 
         #endregion image composition
 
+        #region events
+
+        private void PhotoCaptionContent_Loaded(object sender, RoutedEventArgs e) {
+            UpdatePhotoCaptionPosition();
+            Window.Current.SizeChanged += Current_SizeChanged;
+        }
+
+        private void Current_SizeChanged(object sender, WindowSizeChangedEventArgs e) {
+            UpdatePhotoCaptionPosition();
+        }
+
+        private void PhotoCaptionContent_Unloaded(object sender, RoutedEventArgs e) {
+            Window.Current.SizeChanged -= Current_SizeChanged;
+        }
+
         private void UserView_Tapped(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e) {
             ConnectedAnimationService.GetForCurrentView().PrepareToAnimate("UserProfileImage", UserProfileImage);
             Frame.Navigate(typeof(UserPage), CurrentPhoto);
@@ -341,6 +344,47 @@ namespace Hangon.Views {
             var tracking = "?utm_source=Hangon&utm_medium=referral&utm_campaign=" + Unsplash.ApplicationId;
             var photoUri = new Uri(string.Format("{0}{1}", CurrentPhoto.Links.Html, tracking));
             var success = await Windows.System.Launcher.LaunchUriAsync(photoUri);
+        }
+        #endregion events
+
+        private void UpdatePhotoCaptionPosition() {
+            var height = Window.Current.Bounds.Height - 180;
+            RowSpacing.Height = new GridLength(height);
+        }
+        
+        private void FlyoutNotification_Dismiss(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e) {
+            HideNotification();
+        }
+
+        void Notify(string message) {
+            ProgressGrid.Visibility = Visibility.Collapsed;
+            FlyoutText.Text = message;
+
+            FlyoutNotification.Opacity = 0;
+            FlyoutNotification.Visibility = Visibility.Visible;
+
+            FlyoutNotification
+                .Offset(0, -30, 0)
+                .Then()
+                .Fade(1)
+                .Offset(0)
+                .Start();
+
+            var autoEvent = new AutoResetEvent(false);
+            var timer = new Timer(async (object state) => {
+                UIDispatcher.RunAsync(CoreDispatcherPriority.Normal, () => {
+                    HideNotification();
+                });
+            }, autoEvent, TimeSpan.FromSeconds(5), new TimeSpan());
+        }
+
+        async void HideNotification() {
+            await FlyoutNotification
+                .Fade(0)
+                .Offset(0, -30)
+                .StartAsync();
+
+            FlyoutNotification.Visibility = Visibility.Collapsed;
         }
     }
 }

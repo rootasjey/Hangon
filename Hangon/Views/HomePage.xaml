@@ -62,7 +62,7 @@
                                 <RectangleGeometry Rect="0,0, 300, 300"/>
                             </Border.Clip>
                             
-                            <Image x:Name="WallpaperImage"
+                            <Image x:Name="PhotoImage"
                                    Stretch="UniformToFill"
                                    Height="300"
                                    Width="300"

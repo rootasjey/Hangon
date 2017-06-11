@@ -11,6 +11,7 @@ using Windows.UI.Xaml;
 
 namespace Hangon.Views {
     public sealed partial class HomePage : Page {
+        #region variables
         private DataSource PageDataSource { get; set; }
 
         float _AnimationDelay { get; set; }
@@ -18,11 +19,12 @@ namespace Hangon.Views {
         static Photo _LastSelectedWallpaper { get; set; }
 
         bool _BlockLoadedAnimation { get; set; }
+        #endregion variables
 
         public HomePage() {
             InitializeComponent();
 
-            StartNavigatinToAnimation();
+            StartNavigationToAnimation();
             BindData();
             LoadData();
         }
@@ -49,8 +51,8 @@ namespace Hangon.Views {
 
         #endregion navigation
 
-        void StartNavigatinToAnimation() {
-            var animation = ConnectedAnimationService.GetForCurrentView().GetAnimation("WallpaperImage");
+        void StartNavigationToAnimation() {
+            var animation = ConnectedAnimationService.GetForCurrentView().GetAnimation("PhotoImage");
             if (animation != null && _LastSelectedWallpaper != null) {
                 _BlockLoadedAnimation = true;
 
@@ -60,7 +62,7 @@ namespace Hangon.Views {
                     if (item == null) return;
 
                     var stack = (StackPanel)item.ContentTemplateRoot;
-                    var image = (Image)stack.FindName("WallpaperImage");
+                    var image = (Image)stack.FindName("PhotoImage");
                     if (image == null) return;
 
                     image.Opacity = 0;
@@ -116,16 +118,16 @@ namespace Hangon.Views {
             var wallpaper = (Photo)item.DataContext;
             _LastSelectedWallpaper = wallpaper;
 
-            var image = (Image)item.FindName("WallpaperImage");
+            var image = (Image)item.FindName("PhotoImage");
 
             if (image != null) {
-                ConnectedAnimationService.GetForCurrentView().PrepareToAnimate("WallpaperImage", image);
+                ConnectedAnimationService.GetForCurrentView().PrepareToAnimate("PhotoImage", image);
             }
 
             Frame.Navigate(typeof(PhotoPage), wallpaper);
         }
 
-        private void PhotoItem_Loaded(object sender, Windows.UI.Xaml.RoutedEventArgs e) {
+        private void PhotoItem_Loaded(object sender, RoutedEventArgs e) {
             var wallItem = (StackPanel)sender;
 
             var data = (Photo)wallItem.DataContext;

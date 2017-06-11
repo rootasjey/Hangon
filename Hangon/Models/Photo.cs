@@ -37,11 +37,11 @@ namespace Hangon.Models {
             }
         }
 
-        private bool _LikedByUser;
+        private bool _IsLikedByUser;
 
-        public bool LikedByUser {
-            get { return _LikedByUser; }
-            set { _LikedByUser = value; }
+        public bool IsLikedByUser {
+            get { return _IsLikedByUser; }
+            set { _IsLikedByUser = value; }
         }
 
         #endregion simple properties

@@ -13,7 +13,7 @@
 
         public string UpdatedAt { get; set; }
 
-        public bool IsCurrated { get; set; }
+        public bool IsCurated { get; set; }
 
         public bool IsFeatured { get; set; }
 

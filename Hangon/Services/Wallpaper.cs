@@ -80,7 +80,7 @@ namespace Hangon.Services {
         /// <param name="photo">Pepresents my image model, you can replace it by a string</param>
         /// <param name="httpProgressCallback">A function callback which will be fired when the HTTP progression is updated</param>
         /// <returns></returns>
-        public static async Task SaveToPicturesLibrary(Photo photo, Action<HttpProgress> httpProgressCallback, string url = "") {
+        public static async Task<bool> SaveToPicturesLibrary(Photo photo, Action<HttpProgress> httpProgressCallback, string url = "") {
             StorageFile file;
 
             if (Settings.UseDefaultDownloadPath()) {
@@ -91,8 +91,8 @@ namespace Hangon.Services {
 
 
             if (file == null) {
-                DataTransfer.ShowLocalToast("The photo couldn't be saved.");
-                return;
+                //DataTransfer.ShowLocalToast("The photo couldn't be saved.");
+                return false;
             }
 
             // Prevent updates to the remote version of the file until
@@ -119,16 +119,19 @@ namespace Hangon.Services {
             Windows.Storage.Provider.FileUpdateStatus status =
                 await CachedFileManager.CompleteUpdatesAsync(file);
 
-            if (status == Windows.Storage.Provider.FileUpdateStatus.Complete) {
-                DataTransfer.ShowLocalToast("The photo was saved.");
-            } else {
-                DataTransfer.ShowLocalToast("The photo couldn't be saved.");
-            }
-
             // Free resources
             client.Dispose();
             inputStream.Dispose();
             outputStream.Dispose();
+
+            if (status == Windows.Storage.Provider.FileUpdateStatus.Complete) {
+                //DataTransfer.ShowLocalToast("The photo was saved.");
+                return true;
+            } else {
+                //DataTransfer.ShowLocalToast("The photo couldn't be saved.");
+                return false;
+            }
+                       
 
             async Task<StorageFile> GetFileFromDefaultLocation()
             {

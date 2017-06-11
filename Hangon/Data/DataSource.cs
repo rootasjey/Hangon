@@ -9,6 +9,8 @@ namespace Hangon.Data {
 
         public CollectionsCollection UserCollections { get; set; }
 
+        public PhotosCollection CollectionPhotos { get; set; }
+
         public async Task<int> FetchRecent() {
             if (NewPhotos == null) NewPhotos = new PhotosCollection();
 
@@ -51,6 +53,22 @@ namespace Hangon.Data {
             UserCollections.Page = 0;
             UserCollections.Url = url;
             return await UserCollections.Fetch();
+        }
+
+        public async Task<Collection> GetCollection(string id) {
+            return await Unsplash.GetCollection(id);
+        }
+
+        public async Task<int> GetCollectionPhotos(string collectionId) {
+            if (CollectionPhotos == null) CollectionPhotos = new PhotosCollection();
+
+            var url = string.Format("{0}/{1}/photos", Unsplash.GetUrl("collections"), collectionId);
+            if (CollectionPhotos.Url == url) return 0;
+
+            CollectionPhotos.Clear();
+            CollectionPhotos.Page = 0;
+            CollectionPhotos.Url = url;
+            return await CollectionPhotos.Fetch();
         }
     }
 }
