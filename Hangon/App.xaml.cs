@@ -1,28 +1,17 @@
 ﻿using Hangon.Data;
 using Hangon.Views;
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
 using Windows.Foundation.Metadata;
 using Windows.Phone.UI.Input;
 using Windows.UI;
 using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 
-namespace Hangon
-{
+namespace Hangon {
     /// <summary>
     /// Provides application-specific behavior to supplement the default Application class.
     /// </summary>
@@ -90,6 +79,7 @@ namespace Hangon
             }
 
             //UpdateTitleBarThemeButton();
+            HideSystemTray();
         }
 
         /// <summary>
@@ -157,6 +147,14 @@ namespace Hangon
             titleBar.ButtonInactiveBackgroundColor = Colors.Transparent;
             titleBar.ButtonInactiveForegroundColor = Colors.White;
             titleBar.ButtonForegroundColor = Colors.White;
+        }
+
+        async void HideSystemTray() {
+            var statusbar = "Windows.UI.ViewManagement.StatusBar";
+            if (ApiInformation.IsTypePresent(statusbar)) {
+                //await Windows.UI.ViewManagement.StatusBar.GetForCurrentView().ShowAsync();
+                await Windows.UI.ViewManagement.StatusBar.GetForCurrentView().HideAsync();
+            }
         }
     }
 }

@@ -11,6 +11,10 @@ using Windows.UI.Xaml.Navigation;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Shapes;
 using Windows.UI.Xaml.Input;
+using Windows.UI.Xaml.Hosting;
+using Microsoft.Graphics.Canvas.Effects;
+using Windows.UI.Composition;
+using Windows.UI;
 
 namespace Hangon.Views {
     public sealed partial class UserPage : Page {
@@ -38,6 +42,7 @@ namespace Hangon.Views {
 
         public UserPage() {
             InitializeComponent();
+            ApplyCommandBarBarFrostedGlass();
             PageDataSource = App.AppDataSource;
             RestoreLastSelectedPivotIndex();
         }
@@ -75,9 +80,18 @@ namespace Hangon.Views {
         }
 
         private void LoadData() {
+            PopulateUserInfos();
             LoadStats();
             LoadPhotos();
             LoadCollections();
+        }
+
+        private void PopulateUserInfos() {
+            UserName.Text = CurrentPhoto.User.Name;
+            UserLocation.Text = CurrentPhoto.User.Location ?? "";
+
+            if (string.IsNullOrEmpty(UserLocation.Text))
+                UserLocationPanel.Visibility = Visibility.Collapsed;
         }
 
         private async void LoadStats() {
@@ -120,8 +134,8 @@ namespace Hangon.Views {
 
             var animationService = ConnectedAnimationService.GetForCurrentView();
 
-            UserName.Text = photo.User.Name;
-            UserLocation.Text = photo.User.Location ?? "";
+            //UserName.Text = photo.User.Name;
+            //UserLocation.Text = photo.User.Location ?? "";
 
             AnimateProfileImage();
             AnimateBackground();
@@ -218,16 +232,96 @@ namespace Hangon.Views {
             ellipse.Scale(1f, 1f).Start();
         }
 
-        private void ShadowPanel_PointerExited(object sender, PointerRoutedEventArgs e) {
+        private void PhotoItem_PointerEntered(object sender, PointerRoutedEventArgs e) {
+            var panel = (StackPanel)sender;
+            var image = (Image)panel.FindName("PhotoImage");
 
+            if (image == null) return;
+
+            image.Scale(1f, 1f).Start();
         }
 
-        private void ShadowPanel_PointerEntered(object sender, PointerRoutedEventArgs e) {
+        private void PhotoItem_PointerExited(object sender, PointerRoutedEventArgs e) {
+            var panel = (StackPanel)sender;
+            var image = (Image)panel.FindName("PhotoImage");
 
+            if (image == null) return;
+
+            image.Scale(1f, 1f).Start();
         }
+
+        private void CollectionItem_PointerEntered(object sender, PointerRoutedEventArgs e) {
+            var panel = (Grid)sender;
+            var image = (Image)panel.FindName("PhotoImage");
+
+            if (image == null) return;
+
+            image.Scale(1.1f, 1.1f).Start();
+        }
+
+        private void CollectionItem_PointerExited(object sender, PointerRoutedEventArgs e) {
+            var panel = (Grid)sender;
+            var image = (Image)panel.FindName("PhotoImage");
+
+            if (image == null) return;
+
+            image.Scale(1f, 1f).Start();
+        }
+
         #endregion micro-interactions
 
         #region CommandBar
+        void ApplyCommandBarBarFrostedGlass() {
+            var glassHost = AppBarFrozenHost;
+            var visual = ElementCompositionPreview.GetElementVisual(glassHost);
+            var compositor = visual.Compositor;
+
+            // Create a glass effect, requires Win2D NuGet package
+            var glassEffect = new GaussianBlurEffect {
+                BlurAmount = 10.0f,
+                BorderMode = EffectBorderMode.Hard,
+                Source = new ArithmeticCompositeEffect {
+                    MultiplyAmount = 0,
+                    Source1Amount = 0.5f,
+                    Source2Amount = 0.5f,
+                    Source1 = new CompositionEffectSourceParameter("backdropBrush"),
+                    Source2 = new ColorSourceEffect {
+                        Color = Color.FromArgb(255, 245, 245, 245)
+                    }
+                }
+            };
+
+            //  Create an instance of the effect and set its source to a CompositionBackdropBrush
+            var effectFactory = compositor.CreateEffectFactory(glassEffect);
+            var backdropBrush = compositor.CreateBackdropBrush();
+            var effectBrush = effectFactory.CreateBrush();
+
+            effectBrush.SetSourceParameter("backdropBrush", backdropBrush);
+
+            // Create a Visual to contain the frosted glass effect
+            var glassVisual = compositor.CreateSpriteVisual();
+            glassVisual.Brush = effectBrush;
+
+            // Add the blur as a child of the host in the visual tree
+            ElementCompositionPreview.SetElementChildVisual(glassHost, glassVisual);
+
+            // Make sure size of glass host and glass visual always stay in sync
+            var bindSizeAnimation = compositor.CreateExpressionAnimation("hostVisual.Size");
+            bindSizeAnimation.SetReferenceParameter("hostVisual", visual);
+
+            glassVisual.StartAnimation("Size", bindSizeAnimation);
+
+
+            glassHost.Offset(0, 27).Start();
+
+            AppBar.Opening += (s, e) => {
+                glassHost.Offset(0, 0).Start();
+            };
+            AppBar.Closing += (s, e) => {
+                glassHost.Offset(0, 27).Start();
+            };
+        }
+
         private async void CmdOpenInBrowser_Tapped(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e) {
             if (CurrentUser?.Links == null) return; // get info on question mark
 
@@ -364,41 +458,6 @@ namespace Hangon.Views {
 
         #endregion events
 
-        private void PhotoItem_PointerEntered(object sender, PointerRoutedEventArgs e) {
-            var panel = (StackPanel)sender;
-            var image = (Image)panel.FindName("PhotoImage");
 
-            if (image == null) return;
-
-            image.Scale(1f, 1f).Start();
-        }
-
-        private void PhotoItem_PointerExited(object sender, PointerRoutedEventArgs e) {
-            var panel = (StackPanel)sender;
-            var image = (Image)panel.FindName("PhotoImage");
-
-            if (image == null) return;
-
-            image.Scale(1f, 1f).Start();
-        }
-
-        private void CollectionItem_PointerEntered(object sender, PointerRoutedEventArgs e) {
-            var panel = (Grid)sender;
-            var image = (Image)panel.FindName("PhotoImage");
-
-            if (image == null) return;
-
-            image.Scale(1.1f, 1.1f).Start();
-        }
-
-        private void CollectionItem_PointerExited(object sender, PointerRoutedEventArgs e) {
-            var panel = (Grid)sender;
-            var image = (Image)panel.FindName("PhotoImage");
-
-            if (image == null) return;
-
-            image.Scale(1f, 1f).Start();
-        }
-        
     }
 }

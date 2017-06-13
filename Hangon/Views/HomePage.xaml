@@ -8,6 +8,72 @@
     xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
     xmlns:data="using:Hangon.Models"
     mc:Ignorable="d">
+    
+    <Page.Resources>
+        <Style x:Key="GridViewItemZeroMarginStyle" TargetType="GridViewItem">
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="VerticalContentAlignment" Value="Stretch" />
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+            <Setter Property="Margin" Value="0"/>
+        </Style>
+
+        <DataTemplate x:Key="PhotoTemplate" x:DataType="data:Photo">
+            <UserControl>
+                <StackPanel x:Name="PhotoItem"
+                                    Opacity="0"
+                                    Tapped="PhotoItem_Tapped"
+                                    Loaded="PhotoItem_Loaded">
+
+                    <Border x:Name="PhotoBorder" Width="300">
+                        <Border.Clip>
+                            <RectangleGeometry x:Name="PhotoBorderClip" Rect="0,0, 300, 300"/>
+                        </Border.Clip>
+
+                        <Image x:Name="PhotoImage"
+                                       Stretch="UniformToFill"
+                                       Height="300"
+                                       Width="300"
+                                       PointerEntered="Image_PointerEntered"
+                                       PointerExited="Image_PointerExited">
+                            <Image.Source>
+                                <BitmapImage DecodePixelWidth="300" UriSource="{x:Bind Urls.Regular}"/>
+                            </Image.Source>
+                        </Image>
+                    </Border>
+
+                    <VisualStateManager.VisualStateGroups>
+                        <VisualStateGroup x:Name="PhotoStates">
+                            <VisualState x:Name="SmallSate">
+                                <VisualState.StateTriggers>
+                                    <AdaptiveTrigger MinWindowWidth="0"/>
+                                </VisualState.StateTriggers>
+
+                                <VisualState.Setters>
+                                    <Setter Target="PhotoImage.Height" Value="90"/>
+                                    <Setter Target="PhotoImage.Width" Value="90"/>
+                                    <Setter Target="PhotoBorder.Width" Value="90"/>
+                                    <Setter Target="PhotoBorderClip.Rect" Value="0,0,90,90"/>
+                                </VisualState.Setters>
+                            </VisualState>
+
+                            <VisualState x:Name="WideSate">
+                                <VisualState.StateTriggers>
+                                    <AdaptiveTrigger MinWindowWidth="600"/>
+                                </VisualState.StateTriggers>
+
+                                <VisualState.Setters>
+                                    <Setter Target="PhotoImage.Height" Value="300"/>
+                                    <Setter Target="PhotoImage.Width" Value="300"/>
+                                    <Setter Target="PhotoBorder.Width" Value="300"/>
+                                    <Setter Target="PhotoBorderClip.Rect" Value="0,0,300,300"/>
+                                </VisualState.Setters>
+                            </VisualState>
+                        </VisualStateGroup>
+                    </VisualStateManager.VisualStateGroups>
+                </StackPanel>
+            </UserControl>
+        </DataTemplate>
+    </Page.Resources>
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <!-- Loading -->
@@ -34,53 +100,19 @@
                     Margin="0,20"
                     HorizontalAlignment="Center"/>
         </StackPanel>
-        
+
         <!-- Data -->
         <controls:AdaptiveGridView x:Name="RecentView"
                                    DesiredWidth="300"
                                    ItemHeight="300"
-                                   animations:ReorderGridAnimation.Duration="300">
-            <GridView.ItemTemplate>
-                <DataTemplate x:DataType="data:Photo">
-                    <StackPanel x:Name="WallItem"
-                                Opacity="0" 
-                                Tapped="PhotoItem_Tapped"
-                                Loaded="PhotoItem_Loaded">
-                        
-                        <controls:DropShadowPanel BlurRadius="10"
-                                                ShadowOpacity="0"
-                                                OffsetX="10"
-                                                OffsetY="10"
-                                                Color="Black"
-                                                VerticalAlignment="Center"
-                                                HorizontalAlignment="Center"
-                                                PointerEntered="ShadowPanel_PointerEntered"
-                                                PointerExited="ShadowPanel_PointerExited">
-                            
-                        <Border Width="300">
-                            <Border.Clip>
-                                <RectangleGeometry Rect="0,0, 300, 300"/>
-                            </Border.Clip>
-                            
-                            <Image x:Name="PhotoImage"
-                                   Stretch="UniformToFill"
-                                   Height="300"
-                                   Width="300"
-                                   PointerEntered="Image_PointerEntered"
-                                   PointerExited="Image_PointerExited">
-                                <Image.Source>
-                                    <BitmapImage DecodePixelWidth="300" UriSource="{x:Bind Urls.Regular}"/>
-                                </Image.Source>
-                            </Image>
-                        </Border>
-                        <!--<TextBlock Foreground="Black" Text="{Binding Title}" Height="100"/>-->
-                        </controls:DropShadowPanel>
-                    </StackPanel>
-                </DataTemplate>
-            </GridView.ItemTemplate>
+                                   ItemTemplate="{StaticResource PhotoTemplate}"
+                                   animations:ReorderGridAnimation.Duration="300"
+                                   ItemContainerStyle="{StaticResource GridViewItemZeroMarginStyle}">
         </controls:AdaptiveGridView>
 
-        <CommandBar x:Name="ApplicationBar"
+        <CommandBar x:Name="AppBar"
+                    Canvas.ZIndex="3"
+                    Background="Transparent"
                     VerticalAlignment="Bottom"
                     ClosedDisplayMode="Minimal">
             <AppBarButton x:Name="CmdRefresh" Label="refresh" Icon="Refresh" Tapped="CmdRefresh_Tapped"/>
@@ -88,5 +120,34 @@
                 <AppBarButton x:Name="CmdSettings" Label="settings" Tapped="CmdSettings_Tapped"/>
             </CommandBar.SecondaryCommands>
         </CommandBar>
+
+        <Grid x:Name="AppBarFrozenHost" Canvas.ZIndex="2" Height="58" VerticalAlignment="Bottom"/>
+
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup x:Name="WindowStates">
+                <VisualState x:Name="SmallSate">
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="0"/>
+                    </VisualState.StateTriggers>
+
+                    <VisualState.Setters>
+                        <Setter Target="RecentView.ItemHeight" Value="90"/>
+                        <Setter Target="RecentView.DesiredWidth" Value="90"/>
+                        <Setter Target="RecentView.Margin" Value="0,0,-20,0"/>
+                    </VisualState.Setters>
+                </VisualState>
+
+                <VisualState x:Name="WideSate">
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="600"/>
+                    </VisualState.StateTriggers>
+
+                    <VisualState.Setters>
+                        <Setter Target="RecentView.ItemHeight" Value="300"/>
+                        <Setter Target="RecentView.DesiredWidth" Value="300"/>
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
     </Grid>
 </Page>

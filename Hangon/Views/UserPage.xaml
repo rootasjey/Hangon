@@ -24,9 +24,7 @@
                                         OffsetY="10"
                                         Color="Black"
                                         VerticalAlignment="Center"
-                                        HorizontalAlignment="Center"
-                                        PointerEntered="ShadowPanel_PointerEntered"
-                                        PointerExited="ShadowPanel_PointerExited">
+                                        HorizontalAlignment="Center">
 
                     <Border Width="150">
                         <Border.Clip>
@@ -172,7 +170,8 @@
         <Pivot x:Name="PivotUserData"
                SelectionChanged="PivotUserData_SelectionChanged"
                Grid.Row="2"
-               Canvas.ZIndex="2" RequestedTheme="Dark"
+               Canvas.ZIndex="1" 
+               RequestedTheme="Dark"
                Style="{StaticResource PivotCenteredHeadersStyle}">
 
             <PivotItem x:Name="UserInfosView" Header="infos">
@@ -209,17 +208,17 @@
                                         VerticalAlignment="Center"/>
                         </Grid>
 
-                        <StackPanel x:Name="PanelUserLocation" 
-                                        Margin="0,6,0,0"
+                        <StackPanel x:Name="UserLocationPanel" 
+                                    Margin="0,6,0,0"
                                     HorizontalAlignment="Center"
-                                        Orientation="Horizontal"
-                                        Opacity=".6">
+                                    Orientation="Horizontal"
+                                    Opacity=".6">
                             <FontIcon Glyph="&#xE128;"
-                                        FontSize="20"
-                                        Margin="0,0,12,0"/>
+                                      FontSize="20"
+                                      Margin="0,0,12,0"/>
                             <TextBlock x:Name="UserLocation"
-                                        FontSize="20"
-                                        FontWeight="Light"/>
+                                       FontSize="20"
+                                       FontWeight="Light"/>
                         </StackPanel>
 
                         <TextBlock x:Name="UserBioView" 
@@ -347,10 +346,13 @@
 
         <CommandBar x:Name="AppBar"
                     Canvas.ZIndex="3"
+                    Background="Transparent"
                     VerticalAlignment="Bottom">
             <AppBarButton x:Name="CmdRefresh" Label="refresh" Icon="Refresh" Tapped="CmdRefresh_Tapped"/>
             <AppBarButton x:Name="CmdCopyLink" Label="copy link" Icon="Link" Tapped="CmdCopyLink_Tapped"/>
             <AppBarButton x:Name="CmdOpenInBrowser" Label="open in browser" Icon="Globe" Tapped="CmdOpenInBrowser_Tapped"/>
         </CommandBar>
+
+        <Grid x:Name="AppBarFrozenHost" Canvas.ZIndex="2" Height="75" VerticalAlignment="Bottom"/>
     </Grid>
 </Page>

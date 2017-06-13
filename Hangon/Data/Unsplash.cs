@@ -83,6 +83,23 @@ namespace Hangon.Data {
                         }
                     },
 
+
+                Urls = new Urls() {
+                    Raw = (string)parsedResponse["urls"]["raw"],
+                    Full = (string)parsedResponse["urls"]["full"],
+                    Regular = (string)parsedResponse["urls"]["regular"],
+                    Thumbnail = (string)parsedResponse["urls"]["thumb"],
+                },
+
+                Categories = ExtractCategories(parsedResponse["categories"]),
+
+                Links = new PhotoLinks() {
+                    Download = (string)parsedResponse["links"]["download"],
+                    DownloadLocation = (string)parsedResponse["links"]["download_location"],
+                    Html = (string)parsedResponse["links"]["html"],
+                    Self = (string)parsedResponse["links"]["self"],
+                },
+
                 User = new User() {
                     Id = (string)parsedResponse["user"]["id"],
                     Username = (string)parsedResponse["user"]["username"],
@@ -108,13 +125,6 @@ namespace Hangon.Data {
                         Small = (string)parsedResponse["user"]["profile_image"]["small"],
                     }
                 },
-
-                Urls = new Urls() {
-                    Raw = (string)parsedResponse["urls"]["raw"],
-                    Full = (string)parsedResponse["urls"]["full"],
-                    Regular = (string)parsedResponse["urls"]["regular"],
-                    Thumbnail = (string)parsedResponse["urls"]["thumb"],
-                }
             };
 
             return photo;

@@ -11,6 +11,10 @@ using Windows.UI.Xaml.Navigation;
 using Windows.UI.Xaml.Shapes;
 using Windows.UI.Xaml;
 using System.Globalization;
+using Windows.UI.Xaml.Hosting;
+using Windows.UI.Composition;
+using Microsoft.Graphics.Canvas.Effects;
+using Windows.UI;
 
 namespace Hangon.Views {
     public sealed partial class CollectionPage : Page {
@@ -32,6 +36,7 @@ namespace Hangon.Views {
             InitializeComponent();
             PageDataSource = App.AppDataSource;
             RestoreLastSelectedPivotIndex();
+            ApplyCommandBarBarFrostedGlass();
         }
 
         #region navigation
@@ -273,6 +278,76 @@ namespace Hangon.Views {
         }
 
         #endregion micro-interactions
+
+        #region commandbar
+        void ApplyCommandBarBarFrostedGlass() {
+            var glassHost = AppBarFrozenHost;
+            var visual = ElementCompositionPreview.GetElementVisual(glassHost);
+            var compositor = visual.Compositor;
+
+            // Create a glass effect, requires Win2D NuGet package
+            var glassEffect = new GaussianBlurEffect {
+                BlurAmount = 10.0f,
+                BorderMode = EffectBorderMode.Hard,
+                Source = new ArithmeticCompositeEffect {
+                    MultiplyAmount = 0,
+                    Source1Amount = 0.5f,
+                    Source2Amount = 0.5f,
+                    Source1 = new CompositionEffectSourceParameter("backdropBrush"),
+                    Source2 = new ColorSourceEffect {
+                        Color = Color.FromArgb(255, 245, 245, 245)
+                    }
+                }
+            };
+
+            //  Create an instance of the effect and set its source to a CompositionBackdropBrush
+            var effectFactory = compositor.CreateEffectFactory(glassEffect);
+            var backdropBrush = compositor.CreateBackdropBrush();
+            var effectBrush = effectFactory.CreateBrush();
+
+            effectBrush.SetSourceParameter("backdropBrush", backdropBrush);
+
+            // Create a Visual to contain the frosted glass effect
+            var glassVisual = compositor.CreateSpriteVisual();
+            glassVisual.Brush = effectBrush;
+
+            // Add the blur as a child of the host in the visual tree
+            ElementCompositionPreview.SetElementChildVisual(glassHost, glassVisual);
+
+            // Make sure size of glass host and glass visual always stay in sync
+            var bindSizeAnimation = compositor.CreateExpressionAnimation("hostVisual.Size");
+            bindSizeAnimation.SetReferenceParameter("hostVisual", visual);
+
+            glassVisual.StartAnimation("Size", bindSizeAnimation);
+
+
+            glassHost.Offset(0, 27).Start();
+
+            AppBar.Opening += (s, e) => {
+                glassHost.Offset(0, 0).Start();
+            };
+            AppBar.Closing += (s, e) => {
+                glassHost.Offset(0, 27).Start();
+            };
+        }
+
+        private async void CmdOpenInBrowser_Tapped(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e) {
+            if (CurrentCollection?.Links == null) return; // get info on question mark
+
+            var tracking = "?utm_source=Hangon&utm_medium=referral&utm_campaign=" + Unsplash.ApplicationId;
+            var userUri = new Uri(string.Format("{0}{1}", CurrentCollection.Links.Html, tracking));
+            var success = await Windows.System.Launcher.LaunchUriAsync(userUri);
+        }
+
+        private void CmdCopyLink_Tapped(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e) {
+            if (CurrentCollection?.Links == null) return;
+
+            var tracking = "?utm_source=Hangon&utm_medium=referral&utm_campaign=" + Unsplash.ApplicationId;
+            var userUri = string.Format("{0}{1}", CurrentCollection.Links.Html, tracking);
+            DataTransfer.Copy(userUri);
+        }
+
+        #endregion commandbar
 
     }
 }

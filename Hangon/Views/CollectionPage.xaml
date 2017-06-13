@@ -43,13 +43,14 @@
         </DataTemplate>
     </Page.Resources>
     
-    <Grid Background="Black" RequestedTheme="Dark">
+    <Grid Background="Black">
         <Grid x:Name="BackgroundView">
-            <Image x:Name="CollectionCoverImage" Stretch="UniformToFill"></Image>
+            <Image x:Name="CollectionCoverImage" Stretch="UniformToFill"/>
             <Grid x:Name="BackgroundBlurEffect"/>
         </Grid>
 
         <Pivot x:Name="PivotCollection"
+               RequestedTheme="Dark"
                Style="{StaticResource PivotCenteredHeadersStyle}"
                SelectionChanged="PivotCollection_SelectionChanged">
             
@@ -185,5 +186,15 @@
                 </Grid>
             </PivotItem>
         </Pivot>
+
+        <CommandBar x:Name="AppBar"
+                    Canvas.ZIndex="3"
+                    Background="Transparent"
+                    VerticalAlignment="Bottom">
+            <AppBarButton x:Name="CmdCopyLink" Label="copy link" Icon="Link" Tapped="CmdCopyLink_Tapped"/>
+            <AppBarButton x:Name="CmdOpenInBrowser" Label="open in browser" Icon="Globe" Tapped="CmdOpenInBrowser_Tapped"/>
+        </CommandBar>
+
+        <Grid x:Name="AppBarFrozenHost" Canvas.ZIndex="2" Height="75" VerticalAlignment="Bottom"/>
     </Grid>
 </Page>

@@ -4,7 +4,6 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:data="using:Hangon.Models"
     mc:Ignorable="d">
 
     <Page.Resources>
@@ -34,7 +33,8 @@
             </StackPanel>
         </FlyoutPresenter>
 
-        <Grid x:Name="PhotoViewContainer" Loaded="PhotoViewContainer_Loaded">
+        <Grid x:Name="PhotoViewContainer" 
+              Loaded="PhotoViewContainer_Loaded">
             <Image x:Name="PhotoView" Stretch="UniformToFill"
                    VerticalAlignment="Center" HorizontalAlignment="Center">
             </Image>
@@ -61,7 +61,7 @@
                     <RowDefinition x:Name="RowDate" Height="70"/>
                     <RowDefinition Height="60"/>
                 </Grid.RowDefinitions>
-                
+
                 <StackPanel x:Name="UserView"
                             Grid.Row="1"
                             HorizontalAlignment="Center"
@@ -116,6 +116,7 @@
                             HorizontalAlignment="Center"
                             Orientation="Horizontal"
                             Tapped="OpenPhotoInBrowser_Tapped">
+                    
                     <FontIcon Glyph="&#xE12B;" FontSize="20" Margin="-0,0,12,0"/>
                     <TextBlock x:Name="UnsplashAttribution" 
                            Text="unsplash"
@@ -185,9 +186,16 @@
         </ScrollViewer>
 
         <CommandBar x:Name="AppBar"
-                    Canvas.ZIndex="2"
+                    Canvas.ZIndex="3"
+                    Background="Transparent"
                     VerticalAlignment="Bottom">
+            
             <AppBarButton x:Name="CmdCrop" Visibility="Collapsed" Label="crop" Icon="Crop" Tapped="CmdCrop_Tapped"/>
+            <AppBarButton x:Name="CmdToggleCaption" Label="hide caption" Tapped="CmdToggleCaption_Tapped">
+                <AppBarButton.Icon>
+                    <BitmapIcon x:Name="CmdToggleCaptionIcon" UriSource="ms-appx:///Assets/Icons/hide.png" />
+                </AppBarButton.Icon>
+            </AppBarButton>
             <AppBarButton x:Name="CmdDownload" Label="download" Icon="Download" Tapped="CmdDownload_Tapped"/>
             <AppBarButton x:Name="CmdSetAs" Label="set as..." Icon="SetLockScreen">
                 <AppBarButton.Flyout>
@@ -197,6 +205,9 @@
                     </MenuFlyout>
                 </AppBarButton.Flyout>
             </AppBarButton>
+            
         </CommandBar>
+
+        <Grid x:Name="AppBarFrozenHost" Canvas.ZIndex="2" Height="75" VerticalAlignment="Bottom"/>
     </Grid>
 </Page>

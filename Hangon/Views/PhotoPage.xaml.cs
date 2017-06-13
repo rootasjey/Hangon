@@ -19,6 +19,7 @@ using Windows.Graphics.Display;
 using Windows.Foundation;
 using System.Globalization;
 using System.Threading;
+using Windows.UI;
 
 namespace Hangon.Views {
     public sealed partial class PhotoPage : Page {
@@ -33,14 +34,30 @@ namespace Hangon.Views {
         private CompositionPropertySet _ScrollerPropertySet { get; set; }
 
         CoreDispatcher UIDispatcher { get; set; }
+
+        private double PhotoCaptionTopMargin { get; set; }
+
+        private bool PhotoCaptionIsVisible { get; set; }
         #endregion variables
 
         public PhotoPage() {
             InitializeComponent();
             PageDataSource = App.AppDataSource;
             UIDispatcher = CoreWindow.GetForCurrentThread().Dispatcher;
+            GetDeviceType();
+            ApplyCommandBarBarFrostedGlass();
+
+            PhotoCaptionIsVisible = true;
         }
 
+        void GetDeviceType() {
+            if (Windows.System.Profile.AnalyticsInfo.VersionInfo.DeviceFamily == "Windows.Mobile") {
+                PhotoCaptionTopMargin = 280;
+            } else {
+                PhotoCaptionTopMargin = 180;
+            }
+        }
+                
         #region navigation
 
         protected override void OnNavigatingFrom(NavigatingCancelEventArgs e) {
@@ -86,6 +103,9 @@ namespace Hangon.Views {
                 UserImageSource.UriSource = new Uri(Unsplash.GetProfileImageLink(CurrentPhoto.User));
                 UserName.Text = CurrentPhoto.User.Name;
                 UserLocation.Text = CurrentPhoto.User.Location ?? "";
+
+                if (string.IsNullOrEmpty(UserLocation.Text))
+                    PanelUserLocation.Visibility = Visibility.Collapsed;
             }
 
             void PopulateStats()
@@ -181,6 +201,57 @@ namespace Hangon.Views {
         #endregion download
 
         #region commandbar
+        void ApplyCommandBarBarFrostedGlass() {
+            var glassHost = AppBarFrozenHost;
+            var visual = ElementCompositionPreview.GetElementVisual(glassHost);
+            var compositor = visual.Compositor;
+
+            // Create a glass effect, requires Win2D NuGet package
+            var glassEffect = new GaussianBlurEffect {
+                BlurAmount = 10.0f,
+                BorderMode = EffectBorderMode.Hard,
+                Source = new ArithmeticCompositeEffect {
+                    MultiplyAmount = 0,
+                    Source1Amount = 0.5f,
+                    Source2Amount = 0.5f,
+                    Source1 = new CompositionEffectSourceParameter("backdropBrush"),
+                    Source2 = new ColorSourceEffect {
+                        Color = Color.FromArgb(255, 245, 245, 245)
+                    }
+                }
+            };
+
+            //  Create an instance of the effect and set its source to a CompositionBackdropBrush
+            var effectFactory = compositor.CreateEffectFactory(glassEffect);
+            var backdropBrush = compositor.CreateBackdropBrush();
+            var effectBrush = effectFactory.CreateBrush();
+
+            effectBrush.SetSourceParameter("backdropBrush", backdropBrush);
+
+            // Create a Visual to contain the frosted glass effect
+            var glassVisual = compositor.CreateSpriteVisual();
+            glassVisual.Brush = effectBrush;
+
+            // Add the blur as a child of the host in the visual tree
+            ElementCompositionPreview.SetElementChildVisual(glassHost, glassVisual);
+
+            // Make sure size of glass host and glass visual always stay in sync
+            var bindSizeAnimation = compositor.CreateExpressionAnimation("hostVisual.Size");
+            bindSizeAnimation.SetReferenceParameter("hostVisual", visual);
+
+            glassVisual.StartAnimation("Size", bindSizeAnimation);
+
+
+            glassHost.Offset(0, 27).Start();
+
+            AppBar.Opening += (s, e) => {
+                glassHost.Offset(0, 0).Start();
+            };
+            AppBar.Closing += (s, e) => {
+                glassHost.Offset(0, 27).Start();
+            };
+        }
+
         private async void CmdSetWallpaper(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e) {
             ShowProgress("Setting wallpaper");
             var success = await Wallpaper.SetAsWallpaper(CurrentPhoto, HttpProgressCallback);
@@ -214,6 +285,43 @@ namespace Hangon.Views {
             var cmd = (MenuFlyoutItem)sender;
             var resolution = cmd.Text;
             Download(resolution);
+        }
+
+        /// <summary>
+        /// Show/Hide photo's caption
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void CmdToggleCaption_Tapped(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e) {
+            if (PhotoCaptionIsVisible) {
+                hideCaption();
+                PhotoCaptionIsVisible = false;
+            } else {
+                showCaption();
+                PhotoCaptionIsVisible = true;
+            }
+
+            void showCaption()
+            {
+                PhotoCaptionContent
+                    .Offset(0, 0)
+                    .Fade(1)
+                    .Start();
+
+                CmdToggleCaptionIcon.UriSource = new Uri("ms-appx:///Assets/Icons/hide.png");
+                CmdToggleCaption.Label = "hide caption";
+            }
+
+            void hideCaption()
+            {
+                PhotoCaptionContent
+                    .Offset(0, 300)
+                    .Fade(0)
+                    .Start();
+
+                CmdToggleCaptionIcon.UriSource = new Uri("ms-appx:///Assets/Icons/show.png");
+                CmdToggleCaption.Label = "show caption";
+            }
         }
 
         private void CmdCrop_Tapped(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e) {
@@ -348,7 +456,7 @@ namespace Hangon.Views {
         #endregion events
 
         private void UpdatePhotoCaptionPosition() {
-            var height = Window.Current.Bounds.Height - 180;
+            var height = Window.Current.Bounds.Height - PhotoCaptionTopMargin;
             RowSpacing.Height = new GridLength(height);
         }
         
@@ -386,5 +494,6 @@ namespace Hangon.Views {
 
             FlyoutNotification.Visibility = Visibility.Collapsed;
         }
+        
     }
 }

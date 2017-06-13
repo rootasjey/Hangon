@@ -8,6 +8,10 @@ using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Navigation;
 using Windows.UI.Xaml;
+using Windows.UI.Xaml.Hosting;
+using Microsoft.Graphics.Canvas.Effects;
+using Windows.UI;
+using Windows.UI.Composition;
 
 namespace Hangon.Views {
     public sealed partial class HomePage : Page {
@@ -23,7 +27,7 @@ namespace Hangon.Views {
 
         public HomePage() {
             InitializeComponent();
-
+            ApplyCommandBarBarFrostedGlass();
             StartNavigationToAnimation();
             BindData();
             LoadData();
@@ -61,8 +65,8 @@ namespace Hangon.Views {
                     var item = (GridViewItem)RecentView.ContainerFromItem(_LastSelectedWallpaper);
                     if (item == null) return;
 
-                    var stack = (StackPanel)item.ContentTemplateRoot;
-                    var image = (Image)stack.FindName("PhotoImage");
+                    var control = (UserControl)item.ContentTemplateRoot;
+                    var image = (Image)control.FindName("PhotoImage");
                     if (image == null) return;
 
                     image.Opacity = 0;
@@ -76,6 +80,7 @@ namespace Hangon.Views {
             }
         }
 
+        #region data
         private  void BindData() {
             if (App.AppDataSource == null) {
                 App.AppDataSource = new DataSource();
@@ -113,6 +118,9 @@ namespace Hangon.Views {
             }
         }
 
+        #endregion data 
+
+        #region events
         private void PhotoItem_Tapped(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e) {
             var item = (StackPanel)sender;
             var wallpaper = (Photo)item.DataContext;
@@ -128,22 +136,23 @@ namespace Hangon.Views {
         }
 
         private void PhotoItem_Loaded(object sender, RoutedEventArgs e) {
-            var wallItem = (StackPanel)sender;
+            var photoItem = (StackPanel)sender;
 
-            var data = (Photo)wallItem.DataContext;
+            var data = (Photo)photoItem.DataContext;
             if (data == _LastSelectedWallpaper) {
-                wallItem.Fade(1).Start();
+                photoItem.Fade(1).Start();
                 return;
             }
 
             _AnimationDelay += 100;
 
-            wallItem.Offset(0, 100, 0)
+            photoItem.Offset(0, 100, 0)
                     .Then()
                     .Fade(1, 500, _AnimationDelay)
                     .Offset(0,0, 500, _AnimationDelay)
                     .Start();
         }
+        #endregion events
 
         #region micro-interactions
         private void Image_PointerEntered(object sender, Windows.UI.Xaml.Input.PointerRoutedEventArgs e) {
@@ -169,6 +178,57 @@ namespace Hangon.Views {
         #endregion micro-interactions
 
         #region commandbar
+        void ApplyCommandBarBarFrostedGlass() {
+            var glassHost = AppBarFrozenHost;
+            var visual = ElementCompositionPreview.GetElementVisual(glassHost);
+            var compositor = visual.Compositor;
+
+            // Create a glass effect, requires Win2D NuGet package
+            var glassEffect = new GaussianBlurEffect {
+                BlurAmount = 10.0f,
+                BorderMode = EffectBorderMode.Hard,
+                Source = new ArithmeticCompositeEffect {
+                    MultiplyAmount = 0,
+                    Source1Amount = 0.5f,
+                    Source2Amount = 0.5f,
+                    Source1 = new CompositionEffectSourceParameter("backdropBrush"),
+                    Source2 = new ColorSourceEffect {
+                        Color = Color.FromArgb(255, 245, 245, 245)
+                    }
+                }
+            };
+
+            //  Create an instance of the effect and set its source to a CompositionBackdropBrush
+            var effectFactory = compositor.CreateEffectFactory(glassEffect);
+            var backdropBrush = compositor.CreateBackdropBrush();
+            var effectBrush = effectFactory.CreateBrush();
+
+            effectBrush.SetSourceParameter("backdropBrush", backdropBrush);
+
+            // Create a Visual to contain the frosted glass effect
+            var glassVisual = compositor.CreateSpriteVisual();
+            glassVisual.Brush = effectBrush;
+
+            // Add the blur as a child of the host in the visual tree
+            ElementCompositionPreview.SetElementChildVisual(glassHost, glassVisual);
+
+            // Make sure size of glass host and glass visual always stay in sync
+            var bindSizeAnimation = compositor.CreateExpressionAnimation("hostVisual.Size");
+            bindSizeAnimation.SetReferenceParameter("hostVisual", visual);
+
+            glassVisual.StartAnimation("Size", bindSizeAnimation);
+
+
+            glassHost.Offset(0, 35).Start();
+
+            AppBar.Opening += (s, e) => {
+                glassHost.Offset(0, 0).Start();
+            };
+            AppBar.Closing += (s, e) => {
+                glassHost.Offset(0, 35).Start();
+            };
+        }
+
         private void CmdSettings_Tapped(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e) {
             Frame.Navigate(typeof(SettingsPage));
         }
