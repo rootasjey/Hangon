@@ -45,8 +45,8 @@ namespace Hangon.Views {
 
         private void FeedbackButton_Click(object sender, RoutedEventArgs e) {
             EmailMessage email = new EmailMessage() {
-                Subject = "[splashpaper] Feedback",
-                Body = "send this email to metrodevapp@outlook.com"
+                Subject = "[Hangon] Feedback",
+                Body = "send this email to jeremiecorpinot@outlook.com"
             };
             // TODO : add app infos
             EmailManager.ShowComposeNewEmailAsync(email);

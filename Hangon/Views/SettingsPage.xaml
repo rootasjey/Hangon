@@ -132,19 +132,23 @@
                         <TextBlock Text="feedback" FontSize="24"/>
                         <TextBlock Text="Send an email if you encounter issues or if you've suggestions"
                                    Opacity=".6" TextWrapping="Wrap"/>
-                        <Button x:Name="FeedbackButton" Content="send a suggestion" Margin="0,12,0,40" Click="FeedbackButton_Click"/>
+                        <Button x:Name="FeedbackButton" 
+                                Content="send a suggestion" 
+                                Margin="0,12,0,20" 
+                                Click="FeedbackButton_Click"/>
 
                         <TextBlock Text="notation" FontSize="24"/>
-                        <TextBlock Text="Don't forgt to give the app a note on the store ;)"
+                        <TextBlock Text="Don't forget to give the app a note on the store ;)"
                                    TextWrapping="Wrap"
                                    Opacity=".6"/>
                         
                         <Button x:Name="NoteButton" 
                                 Content="give a note" 
-                                Margin="0,12,0,40" 
+                                Margin="0,12,0,20" 
+                                Visibility="Collapsed"
                                 Click="NoteButton_Click"/>
 
-                        <TextBlock Text="images" FontSize="24"/>
+                        <TextBlock Text="images" FontSize="24" Margin="0,20,0,0"/>
                         <RichTextBlock x:Name="ImagesBox" Margin="0,0,0,40" Opacity=".6">
                             <Paragraph>
                                 All photos are from

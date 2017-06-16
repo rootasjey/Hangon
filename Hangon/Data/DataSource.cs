@@ -3,7 +3,9 @@ using Hangon.Models;
 
 namespace Hangon.Data {
     public class DataSource {
-        public PhotosCollection NewPhotos { get; set; }
+        public PhotosCollection RecentPhotos { get; set; }
+
+        public PhotosCollection CuratedPhotos { get; set; }
 
         public PhotosCollection UserPhotos { get; set; }
 
@@ -11,16 +13,28 @@ namespace Hangon.Data {
 
         public PhotosCollection CollectionPhotos { get; set; }
 
-        public async Task<int> FetchRecent() {
-            if (NewPhotos == null) NewPhotos = new PhotosCollection();
+        public async Task<int> FetchRecentPhotos() {
+            if (RecentPhotos == null) RecentPhotos = new PhotosCollection();
 
             var url = string.Format(Unsplash.GetUrl("photos"));
-            if (NewPhotos.Url == url) return 0;
+            if (RecentPhotos.Url == url) return 0;
 
-            NewPhotos.Clear();
-            NewPhotos.Page = 0;
-            NewPhotos.Url = url;
-            return await NewPhotos.Fetch();
+            RecentPhotos.Clear();
+            RecentPhotos.Page = 0;
+            RecentPhotos.Url = url;
+            return await RecentPhotos.Fetch();
+        }
+
+        public async Task<int> FetchCuratedPhotos() {
+            if (CuratedPhotos == null) CuratedPhotos = new PhotosCollection();
+
+            var url = string.Format(Unsplash.GetUrl("photos"));
+            if (CuratedPhotos.Url == url) return 0;
+
+            CuratedPhotos.Clear();
+            CuratedPhotos.Page = 0;
+            CuratedPhotos.Url = url;
+            return await CuratedPhotos.Fetch();
         }
 
         public async Task<Photo> GetPhoto(string id) {

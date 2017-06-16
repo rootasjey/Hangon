@@ -42,7 +42,7 @@ namespace Hangon.Services {
             dataPackage.SetText(text);
             Clipboard.SetContent(dataPackage);
 
-            ShowLocalToast("User link copied!");
+            ShowLocalToast("Link copied!");
         }
 
         public static void ShowLocalToast(string message) {
@@ -51,7 +51,7 @@ namespace Hangon.Services {
                     BindingGeneric = new ToastBindingGeneric() {
                         Children = {
                             new AdaptiveText() {
-                                Text = "Download"
+                                Text = "Hangon"
                             },
                             new AdaptiveText() {
                                 Text = message

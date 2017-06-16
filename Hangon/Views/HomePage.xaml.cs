@@ -90,37 +90,53 @@ namespace Hangon.Views {
         }
 
         private async void LoadData() {
-            if (PageDataSource.NewPhotos?.Count > 0) {
-                RecentView.ItemsSource = PageDataSource.NewPhotos;
+            if (PageDataSource.RecentPhotos?.Count > 0) {
+                RecentView.ItemsSource = PageDataSource.RecentPhotos;
                 return;
             }
 
             ShowLoadingView();
 
-            var added = await PageDataSource.FetchRecent();
+            var added = await PageDataSource.FetchRecentPhotos();
 
             HideLoadingView();
 
             if (added>0) {
-                RecentView.ItemsSource = PageDataSource.NewPhotos;
+                RecentView.ItemsSource = PageDataSource.RecentPhotos;
             } else {
-                EmptyView.Visibility = Visibility.Visible;
+                RecentEmptyView.Visibility = Visibility.Visible;
             }
 
             void ShowLoadingView()
             {
-                LoadingView.Visibility = Visibility.Visible;
+                RecentLoadingView.Visibility = Visibility.Visible;
             }
 
             void HideLoadingView()
             {
-                LoadingView.Visibility = Visibility.Collapsed;
+                RecentLoadingView.Visibility = Visibility.Collapsed;
             }
+        }
+
+        async void LoadCurated() {
+            FindName("CuratedPhotosPivotItem");
         }
 
         #endregion data 
 
         #region events
+        private void PagePivot_SelectionChanged(object sender, SelectionChangedEventArgs e) {
+            switch (PagePivot.SelectedIndex) {
+                case 0:
+                    break;
+                case 1:
+                    LoadCurated();
+                    break;
+                default:
+                    break;
+            }
+        }
+
         private void PhotoItem_Tapped(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e) {
             var item = (StackPanel)sender;
             var wallpaper = (Photo)item.DataContext;
@@ -234,7 +250,7 @@ namespace Hangon.Views {
         }
 
         private void CmdRefresh_Tapped(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e) {
-            PageDataSource.NewPhotos.Clear();
+            PageDataSource.RecentPhotos.Clear();
             LoadData();
         }
         #endregion commandbar

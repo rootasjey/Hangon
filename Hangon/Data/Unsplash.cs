@@ -25,6 +25,7 @@ namespace Hangon.Data {
 
         private static IDictionary<string, string> Endpoints = new Dictionary<string, string>() {
             {"photos", "photos" },
+            {"curated_photos", "photos/curated" },
             {"search", "search" },
             {"users", "users" },
             {"collections", "collections" }
@@ -34,6 +35,8 @@ namespace Hangon.Data {
             switch (type) {
                 case "photos":
                     return BaseURI + Endpoints["photos"];
+                case "curated_photos":
+                    return BaseURI + Endpoints["curated_photos"];
                 case "users":
                     return BaseURI + Endpoints["users"];
                 case "search":

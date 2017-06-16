@@ -76,39 +76,91 @@
     </Page.Resources>
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-        <!-- Loading -->
-        <Grid x:Name="LoadingView" 
-              VerticalAlignment="Center" 
-              HorizontalAlignment="Center"
-              Visibility="Collapsed">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="20"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
-            <ProgressBar x:Name="ProgressPage" IsIndeterminate="True"/>
-            <TextBlock Text="Loading photos from Unsplash..." FontSize="20" Grid.Row="1"/>
-        </Grid>
+        <Pivot x:Name="PagePivot"
+               SelectionChanged="PagePivot_SelectionChanged">
+            <PivotItem x:Name="RecentPhotoPivotItem"
+                       Header="recent">
+                <Grid>
+                    <!-- Loading -->
+                    <Grid x:Name="RecentLoadingView" 
+                          VerticalAlignment="Center" 
+                          HorizontalAlignment="Center"
+                          Visibility="Collapsed">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="20"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <ProgressBar x:Name="ProgressPage" IsIndeterminate="True"/>
+                        <TextBlock Text="Loading photos from Unsplash..." FontSize="20" Grid.Row="1"/>
+                    </Grid>
 
-        <StackPanel x:Name="EmptyView"
-              Visibility="Collapsed"
-              VerticalAlignment="Center"
-              HorizontalAlignment="Center">
-            <TextBlock Text="Sorry, I couldn't get data from Unsplash :("
-                       FontSize="20"
-                       TextWrapping="Wrap"/>
-            <Button x:Name="ButtonTryAgain" Content="try again" 
-                    Margin="0,20"
-                    HorizontalAlignment="Center"/>
-        </StackPanel>
+                    <StackPanel x:Name="RecentEmptyView"
+                                Visibility="Collapsed"
+                                VerticalAlignment="Center"
+                                HorizontalAlignment="Center">
+                        
+                        <TextBlock Text="Sorry, I couldn't get recent photos from Unsplash :("
+                                    FontSize="20"
+                                    TextWrapping="Wrap"/>
+                        <Button Content="try again" 
+                                Margin="0,20"
+                                HorizontalAlignment="Center"/>
+                    </StackPanel>
 
-        <!-- Data -->
-        <controls:AdaptiveGridView x:Name="RecentView"
+                    <!-- Data -->
+                    <controls:AdaptiveGridView x:Name="RecentView"
                                    DesiredWidth="300"
                                    ItemHeight="300"
                                    ItemTemplate="{StaticResource PhotoTemplate}"
                                    animations:ReorderGridAnimation.Duration="300"
                                    ItemContainerStyle="{StaticResource GridViewItemZeroMarginStyle}">
-        </controls:AdaptiveGridView>
+                    </controls:AdaptiveGridView>
+                </Grid>
+            </PivotItem>
+
+            <PivotItem x:Name="CuratedPhotosPivotItem"
+                       x:DeferLoadStrategy="Lazy"
+                       Header="curated">
+                <Grid>
+                    <!-- Loading -->
+                    <Grid x:Name="CuratedLoadingView" 
+                          VerticalAlignment="Center" 
+                          HorizontalAlignment="Center"
+                          Visibility="Collapsed">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="20"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <ProgressBar x:Name="CuratedProgressPage" IsIndeterminate="True"/>
+                        <TextBlock Text="Loading photos from Unsplash..." FontSize="20" Grid.Row="1"/>
+                    </Grid>
+
+                    <StackPanel x:Name="CuratedEmptyView"
+                                Visibility="Visible"
+                                VerticalAlignment="Center"
+                                HorizontalAlignment="Center">
+
+                        <TextBlock Text="Sorry, I couldn't get curated photos from Unsplash :("
+                                    FontSize="20"
+                                    TextWrapping="Wrap"/>
+                        <Button Content="try again" 
+                                Margin="0,20"
+                                HorizontalAlignment="Center"/>
+                    </StackPanel>
+
+                    <!-- Data -->
+                    <controls:AdaptiveGridView x:Name="CuratedView"
+                                               Visibility="Collapsed"
+                                               DesiredWidth="300"
+                                               ItemHeight="300"
+                                               ItemTemplate="{StaticResource PhotoTemplate}"
+                                               animations:ReorderGridAnimation.Duration="300"
+                                   ItemContainerStyle="{StaticResource GridViewItemZeroMarginStyle}">
+                    </controls:AdaptiveGridView>
+                </Grid>
+            </PivotItem>
+        </Pivot>
+
 
         <CommandBar x:Name="AppBar"
                     Canvas.ZIndex="3"
