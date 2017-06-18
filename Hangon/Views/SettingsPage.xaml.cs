@@ -1,5 +1,8 @@
 ﻿using Hangon.Services;
+using Microsoft.Toolkit.Uwp.UI.Animations;
 using System;
+using System.Globalization;
+using System.Threading;
 using Windows.ApplicationModel.Email;
 using Windows.UI.Core;
 using Windows.UI.Xaml;
@@ -8,9 +11,12 @@ using Windows.UI.Xaml.Navigation;
 
 namespace Hangon.Views {
     public sealed partial class SettingsPage : Page {
+        CoreDispatcher UIDispatcher { get; set; }
+
         public SettingsPage() {
             InitializeComponent();
             LoadData();
+            UIDispatcher = CoreWindow.GetForCurrentThread().Dispatcher;
         }
 
         private void LoadData() {
@@ -220,26 +226,38 @@ namespace Hangon.Views {
         #region language
         private void LanguageSelection_Loaded(object sender, RoutedEventArgs e) {
             var language = Settings.GetAppCurrentLanguage();
-            switch (language) {
-                case "English":
-                    LanguageSelection.SelectedIndex = 0;
-                    break;
-                case "Français":
-                    LanguageSelection.SelectedIndex = 1;
-                    break;
-                default:
-                    LanguageSelection.SelectedIndex = 0;
-                    break;
+
+            var culture = new CultureInfo(language);
+
+            if (culture.CompareInfo.IndexOf(language, "en", CompareOptions.IgnoreCase) >= 0) {
+                LanguageSelection.SelectedIndex = 0;
+                return;
+            }
+
+            if (culture.CompareInfo.IndexOf(language, "fr", CompareOptions.IgnoreCase) >= 0) {
+                LanguageSelection.SelectedIndex = 1;
+                return;
             }
         }
 
         private void LanguageSelection_SelectionChanged(object sender, SelectionChangedEventArgs e) {
             var item = (ComboBoxItem)LanguageSelection.SelectedItem;
-            var language = (string)item.Content;
+            var language = (string)item.Tag;
+            var fullLang = (string)item.Content;
 
             if (language == Settings.GetAppCurrentLanguage()) return;
             Settings.SaveAppCurrentLanguage(language);
+
+            App.UpdateLanguage();
+            ToastLanguageUpdated();
+
+            void ToastLanguageUpdated()
+            {
+                var toastMessage = fullLang + " language selected!";
+                Notify(toastMessage);
+            }
         }
+        
 
         #endregion language
 
@@ -292,9 +310,68 @@ namespace Hangon.Views {
 
             
         }
-        
+
         #endregion auto download resolution
 
+        private void ThemeSwitch_Loaded(object sender, RoutedEventArgs e) {
+            UpdateThemeSwitcher();
+
+            void UpdateThemeSwitcher()
+            {
+                ThemeSwitch.IsOn = Settings.IsApplicationThemeLight();
+            }
+        }
+
+        private void ThemeSwitch_Toggled(object sender, RoutedEventArgs e) {
+            var toggle = (ToggleSwitch)sender;
+
+            if (toggle.IsOn) ChangeTheme(ApplicationTheme.Light);
+
+            else ChangeTheme(ApplicationTheme.Dark);
+
+            void ChangeTheme(ApplicationTheme theme)
+            {
+                Settings.UpdateAppTheme(theme);
+            }
+        }
+
+
         #endregion personalization
+
+        #region notifications
+        private void FlyoutNotification_Dismiss(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e) {
+            HideNotification();
+        }
+
+        void Notify(string message) {
+            FlyoutText.Text = message;
+
+            FlyoutNotification.Opacity = 0;
+            FlyoutNotification.Visibility = Visibility.Visible;
+
+            FlyoutNotification
+                .Offset(0, -30, 0)
+                .Then()
+                .Fade(1)
+                .Offset(0)
+                .Start();
+
+            var autoEvent = new AutoResetEvent(false);
+            var timer = new Timer(async (object state) => {
+                UIDispatcher.RunAsync(CoreDispatcherPriority.Normal, () => {
+                    HideNotification();
+                });
+            }, autoEvent, TimeSpan.FromSeconds(5), new TimeSpan());
+        }
+
+        async void HideNotification() {
+            await FlyoutNotification
+                .Fade(0)
+                .Offset(0, -30)
+                .StartAsync();
+
+            FlyoutNotification.Visibility = Visibility.Collapsed;
+        }
+        #endregion notifications
     }
 }

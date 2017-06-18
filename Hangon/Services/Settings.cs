@@ -1,4 +1,6 @@
 ﻿using Windows.Storage;
+using Windows.System.UserProfile;
+using Windows.UI.Xaml;
 
 namespace Hangon.Services {
     public class Settings {
@@ -32,6 +34,13 @@ namespace Hangon.Services {
                 return "Language";
             }
         }
+
+        private static string ThemeKey {
+            get {
+                return "Theme";
+            }
+        }
+
         #endregion keys
 
         #region path
@@ -90,10 +99,30 @@ namespace Hangon.Services {
         }
 
         public static string GetAppCurrentLanguage() {
+            string defaultLanguage = GlobalizationPreferences.Languages[0];
+
             var settingsValues = ApplicationData.Current.LocalSettings.Values;
-            return settingsValues.ContainsKey(LanguageKey) ? (string)settingsValues[LanguageKey] : null;
+            return settingsValues.ContainsKey(LanguageKey) ? (string)settingsValues[LanguageKey] : defaultLanguage;
         }
-        #endregion lang
         
+        #endregion lang
+
+        #region theme
+        public static bool IsApplicationThemeLight() {
+            ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
+            localSettings.Values.TryGetValue(ThemeKey, out var previousTheme);
+            return ApplicationTheme.Light.ToString() == (string)previousTheme;
+        }
+
+        public static void UpdateAppTheme(ApplicationTheme theme) {
+            ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
+            localSettings.Values.TryGetValue(ThemeKey, out var previousTheme);
+
+            if ((string)previousTheme == theme.ToString()) return;
+
+            localSettings.Values[ThemeKey] = theme.ToString();
+            App.UpdateAppTheme();
+        }
+        #endregion theme
     }
 }

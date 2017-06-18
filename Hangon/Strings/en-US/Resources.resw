@@ -117,7 +117,46 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="CollectionPhotosFetchIssue" xml:space="preserve">
+  <data name="CollectionPhotosFetchFailed.Text" xml:space="preserve">
     <value>Sorry, I couldn't get the collection's photos :(</value>
+  </data>
+  <data name="CuratedHeader.Header" xml:space="preserve">
+    <value>curated</value>
+  </data>
+  <data name="CuratedPhotosFetchFailed.Text" xml:space="preserve">
+    <value>Sorry, I couldn't get curated photos :(</value>
+  </data>
+  <data name="LoadingPhotos.Text" xml:space="preserve">
+    <value>Loading photos from Unsplash...</value>
+  </data>
+  <data name="NoResultsSearchPhotos.Text" xml:space="preserve">
+    <value>there's no photos for this keyword</value>
+  </data>
+  <data name="RecentHeader.Header" xml:space="preserve">
+    <value>recent</value>
+  </data>
+  <data name="RecentPhotoFetchFailed.Text" xml:space="preserve">
+    <value>Sorry, I couldn't get recent photos :(</value>
+  </data>
+  <data name="SearchHeader.Header" xml:space="preserve">
+    <value>search</value>
+  </data>
+  <data name="Searching.Text" xml:space="preserve">
+    <value>searching photos from Unsplash...</value>
+  </data>
+  <data name="SearchSentenceSuggestion.Text" xml:space="preserve">
+    <value>begin by typing a keyword</value>
+  </data>
+  <data name="Theme.Text" xml:space="preserve">
+    <value>theme</value>
+  </data>
+  <data name="ThemeSwitch.OffContent" xml:space="preserve">
+    <value>Dark Theme</value>
+  </data>
+  <data name="ThemeSwitch.OnContent" xml:space="preserve">
+    <value>Light Theme</value>
+  </data>
+  <data name="SearchQueryMinimum" xml:space="preserve">
+    <value>Please enter a word containing at least 3 characters</value>
   </data>
 </root>

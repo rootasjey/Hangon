@@ -1,10 +1,14 @@
 ﻿using Hangon.Data;
+using Hangon.Services;
 using Hangon.Views;
 using System;
+using System.Globalization;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
 using Windows.Foundation.Metadata;
+using Windows.Globalization;
 using Windows.Phone.UI.Input;
+using Windows.Storage;
 using Windows.UI;
 using Windows.UI.Core;
 using Windows.UI.Xaml;
@@ -79,6 +83,7 @@ namespace Hangon {
             }
 
             //UpdateTitleBarThemeButton();
+            UpdateAppTheme();
             HideSystemTray();
         }
 
@@ -141,6 +146,20 @@ namespace Hangon {
             SystemNavigationManager.GetForCurrentView().AppViewBackButtonVisibility = visibility;
         }
 
+        public static void UpdateAppTheme() {
+            ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
+            var theme = localSettings.Values.ContainsKey("Theme") ?
+                (string)localSettings.Values["Theme"] : "Dark";
+
+            var frame = (Frame)Window.Current.Content;
+            if (theme == ApplicationTheme.Light.ToString()) {
+                frame.RequestedTheme = ElementTheme.Light;
+                return;
+            }
+
+            frame.RequestedTheme = ElementTheme.Dark;
+        }
+
         void UpdateTitleBarThemeButton() {
             var titleBar = Windows.UI.ViewManagement.ApplicationView.GetForCurrentView().TitleBar;
             titleBar.ButtonBackgroundColor = Colors.Transparent;
@@ -152,9 +171,13 @@ namespace Hangon {
         async void HideSystemTray() {
             var statusbar = "Windows.UI.ViewManagement.StatusBar";
             if (ApiInformation.IsTypePresent(statusbar)) {
-                //await Windows.UI.ViewManagement.StatusBar.GetForCurrentView().ShowAsync();
                 await Windows.UI.ViewManagement.StatusBar.GetForCurrentView().HideAsync();
             }
+        }
+
+        public static void UpdateLanguage() {
+            var lang = Settings.GetAppCurrentLanguage();
+            ApplicationLanguages.PrimaryLanguageOverride = lang;
         }
     }
 }

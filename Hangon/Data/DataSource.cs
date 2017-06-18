@@ -3,15 +3,22 @@ using Hangon.Models;
 
 namespace Hangon.Data {
     public class DataSource {
+        #region variables
         public PhotosCollection RecentPhotos { get; set; }
 
         public PhotosCollection CuratedPhotos { get; set; }
+
+        public PhotosCollection PhotosSearchResults { get; set; }
 
         public PhotosCollection UserPhotos { get; set; }
 
         public CollectionsCollection UserCollections { get; set; }
 
         public PhotosCollection CollectionPhotos { get; set; }
+
+        #endregion variables
+
+        #region methods
 
         public async Task<int> FetchRecentPhotos() {
             if (RecentPhotos == null) RecentPhotos = new PhotosCollection();
@@ -28,13 +35,26 @@ namespace Hangon.Data {
         public async Task<int> FetchCuratedPhotos() {
             if (CuratedPhotos == null) CuratedPhotos = new PhotosCollection();
 
-            var url = string.Format(Unsplash.GetUrl("photos"));
+            var url = string.Format(Unsplash.GetUrl("curated_photos"));
             if (CuratedPhotos.Url == url) return 0;
 
             CuratedPhotos.Clear();
             CuratedPhotos.Page = 0;
             CuratedPhotos.Url = url;
             return await CuratedPhotos.Fetch();
+        }
+
+        public async Task<int> SearchPhotos(string query) {
+            if (PhotosSearchResults == null) PhotosSearchResults = new PhotosCollection();
+
+            var url = string.Format(Unsplash.GetUrl("search_photos"));
+            if (PhotosSearchResults.Query == query) return 0;
+
+            PhotosSearchResults.Clear();
+            PhotosSearchResults.Page = 0;
+            PhotosSearchResults.Url = url;
+            PhotosSearchResults.Query = query;
+            return await PhotosSearchResults.Fetch();
         }
 
         public async Task<Photo> GetPhoto(string id) {
@@ -84,5 +104,7 @@ namespace Hangon.Data {
             CollectionPhotos.Url = url;
             return await CollectionPhotos.Fetch();
         }
+
+        #endregion methods
     }
 }

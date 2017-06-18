@@ -27,6 +27,7 @@ namespace Hangon.Data {
             {"photos", "photos" },
             {"curated_photos", "photos/curated" },
             {"search", "search" },
+            {"search_photos", "search/photos" },
             {"users", "users" },
             {"collections", "collections" }
         };
@@ -41,6 +42,8 @@ namespace Hangon.Data {
                     return BaseURI + Endpoints["users"];
                 case "search":
                     return BaseURI + Endpoints["search"];
+                case "search_photos":
+                    return BaseURI + Endpoints["search_photos"];
                 case "collections":
                     return BaseURI + Endpoints["collections"];
                 default:
@@ -324,9 +327,31 @@ namespace Hangon.Data {
     }
 
     public class PhotosCollection: ObservableCollection<Photo>, ISupportIncrementalLoading {
+        /// <summary>
+        /// URL to get the data from
+        /// </summary>
         public string Url { get; set; }
+
+        /// <summary>
+        /// Cursor (page number)
+        /// </summary>
         public int Page { get; set; }
+
+        /// <summary>
+        /// If there's more data to fetch
+        /// </summary>
         public bool HasMoreItems { get; set; }
+
+        /// <summary>
+        /// Optional query to search photos
+        /// If set, the collection is handled as a search collection
+        /// </summary>
+        public string Query { get; set; }
+
+        /// <summary>
+        /// (Search case) total photos found
+        /// </summary>
+        public int TotalPhotoCount { get; set; }
 
         public async Task<int> Fetch() {
             HttpClient http = new HttpClient();
@@ -340,62 +365,65 @@ namespace Hangon.Data {
             int added = 0;
             string fetchURL = string.Format("{0}?page={1}", Url, Page);
 
+            addSearchParametersIfRequested();
+
             try {
                 response = await http.GetAsync(fetchURL);
                 response.EnsureSuccessStatusCode();
                 string responseBodyAsText = await response.Content.ReadAsStringAsync();
 
-                JArray jsonList = JArray.Parse(responseBodyAsText);
+                JArray rawPhotosList = handleAndExtractResults(responseBodyAsText);
 
-                foreach (JObject item in jsonList) {
+
+                foreach (JObject rawPhoto in rawPhotosList) {
                     var photo = new Photo() {
-                        Id = (string)item["id"],
-                        Width = (int)item["width"],
-                        Height = (int)item["height"],
-                        Color = (string)item["color"],
-                        Likes = (int)item["likes"],
-                        IsLikedByUser = (bool)item["liked_by_user"],
+                        Id = (string)rawPhoto["id"],
+                        Width = (int)rawPhoto["width"],
+                        Height = (int)rawPhoto["height"],
+                        Color = (string)rawPhoto["color"],
+                        Likes = (int)rawPhoto["likes"],
+                        IsLikedByUser = (bool)rawPhoto["liked_by_user"],
 
                         User = new User() {
-                            Id = (string)item["user"]["id"],
-                            Username = (string)item["user"]["username"],
-                            Name = (string)item["user"]["name"],
-                            PortfolioUrl = (string)item["user"]["portfolio_url"],
-                            Bio = (string)item["user"]["bio"],
-                            Location = (string)item["user"]["location"],
-                            TotalLikes = (int)item["user"]["total_likes"],
-                            TotalPhotos = (int)item["user"]["total_photos"],
-                            TotalCollections = (int)item["user"]["total_collections"],
+                            Id = (string)rawPhoto["user"]["id"],
+                            Username = (string)rawPhoto["user"]["username"],
+                            Name = (string)rawPhoto["user"]["name"],
+                            PortfolioUrl = (string)rawPhoto["user"]["portfolio_url"],
+                            Bio = (string)rawPhoto["user"]["bio"],
+                            Location = (string)rawPhoto["user"]["location"],
+                            TotalLikes = (int)rawPhoto["user"]["total_likes"],
+                            TotalPhotos = (int)rawPhoto["user"]["total_photos"],
+                            TotalCollections = (int)rawPhoto["user"]["total_collections"],
 
                             ProfileImage = new ProfileImage() {
-                                Small = (string)item["user"]["profile_image"]["small"],
-                                Medium = (string)item["user"]["profile_image"]["medium"],
-                                Large = (string)item["user"]["profile_image"]["large"],
+                                Small = (string)rawPhoto["user"]["profile_image"]["small"],
+                                Medium = (string)rawPhoto["user"]["profile_image"]["medium"],
+                                Large = (string)rawPhoto["user"]["profile_image"]["large"],
                             },
 
                             Links = new UserLinks() {
-                                Self = (string)item["user"]["links"]["self"],
-                                Html = (string)item["user"]["links"]["html"],
-                                Photos = (string)item["user"]["links"]["photos"],
-                                Likes = (string)item["user"]["links"]["likes"],
-                                Portfolio = (string)item["user"]["links"]["portfolio"],
+                                Self = (string)rawPhoto["user"]["links"]["self"],
+                                Html = (string)rawPhoto["user"]["links"]["html"],
+                                Photos = (string)rawPhoto["user"]["links"]["photos"],
+                                Likes = (string)rawPhoto["user"]["links"]["likes"],
+                                Portfolio = (string)rawPhoto["user"]["links"]["portfolio"],
                             }
                         },
 
                         Urls = new Urls() {
-                            Raw = (string)item["urls"]["raw"],
-                            Full = (string)item["urls"]["full"],
-                            Regular = (string)item["urls"]["regular"],
-                            Small = (string)item["urls"]["small"],
-                            Thumbnail = (string)item["urls"]["thumb"],
+                            Raw = (string)rawPhoto["urls"]["raw"],
+                            Full = (string)rawPhoto["urls"]["full"],
+                            Regular = (string)rawPhoto["urls"]["regular"],
+                            Small = (string)rawPhoto["urls"]["small"],
+                            Thumbnail = (string)rawPhoto["urls"]["thumb"],
                         },
 
-                        Categories = Unsplash.ExtractCategories(item["categories"]),
+                        Categories = Unsplash.ExtractCategories(rawPhoto["categories"]),
 
                         Links = new PhotoLinks() {
-                            Self = (string)item["links"]["self"],
-                            Html = (string)item["links"]["html"],
-                            Download = (string)item["links"]["download"],
+                            Self = (string)rawPhoto["links"]["self"],
+                            Html = (string)rawPhoto["links"]["html"],
+                            Download = (string)rawPhoto["links"]["download"],
                         }
                     };
 
@@ -409,6 +437,26 @@ namespace Hangon.Data {
             } catch /*(HttpRequestException hre)*/ {
                 HasMoreItems = false;
                 return 0;
+            }
+
+            void addSearchParametersIfRequested()
+            {
+                if (!string.IsNullOrEmpty(Query)) {
+                    fetchURL += "&query=" + Query;
+                }
+            }
+
+            JArray handleAndExtractResults(string responseBodyAsText)
+            {
+                if (!string.IsNullOrEmpty(Query)) {  // if it's a search !
+                    var searchResponse = JObject.Parse(responseBodyAsText);
+                    TotalPhotoCount = (int)searchResponse["total"];
+                    return (JArray)searchResponse["results"];
+
+                } else {
+                    return JArray.Parse(responseBodyAsText);
+                }
+
             }
         }
 

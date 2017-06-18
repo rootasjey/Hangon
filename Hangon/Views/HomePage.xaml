@@ -76,9 +76,24 @@
     </Page.Resources>
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <FlyoutPresenter x:Name="FlyoutNotification"
+                         RequestedTheme="Dark"
+                         Visibility="Collapsed"
+                         Canvas.ZIndex="2"
+                         Background="{ThemeResource SystemControlHighlightAccentBrush}" 
+                         Height="20" VerticalAlignment="Top"
+                         Tapped="FlyoutNotification_Dismiss">
+            <StackPanel>
+                <TextBlock x:Name="FlyoutText" Text=""/>
+            </StackPanel>
+        </FlyoutPresenter>
+        
         <Pivot x:Name="PagePivot"
+               Style="{StaticResource PivotCenteredHeadersStyle}"
                SelectionChanged="PagePivot_SelectionChanged">
+            
             <PivotItem x:Name="RecentPhotoPivotItem"
+                       Margin="0"
                        Header="recent">
                 <Grid>
                     <!-- Loading -->
@@ -91,15 +106,18 @@
                             <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
                         <ProgressBar x:Name="ProgressPage" IsIndeterminate="True"/>
-                        <TextBlock Text="Loading photos from Unsplash..." FontSize="20" Grid.Row="1"/>
+                        <TextBlock  x:Uid="LoadingPhotos" 
+                                    Text="Loading photos from Unsplash..." 
+                                    FontSize="20" Grid.Row="1"/>
                     </Grid>
 
                     <StackPanel x:Name="RecentEmptyView"
                                 Visibility="Collapsed"
                                 VerticalAlignment="Center"
                                 HorizontalAlignment="Center">
-                        
-                        <TextBlock Text="Sorry, I couldn't get recent photos from Unsplash :("
+
+                        <TextBlock x:Uid="RecentPhotoFetchFailed" 
+                                   Text="Sorry, I couldn't get recent photos from Unsplash :("
                                     FontSize="20"
                                     TextWrapping="Wrap"/>
                         <Button Content="try again" 
@@ -119,9 +137,13 @@
             </PivotItem>
 
             <PivotItem x:Name="CuratedPhotosPivotItem"
-                       x:DeferLoadStrategy="Lazy"
+                       Margin="0"
+                       x:Uid="CuratedHeader"
                        Header="curated">
-                <Grid>
+                
+                <Grid x:Name="CuratedPhotosPivotItemContent"
+                      x:DeferLoadStrategy="Lazy">
+                    
                     <!-- Loading -->
                     <Grid x:Name="CuratedLoadingView" 
                           VerticalAlignment="Center" 
@@ -132,17 +154,20 @@
                             <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
                         <ProgressBar x:Name="CuratedProgressPage" IsIndeterminate="True"/>
-                        <TextBlock Text="Loading photos from Unsplash..." FontSize="20" Grid.Row="1"/>
+                        <TextBlock x:Uid="LoadingPhotos" 
+                                   Text="Loading photos from Unsplash..." 
+                                   FontSize="20" Grid.Row="1"/>
                     </Grid>
 
                     <StackPanel x:Name="CuratedEmptyView"
-                                Visibility="Visible"
+                                Visibility="Collapsed"
                                 VerticalAlignment="Center"
                                 HorizontalAlignment="Center">
 
-                        <TextBlock Text="Sorry, I couldn't get curated photos from Unsplash :("
-                                    FontSize="20"
-                                    TextWrapping="Wrap"/>
+                        <TextBlock x:Uid="CuratedPhotosFetchFailed" 
+                                   Text="Sorry, I couldn't get curated photos from Unsplash :("
+                                   FontSize="20"
+                                   TextWrapping="Wrap"/>
                         <Button Content="try again" 
                                 Margin="0,20"
                                 HorizontalAlignment="Center"/>
@@ -150,12 +175,78 @@
 
                     <!-- Data -->
                     <controls:AdaptiveGridView x:Name="CuratedView"
+                                               Visibility="Visible"
+                                               DesiredWidth="300"
+                                               ItemHeight="300"
+                                               ItemTemplate="{StaticResource PhotoTemplate}"
+                                               animations:ReorderGridAnimation.Duration="300"
+                                               ItemContainerStyle="{StaticResource GridViewItemZeroMarginStyle}">
+                    </controls:AdaptiveGridView>
+                </Grid>
+            </PivotItem>
+
+            <PivotItem x:Name="SearchPivotItem"
+                       x:Uid="SearchHeader"
+                       Margin="0"
+                       Header="search">
+                
+                <Grid x:Name="SearchPivotItemContent">
+                    <StackPanel x:Name="SearchPanel" VerticalAlignment="Center">
+                        <FontIcon Glyph="&#xE094;" FontSize="30" Margin="0,10"/>
+                        
+                        <TextBox x:Name="SearchBox" MaxWidth="300"
+                                 KeyUp="SearchBox_KeyUp"></TextBox>
+                        
+                        <TextBlock x:Uid="TextSearchSentenceSuggestion" 
+                                   Text="begin by typing a keyword..." 
+                                   HorizontalAlignment="Center"
+                                   FontSize="22"
+                                   Opacity=".6"/>
+                        
+                        <TextBlock x:Name="WordSuggestion" 
+                                   Text="...space"
+                                   Opacity=".6"
+                                   FontSize="22"
+                                   FontWeight="SemiBold"
+                                   Foreground="{StaticResource SystemControlHighlightAccentBrush}"
+                                   HorizontalAlignment="Center"
+                                   Tapped="WordSuggestion_Tapped"/>
+                    </StackPanel>
+
+                    <!-- Loading -->
+                    <Grid x:Name="SearchLoadingView" 
+                          VerticalAlignment="Center" 
+                          HorizontalAlignment="Center"
+                          Visibility="Collapsed">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="20"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <ProgressBar x:Name="SearchProgressPage" IsIndeterminate="True"/>
+                        <TextBlock x:Uid="SearchingPhotos" 
+                                   Text="searching photos from Unsplash..." 
+                                   FontSize="20" Grid.Row="1"/>
+                    </Grid>
+
+                    <StackPanel x:Name="SearchEmptyView"
+                                Visibility="Collapsed"
+                                VerticalAlignment="Center"
+                                HorizontalAlignment="Center">
+
+                        <TextBlock x:Uid="NoResultsSearchPhotos" 
+                                   Text="There's no photos for this keyword"
+                                   FontSize="20"
+                                   TextWrapping="Wrap"/>
+                    </StackPanel>
+
+                    <!-- Data -->
+                    <controls:AdaptiveGridView x:Name="SearchPhotosView"
                                                Visibility="Collapsed"
                                                DesiredWidth="300"
                                                ItemHeight="300"
                                                ItemTemplate="{StaticResource PhotoTemplate}"
                                                animations:ReorderGridAnimation.Duration="300"
-                                   ItemContainerStyle="{StaticResource GridViewItemZeroMarginStyle}">
+                                               ItemContainerStyle="{StaticResource GridViewItemZeroMarginStyle}">
                     </controls:AdaptiveGridView>
                 </Grid>
             </PivotItem>
@@ -164,16 +255,18 @@
 
         <CommandBar x:Name="AppBar"
                     Canvas.ZIndex="3"
+                    RequestedTheme="Light"
                     Background="Transparent"
                     VerticalAlignment="Bottom"
-                    ClosedDisplayMode="Minimal">
+                    ClosedDisplayMode="Compact">
+            <AppBarButton x:Name="CmdShowSearch" Label="show search" Icon="Find" Tapped="CmdShowSearch_Tapped"/>
             <AppBarButton x:Name="CmdRefresh" Label="refresh" Icon="Refresh" Tapped="CmdRefresh_Tapped"/>
             <CommandBar.SecondaryCommands>
                 <AppBarButton x:Name="CmdSettings" Label="settings" Tapped="CmdSettings_Tapped"/>
             </CommandBar.SecondaryCommands>
         </CommandBar>
 
-        <Grid x:Name="AppBarFrozenHost" Canvas.ZIndex="2" Height="58" VerticalAlignment="Bottom"/>
+        <Grid x:Name="AppBarFrozenHost" Canvas.ZIndex="2" Height="75" VerticalAlignment="Bottom"/>
 
         <VisualStateManager.VisualStateGroups>
             <VisualStateGroup x:Name="WindowStates">

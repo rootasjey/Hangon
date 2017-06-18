@@ -117,7 +117,46 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="CollectionPhotosFetchIssue" xml:space="preserve">
+  <data name="CollectionPhotosFetchIssue.Text" xml:space="preserve">
     <value>Désolé, je n'ai pas pu récupérer les photos de la collection :(</value>
+  </data>
+  <data name="CuratedHeader.Header" xml:space="preserve">
+    <value>organisées</value>
+  </data>
+  <data name="CuratedPhotosFetchFailed.Text" xml:space="preserve">
+    <value>Désolé, je n'ai pas pu récupérer les photos organisées :(</value>
+  </data>
+  <data name="LoadingPhotos.Text" xml:space="preserve">
+    <value>Chargement des photos depuis Unplash...</value>
+  </data>
+  <data name="NoResultsSearchPhotos.Text" xml:space="preserve">
+    <value>aucune photo ne correspond à ce terme de recherche</value>
+  </data>
+  <data name="RecentHeader.Header" xml:space="preserve">
+    <value>récent</value>
+  </data>
+  <data name="RecentPhotoFetchFailed.Text" xml:space="preserve">
+    <value>Désolé, je n'ai pas pu récupérer les photos récentes :(</value>
+  </data>
+  <data name="SearchHeader.Header" xml:space="preserve">
+    <value>recherche</value>
+  </data>
+  <data name="Searching.Text" xml:space="preserve">
+    <value>recherche de photos sur Unplash...</value>
+  </data>
+  <data name="SearchSentenceSuggestion.Text" xml:space="preserve">
+    <value>commence par taper un mot-clé</value>
+  </data>
+  <data name="Theme.Text" xml:space="preserve">
+    <value>thème</value>
+  </data>
+  <data name="ThemeSwitch.OffContent" xml:space="preserve">
+    <value>Thème Sombre</value>
+  </data>
+  <data name="ThemeSwitch.OnContent" xml:space="preserve">
+    <value>Thème Clair</value>
+  </data>
+  <data name="SearchQueryMinimum" xml:space="preserve">
+    <value>Veuillez entrer un mot d'au moins 3 lettres</value>
   </data>
 </root>

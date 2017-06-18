@@ -1,4 +1,5 @@
-﻿using Hangon.Data;
+﻿using System;
+using Hangon.Data;
 using Hangon.Models;
 using Hangon.Services;
 using Microsoft.Toolkit.Uwp.UI.Animations;
@@ -12,38 +13,53 @@ using Windows.UI.Xaml.Hosting;
 using Microsoft.Graphics.Canvas.Effects;
 using Windows.UI;
 using Windows.UI.Composition;
+using Windows.UI.Xaml.Input;
+using System.Threading;
 
 namespace Hangon.Views {
     public sealed partial class HomePage : Page {
         #region variables
         private DataSource PageDataSource { get; set; }
 
-        float _AnimationDelay { get; set; }
+        float _RecentAnimationDelay { get; set; }
 
-        static Photo _LastSelectedWallpaper { get; set; }
+        float _CuratedAnimationDelay { get; set; }
+
+        float _SearchAnimationDelay { get; set; }
+
+        static Photo _LastSelectedPhoto { get; set; }
 
         bool _BlockLoadedAnimation { get; set; }
+
+        private static int _LastSelectedPivotIndex { get; set; }
+
+        CoreDispatcher UIDispatcher { get; set; }
+
+        Timer _TimerWordSuggestion { get; set; }
+        Timer _TimerSearchBackground { get; set; }
         #endregion variables
 
         public HomePage() {
             InitializeComponent();
+            UIDispatcher = CoreWindow.GetForCurrentThread().Dispatcher;
+
             ApplyCommandBarBarFrostedGlass();
+            BindAppDataSource();
+
+            RestorePivotPosition();
             StartNavigationToAnimation();
-            BindData();
-            LoadData();
+            LoadRecentData();
         }
 
         #region navigation
 
         protected override void OnNavigatedFrom(NavigationEventArgs e) {
             CoreWindow.GetForCurrentThread().KeyDown -= Page_KeyDown;
-            //_LastSelectedPivotItem = HomePivot.SelectedIndex;
             base.OnNavigatedFrom(e);
         }
 
         protected override void OnNavigatedTo(NavigationEventArgs e) {
             CoreWindow.GetForCurrentThread().KeyDown += Page_KeyDown;
-            //RestorePivotPosition();
             base.OnNavigatedTo(e);
         }
 
@@ -55,14 +71,48 @@ namespace Hangon.Views {
 
         #endregion navigation
 
+        void RestorePivotPosition() {
+            PagePivot.SelectedIndex = _LastSelectedPivotIndex;
+            AutoShowSearchResults();
+
+            void AutoShowSearchResults()
+            {
+                if (_LastSelectedPivotIndex != 2) {
+                    return;
+                }
+
+                if (PageDataSource.PhotosSearchResults?.Count > 0) {
+                    HideSearchPanel();
+                    ShowSearchResults();
+                }
+            }
+        }
+
         void StartNavigationToAnimation() {
             var animation = ConnectedAnimationService.GetForCurrentView().GetAnimation("PhotoImage");
-            if (animation != null && _LastSelectedWallpaper != null) {
-                _BlockLoadedAnimation = true;
+
+            if (animation == null || _LastSelectedPhoto == null) {
+                return;
+            }
+
+            _BlockLoadedAnimation = true;
+
+            if (PagePivot.SelectedIndex == 0) {
+                animateRecent();
+
+            } else if (PagePivot.SelectedIndex == 1) {
+                animateCurated();
+
+            } else if (PagePivot.SelectedIndex == 2) {
+                animateSearchResults();
+            }
+
+            void animateRecent()
+            {
 
                 RecentView.Loaded += (s, e) => {
-                    RecentView.ScrollIntoView(_LastSelectedWallpaper);
-                    var item = (GridViewItem)RecentView.ContainerFromItem(_LastSelectedWallpaper);
+                    RecentView.ScrollIntoView(_LastSelectedPhoto);
+                    var item = (GridViewItem)RecentView.ContainerFromItem(_LastSelectedPhoto);
                     if (item == null) return;
 
                     var control = (UserControl)item.ContentTemplateRoot;
@@ -73,15 +123,51 @@ namespace Hangon.Views {
                     image.Loaded += (_s, _e) => {
                         image.Opacity = 1;
                         animation.TryStart(image);
-                    };                    
+                    };
                 };
+            }
 
-                return;
+            void animateCurated()
+            {
+                CuratedView.Loaded += (s, e) => {
+                    CuratedView.ScrollIntoView(_LastSelectedPhoto);
+                    var item = (GridViewItem)CuratedView.ContainerFromItem(_LastSelectedPhoto);
+                    if (item == null) return;
+
+                    var control = (UserControl)item.ContentTemplateRoot;
+                    var image = (Image)control.FindName("PhotoImage");
+                    if (image == null) return;
+
+                    image.Opacity = 0;
+                    image.Loaded += (_s, _e) => {
+                        image.Opacity = 1;
+                        animation.TryStart(image);
+                    };
+                };
+            }
+
+            void animateSearchResults()
+            {
+                SearchPhotosView.Loaded += (s, e) => {
+                    SearchPhotosView.ScrollIntoView(_LastSelectedPhoto);
+                    var item = (GridViewItem)SearchPhotosView.ContainerFromItem(_LastSelectedPhoto);
+                    if (item == null) return;
+
+                    var control = (UserControl)item.ContentTemplateRoot;
+                    var image = (Image)control.FindName("PhotoImage");
+                    if (image == null) return;
+
+                    image.Opacity = 0;
+                    image.Loaded += (_s, _e) => {
+                        image.Opacity = 1;
+                        animation.TryStart(image);
+                    };
+                };
             }
         }
 
         #region data
-        private  void BindData() {
+        private void BindAppDataSource() {
             if (App.AppDataSource == null) {
                 App.AppDataSource = new DataSource();
             }
@@ -89,7 +175,7 @@ namespace Hangon.Views {
             PageDataSource = App.AppDataSource;
         }
 
-        private async void LoadData() {
+        private async void LoadRecentData() {
             if (PageDataSource.RecentPhotos?.Count > 0) {
                 RecentView.ItemsSource = PageDataSource.RecentPhotos;
                 return;
@@ -101,10 +187,12 @@ namespace Hangon.Views {
 
             HideLoadingView();
 
-            if (added>0) {
+            if (added > 0) {
                 RecentView.ItemsSource = PageDataSource.RecentPhotos;
+
             } else {
-                RecentEmptyView.Visibility = Visibility.Visible;
+                ShowEmptyView();
+                RecentView.Visibility = Visibility.Collapsed;
             }
 
             void ShowLoadingView()
@@ -116,31 +204,106 @@ namespace Hangon.Views {
             {
                 RecentLoadingView.Visibility = Visibility.Collapsed;
             }
+
+            void ShowEmptyView()
+            {
+                RecentEmptyView.Visibility = Visibility.Visible;
+            }
         }
 
-        async void LoadCurated() {
-            FindName("CuratedPhotosPivotItem");
+        private async void LoadCuratedData() {
+            FindName("CuratedPhotosPivotItemContent");
+
+            if (PageDataSource.CuratedPhotos?.Count > 0) {
+                CuratedView.ItemsSource = PageDataSource.CuratedPhotos;
+                return;
+            }
+
+            ShowLoadingView();
+
+            var added = await PageDataSource.FetchCuratedPhotos();
+
+            HideLoadingView();
+
+            if (added>0) {
+                CuratedView.ItemsSource = PageDataSource.CuratedPhotos;
+
+            } else {
+                ShowEmptyView();
+                CuratedView.Visibility = Visibility.Collapsed;
+            }
+
+
+            void ShowLoadingView()
+            {
+                CuratedLoadingView.Visibility = Visibility.Visible;
+            }
+
+            void HideLoadingView()
+            {
+                CuratedLoadingView.Visibility = Visibility.Collapsed;
+            }
+
+            void ShowEmptyView()
+            {
+                CuratedEmptyView.Visibility = Visibility.Visible;
+            }
         }
 
         #endregion data 
 
         #region events
         private void PagePivot_SelectionChanged(object sender, SelectionChangedEventArgs e) {
+            UseAppBarMinimalMode();
+            _LastSelectedPivotIndex = PagePivot.SelectedIndex;
+
             switch (PagePivot.SelectedIndex) {
                 case 0:
+                    ShowResfreshCmd();
+                    HideShowSearchCmd();
+                    StopWordsSuggestion();
                     break;
+
                 case 1:
-                    LoadCurated();
+                    LoadCuratedData();
+                    ShowResfreshCmd();
+                    HideShowSearchCmd();
+                    StopWordsSuggestion();
                     break;
+
+                case 2:
+                    HideResfreshCmd();
+
+                    if (SearchPanel.Visibility == Visibility.Collapsed) {
+                        UseAppBarCompactMode();
+                        ShowShowSearchCmd();
+                        return;
+                    }
+
+                    FocusSearchBox();
+                    StartWordsSuggestions();
+                    break;
+
                 default:
                     break;
             }
+            
+
+            void HideResfreshCmd()
+            {
+                CmdRefresh.Visibility = Visibility.Collapsed;
+            }
+
+            void ShowResfreshCmd()
+            {
+                CmdRefresh.Visibility = Visibility.Visible;
+            }
         }
 
-        private void PhotoItem_Tapped(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e) {
+        private void PhotoItem_Tapped(object sender, TappedRoutedEventArgs e) {
             var item = (StackPanel)sender;
             var wallpaper = (Photo)item.DataContext;
-            _LastSelectedWallpaper = wallpaper;
+            _LastSelectedPhoto = wallpaper;
 
             var image = (Image)item.FindName("PhotoImage");
 
@@ -155,18 +318,34 @@ namespace Hangon.Views {
             var photoItem = (StackPanel)sender;
 
             var data = (Photo)photoItem.DataContext;
-            if (data == _LastSelectedWallpaper) {
+
+            if (data == _LastSelectedPhoto) {
                 photoItem.Fade(1).Start();
                 return;
             }
 
-            _AnimationDelay += 100;
+            float delay = GetAnimationDelayPivotIndex();
 
             photoItem.Offset(0, 100, 0)
                     .Then()
-                    .Fade(1, 500, _AnimationDelay)
-                    .Offset(0,0, 500, _AnimationDelay)
+                    .Fade(1, 500, delay)
+                    .Offset(0,0, 500, delay)
                     .Start();
+        }
+
+        float GetAnimationDelayPivotIndex() {
+            var step = 100;
+
+            switch (PagePivot.SelectedIndex) {
+                case 0:
+                    return _RecentAnimationDelay += step;
+                case 1:
+                    return _CuratedAnimationDelay += step;
+                case 2:
+                    return _SearchAnimationDelay += step;
+                default:
+                    return 0;
+            }
         }
         #endregion events
 
@@ -235,25 +414,232 @@ namespace Hangon.Views {
             glassVisual.StartAnimation("Size", bindSizeAnimation);
 
 
-            glassHost.Offset(0, 35).Start();
+            glassHost.Offset(0, 50).Start();
 
             AppBar.Opening += (s, e) => {
                 glassHost.Offset(0, 0).Start();
             };
+
             AppBar.Closing += (s, e) => {
-                glassHost.Offset(0, 35).Start();
+                if (AppBar.ClosedDisplayMode == AppBarClosedDisplayMode.Compact) {
+                    glassHost.Offset(0, 27).Start();
+
+                } else if (AppBar.ClosedDisplayMode == AppBarClosedDisplayMode.Minimal) {
+                    glassHost.Offset(0, 50).Start();
+                }
+                
             };
         }
 
-        private void CmdSettings_Tapped(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e) {
+        private void CmdSettings_Tapped(object sender, TappedRoutedEventArgs e) {
             Frame.Navigate(typeof(SettingsPage));
         }
 
-        private void CmdRefresh_Tapped(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e) {
-            PageDataSource.RecentPhotos.Clear();
-            LoadData();
+        private void CmdRefresh_Tapped(object sender, TappedRoutedEventArgs e) {
+            switch (PagePivot.SelectedIndex) {
+                case 0:
+                    ReloadRecentData();
+                    break;
+                case 1:
+                    ReloadCuratedData();
+                    break;
+                default:
+                    break;
+            }
+
+            void ReloadRecentData()
+            {
+                PageDataSource.RecentPhotos.Clear();
+                LoadRecentData();
+            }
+
+            void ReloadCuratedData()
+            {
+                PageDataSource.CuratedPhotos.Clear();
+                LoadCuratedData();
+            }
+            
+        }
+
+        private void CmdShowSearch_Tapped(object sender, TappedRoutedEventArgs e) {
+            HideSearchResults();
+            HideSearchEmptyView();
+            ShowSearchPanel();
+        }
+
+        void UseAppBarMinimalMode() {
+            AppBarFrozenHost.Offset(0, 50).Start();
+            AppBar.ClosedDisplayMode = AppBarClosedDisplayMode.Minimal;
+        }
+
+        void UseAppBarCompactMode() {
+            AppBarFrozenHost.Offset(0, 27).Start();
+            AppBar.ClosedDisplayMode = AppBarClosedDisplayMode.Compact;
+        }
+
+        void ShowShowSearchCmd() {
+            CmdShowSearch.Visibility = Visibility.Visible;
+        }
+
+        void HideShowSearchCmd() {
+            CmdShowSearch.Visibility = Visibility.Collapsed;
         }
         #endregion commandbar
 
+        #region search
+        private void SearchBox_KeyUp(object sender, KeyRoutedEventArgs e) {
+            if (e.Key != Windows.System.VirtualKey.Enter) { return; }
+
+            var query = SearchBox.Text;
+            Search(query);
+        }
+
+        private async void Search(string query) {
+            if (string.IsNullOrEmpty(query) || string.IsNullOrWhiteSpace(query)
+                || query.Length < 3) {
+
+                var loader = new Windows.ApplicationModel.Resources.ResourceLoader();
+                var message = loader.GetString("SearchQueryMinimum");
+                Notify(message);
+                return;
+            }
+
+            HideSearchPanel();
+            ShowLoadingSearch();
+
+            var results = await PageDataSource.SearchPhotos(query);
+
+            HideLoadingSearch();
+
+            if (PageDataSource.PhotosSearchResults.Count > 0) {
+                ShowSearchResults();
+                UseAppBarCompactMode();
+                ShowShowSearchCmd();
+
+            } else {
+                ShowEmptyView();
+            }
+
+            void ShowLoadingSearch()
+            {
+                SearchLoadingView.Visibility = Visibility.Visible;
+            }
+
+            void HideLoadingSearch()
+            {
+                SearchLoadingView.Visibility = Visibility.Collapsed;
+            }
+
+            void ShowEmptyView()
+            {
+                SearchEmptyView.Visibility = Visibility.Visible;
+            }
+        }
+
+        void ShowSearchResults() {
+            SearchPhotosView.ItemsSource = PageDataSource.PhotosSearchResults;
+            SearchPhotosView.Visibility = Visibility.Visible;
+        }
+
+        void HideSearchPanel() {
+            SearchPanel.Visibility = Visibility.Collapsed;
+        }
+
+        void HideSearchEmptyView() {
+            SearchEmptyView.Visibility = Visibility.Collapsed;
+        }
+
+        void HideSearchResults() {
+            SearchPhotosView.Visibility = Visibility.Collapsed;
+        }
+
+        void ShowSearchPanel() {
+            SearchPanel.Visibility = Visibility.Visible;
+        }
+
+        async void FocusSearchBox() {
+            await UIDispatcher.RunAsync(CoreDispatcherPriority.Normal, () => {
+                SearchBox.Focus(FocusState.Programmatic);
+                SearchBox.Focus(FocusState.Programmatic);
+            });
+        }
+
+        void StartWordsSuggestions() {
+            string[] terms = { "nature", "space", "desk", "oceans" };
+
+            var cursor = 0;
+            var random = new Random();
+
+            var autoEvent = new AutoResetEvent(false);
+            _TimerWordSuggestion = new Timer(async (object state) => {
+                await UIDispatcher.RunAsync(CoreDispatcherPriority.Normal, () => {
+                    UpdateTermSuggestion();
+                });
+            }, autoEvent, TimeSpan.FromSeconds(5), TimeSpan.FromSeconds(5));
+
+            async void UpdateTermSuggestion()
+            {
+                await WordSuggestion.Fade(0).StartAsync();
+                WordSuggestion.Text = string.Format("...{0}", terms[cursor]);
+                WordSuggestion.Fade(1).Start();
+
+                cursor = random.Next(terms.Length);
+            }
+        }
+
+        void StopWordsSuggestion() {
+            _TimerWordSuggestion?.Dispose();
+        }
+
+        private async void StartSearchBackgroundSlideShow() {
+
+        }
+
+        private void StopSearchBackgroundSlideShow() {
+
+        }
+
+        private void WordSuggestion_Tapped(object sender, TappedRoutedEventArgs e) {
+            var query = WordSuggestion.Text.Substring(3);
+            Search(query);
+        }
+
+        #endregion search
+
+        #region notifications
+        private void FlyoutNotification_Dismiss(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e) {
+            HideNotification();
+        }
+
+        void Notify(string message) {
+            FlyoutText.Text = message;
+
+            FlyoutNotification.Opacity = 0;
+            FlyoutNotification.Visibility = Visibility.Visible;
+
+            FlyoutNotification
+                .Offset(0, -30, 0)
+                .Then()
+                .Fade(1)
+                .Offset(0)
+                .Start();
+
+            var autoEvent = new AutoResetEvent(false);
+            var timer = new Timer(async (object state) => {
+                UIDispatcher.RunAsync(CoreDispatcherPriority.Normal, () => {
+                    HideNotification();
+                });
+            }, autoEvent, TimeSpan.FromSeconds(5), new TimeSpan());
+        }
+
+        async void HideNotification() {
+            await FlyoutNotification
+                .Fade(0)
+                .Offset(0, -30)
+                .StartAsync();
+
+            FlyoutNotification.Visibility = Visibility.Collapsed;
+        }
+        #endregion notifications
     }
 }

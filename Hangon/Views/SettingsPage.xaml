@@ -7,6 +7,18 @@
     mc:Ignorable="d">
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <FlyoutPresenter x:Name="FlyoutNotification"
+                         RequestedTheme="Dark"
+                         Visibility="Collapsed"
+                         Canvas.ZIndex="2"
+                         Background="{ThemeResource SystemControlHighlightAccentBrush}" 
+                         Height="20" VerticalAlignment="Top"
+                         Tapped="FlyoutNotification_Dismiss">
+            <StackPanel>
+                <TextBlock x:Name="FlyoutText" Text=""/>
+            </StackPanel>
+        </FlyoutPresenter>
+        
         <Pivot x:Name="PivotSettings">
             <PivotItem x:Name="PivotPersonalization"
                        Header="personalization">
@@ -17,12 +29,21 @@
                             <TextBlock Text="Choose your preferred language" Opacity=".6"/>
                             <ComboBox x:Name="LanguageSelection"
                                       Header="chosen language"
-                                      SelectedIndex="0"
                                       Loaded="LanguageSelection_Loaded"
                                       SelectionChanged="LanguageSelection_SelectionChanged">
-                                <ComboBoxItem Content="English"/>
-                                <ComboBoxItem Content="Français"/>
+                                <ComboBoxItem Content="English" Tag="EN"/>
+                                <ComboBoxItem Content="Français" Tag="FR"/>
                             </ComboBox>
+                        </StackPanel>
+
+                        <StackPanel Margin="0,20,0,0">
+                            <TextBlock x:Uid="Theme" Text="thème" FontSize="24"/>
+                            <ToggleSwitch x:Name="ThemeSwitch"
+                                          x:Uid="ThemeSwitch"
+                                          Loaded="ThemeSwitch_Loaded"
+                                          OnContent="Thème Clair"
+                                          OffContent="Thème Sombre"
+                                          Toggled="ThemeSwitch_Toggled"/>
                         </StackPanel>
 
                         <StackPanel Margin="0,20,0,0">
