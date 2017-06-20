@@ -15,6 +15,7 @@ using Windows.UI;
 using Windows.UI.Composition;
 using Windows.UI.Xaml.Input;
 using System.Threading;
+using Windows.UI.Xaml.Media.Imaging;
 
 namespace Hangon.Views {
     public sealed partial class HomePage : Page {
@@ -84,7 +85,12 @@ namespace Hangon.Views {
                 if (PageDataSource.PhotosSearchResults?.Count > 0) {
                     HideSearchPanel();
                     ShowSearchResults();
+                    return;
                 }
+
+                //FocusSearchBox();
+                //StartWordsSuggestions();
+                //StartSearchBackgroundSlideShow();
             }
         }
 
@@ -262,6 +268,7 @@ namespace Hangon.Views {
                     ShowResfreshCmd();
                     HideShowSearchCmd();
                     StopWordsSuggestion();
+                    StopSearchBackgroundSlideShow();
                     break;
 
                 case 1:
@@ -269,12 +276,15 @@ namespace Hangon.Views {
                     ShowResfreshCmd();
                     HideShowSearchCmd();
                     StopWordsSuggestion();
+                    StopSearchBackgroundSlideShow();
                     break;
 
                 case 2:
                     HideResfreshCmd();
 
-                    if (SearchPanel.Visibility == Visibility.Collapsed) {
+                    if (SearchPanel.Visibility == Visibility.Collapsed ||
+                        PageDataSource.PhotosSearchResults?.Count > 0) {
+
                         UseAppBarCompactMode();
                         ShowShowSearchCmd();
                         return;
@@ -282,6 +292,7 @@ namespace Hangon.Views {
 
                     FocusSearchBox();
                     StartWordsSuggestions();
+                    StartSearchBackgroundSlideShow();
                     break;
 
                 default:
@@ -465,6 +476,9 @@ namespace Hangon.Views {
             HideSearchResults();
             HideSearchEmptyView();
             ShowSearchPanel();
+
+            StartSearchBackgroundSlideShow();
+            StartWordsSuggestions();
         }
 
         void UseAppBarMinimalMode() {
@@ -500,10 +514,12 @@ namespace Hangon.Views {
 
                 var loader = new Windows.ApplicationModel.Resources.ResourceLoader();
                 var message = loader.GetString("SearchQueryMinimum");
+
                 Notify(message);
                 return;
             }
 
+            StopSearchBackgroundSlideShow();
             HideSearchPanel();
             ShowLoadingSearch();
 
@@ -565,12 +581,16 @@ namespace Hangon.Views {
         }
 
         void StartWordsSuggestions() {
-            string[] terms = { "nature", "space", "desk", "oceans" };
+            string[] words = {
+                "nature", "space", "desk", "oceans",
+                "city", "road", "people", "love", "sky",
+                "mountains", "man", "woman", "nasa",
+                "summer", "home", "food", "happy"
+            };
 
-            var cursor = 0;
             var random = new Random();
-
             var autoEvent = new AutoResetEvent(false);
+
             _TimerWordSuggestion = new Timer(async (object state) => {
                 await UIDispatcher.RunAsync(CoreDispatcherPriority.Normal, () => {
                     UpdateTermSuggestion();
@@ -580,10 +600,8 @@ namespace Hangon.Views {
             async void UpdateTermSuggestion()
             {
                 await WordSuggestion.Fade(0).StartAsync();
-                WordSuggestion.Text = string.Format("...{0}", terms[cursor]);
+                WordSuggestion.Text = string.Format("...{0}", words[random.Next(words.Length)]);
                 WordSuggestion.Fade(1).Start();
-
-                cursor = random.Next(terms.Length);
             }
         }
 
@@ -591,12 +609,46 @@ namespace Hangon.Views {
             _TimerWordSuggestion?.Dispose();
         }
 
-        private async void StartSearchBackgroundSlideShow() {
+        private void StartSearchBackgroundSlideShow() {
+            var recents = PageDataSource.RecentPhotos;
+            if (recents?.Count == 0) return;
 
+            var duration = 10000;
+            var random = new Random();
+            var autoEvent = new AutoResetEvent(false);
+
+            ShowPageBackground();
+
+            _TimerSearchBackground = new Timer(async (object state) => {
+                await UIDispatcher.RunAsync(CoreDispatcherPriority.Normal, () => {
+                    UpdateBackground();
+                });
+            }, autoEvent, TimeSpan.FromSeconds(5), TimeSpan.FromMilliseconds(duration));
+
+            async void UpdateBackground()
+            {
+                var index = random.Next(recents.Count);
+                var photoPath = recents[index].Urls.Regular;
+
+                await BackgroundImage.Fade(0).StartAsync();
+                await BackgroundImage.Scale(1f, 1f, 0, 0, 0).StartAsync();
+                BackgroundImage.Source = new BitmapImage(new Uri(photoPath));
+                BackgroundImage.Fade(1, duration).Scale(1.2f, 1.2f, 0, 0, duration).Start();
+            }
         }
 
         private void StopSearchBackgroundSlideShow() {
+            HidePageBackground();
+            _TimerSearchBackground?.Dispose();
+        }
 
+        private void ShowPageBackground() {
+            BackgroundContainer.Visibility = Visibility.Visible;
+        }
+
+        private async void HidePageBackground() {
+            await BackgroundImage.Fade().StartAsync();
+            BackgroundContainer.Visibility = Visibility.Collapsed;
         }
 
         private void WordSuggestion_Tapped(object sender, TappedRoutedEventArgs e) {
@@ -641,5 +693,9 @@ namespace Hangon.Views {
             FlyoutNotification.Visibility = Visibility.Collapsed;
         }
         #endregion notifications
+
+        private void RecentViewStates_CurrentStateChanged(object sender, VisualStateChangedEventArgs e) {
+
+        }
     }
 }
