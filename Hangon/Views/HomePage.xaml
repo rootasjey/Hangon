@@ -100,13 +100,14 @@
             
             <PivotItem x:Name="RecentPhotoPivotItem"
                        Margin="0"
+                       x:Uid="RecentHeader"
                        Header="recent">
                 
                 <UserControl> 
                     <!--Visual States don't work if not in an UserControl/ContentControl-->
                     
                     <Grid>
-                        <!-- Loading -->
+                        <!-- LOAD VIEW -->
                         <Grid x:Name="RecentLoadingView" 
                               VerticalAlignment="Center" 
                               HorizontalAlignment="Center"
@@ -135,7 +136,7 @@
                                     HorizontalAlignment="Center"/>
                         </StackPanel>
 
-                        <!-- Data -->
+                        <!-- DATA -->
                         <controls:AdaptiveGridView x:Name="RecentView"
                                        DesiredWidth="300"
                                        ItemHeight="300"
@@ -144,9 +145,9 @@
                                        ItemContainerStyle="{StaticResource GridViewItemZeroMarginStyle}">
                         </controls:AdaptiveGridView>
 
+                        <!-- VISUAL STATES -->
                         <VisualStateManager.VisualStateGroups>
-                            <VisualStateGroup x:Name="RecentViewStates" 
-                                                CurrentStateChanged="RecentViewStates_CurrentStateChanged">
+                            <VisualStateGroup x:Name="RecentViewStates">
                                 <VisualState x:Name="RecentViewSmall">
                                     <VisualState.StateTriggers>
                                         <AdaptiveTrigger MinWindowWidth="0"/>
@@ -186,7 +187,7 @@
                     <Grid x:Name="CuratedPhotosPivotItemContent"
                           x:DeferLoadStrategy="Lazy">
                     
-                        <!-- Loading -->
+                        <!-- LOAD VIEW -->
                         <Grid x:Name="CuratedLoadingView" 
                               VerticalAlignment="Center" 
                               HorizontalAlignment="Center"
@@ -215,7 +216,7 @@
                                     HorizontalAlignment="Center"/>
                         </StackPanel>
 
-                        <!-- Data -->
+                        <!-- DATA -->
                         <controls:AdaptiveGridView x:Name="CuratedView"
                                                    Visibility="Visible"
                                                    DesiredWidth="300"
@@ -226,6 +227,7 @@
                         
                         </controls:AdaptiveGridView>
 
+                        <!-- VISUAL STATES -->
                         <VisualStateManager.VisualStateGroups>
                             <VisualStateGroup x:Name="CuratedViewStates">
                                 <VisualState x:Name="CuratedViewSmall">
@@ -277,7 +279,7 @@
                                        Opacity=".6"/>
                         
                             <TextBlock x:Name="WordSuggestion" 
-                                       Text="...space"
+                                       Text="...landscape"
                                        Opacity=".6"
                                        FontSize="22"
                                        FontWeight="SemiBold"
@@ -286,7 +288,7 @@
                                        Tapped="WordSuggestion_Tapped"/>
                         </StackPanel>
 
-                        <!-- Loading -->
+                        <!-- LOAD VIEW -->
                         <Grid x:Name="SearchLoadingView" 
                               VerticalAlignment="Center" 
                               HorizontalAlignment="Center"
@@ -312,16 +314,18 @@
                                        TextWrapping="Wrap"/>
                         </StackPanel>
 
-                        <!-- Data -->
+                        <!-- DATA -->
                         <controls:AdaptiveGridView x:Name="SearchPhotosView"
                                                    Visibility="Collapsed"
                                                    DesiredWidth="300"
                                                    ItemHeight="300"
+                                                   ItemsSource="{x:Bind PageDataSource.PhotosSearchResults, Mode=OneWay}"
                                                    ItemTemplate="{StaticResource PhotoTemplate}"
                                                    animations:ReorderGridAnimation.Duration="300"
                                                    ItemContainerStyle="{StaticResource GridViewItemZeroMarginStyle}">
                         </controls:AdaptiveGridView>
 
+                        <!-- VISUAL STATES -->
                         <VisualStateManager.VisualStateGroups>
                             <VisualStateGroup x:Name="SearchPhotosViewStates">
                                 <VisualState x:Name="SearchPhotosViewSmall">
@@ -368,46 +372,5 @@
         </CommandBar>
 
         <Grid x:Name="AppBarFrozenHost" Canvas.ZIndex="2" Height="75" VerticalAlignment="Bottom"/>
-
-        <!--<VisualStateManager.VisualStateGroups>
-            <VisualStateGroup x:Name="WindowStates">
-                <VisualState x:Name="SmallSateWindow">
-                    <VisualState.StateTriggers>
-                        <AdaptiveTrigger MinWindowWidth="0"/>
-                    </VisualState.StateTriggers>
-
-                    <VisualState.Setters>
-                        <Setter Target="RecentView.ItemHeight" Value="90"/>
-                        <Setter Target="RecentView.DesiredWidth" Value="90"/>
-                        <Setter Target="RecentView.Margin" Value="0,0,-20,0"/>
-
-                        <Setter Target="CuratedView.ItemHeight" Value="90"/>
-                        <Setter Target="CuratedView.DesiredWidth" Value="90"/>
-                        <Setter Target="CuratedView.Margin" Value="0,0,-20,0"/>
-
-                        <Setter Target="SearchPhotosView.ItemHeight" Value="90"/>
-                        <Setter Target="SearchPhotosView.DesiredWidth" Value="90"/>
-                        <Setter Target="SearchPhotosView.Margin" Value="0,0,-20,0"/>
-                    </VisualState.Setters>
-                </VisualState>
-
-                <VisualState x:Name="WideSateWindow">
-                    <VisualState.StateTriggers>
-                        <AdaptiveTrigger MinWindowWidth="600"/>
-                    </VisualState.StateTriggers>
-
-                    <VisualState.Setters>
-                        <Setter Target="RecentView.ItemHeight" Value="300"/>
-                        <Setter Target="RecentView.DesiredWidth" Value="300"/>
-
-                        <Setter Target="CuratedView.ItemHeight" Value="300"/>
-                        <Setter Target="CuratedView.DesiredWidth" Value="300"/>
-
-                        <Setter Target="SearchPhotosView.ItemHeight" Value="300"/>
-                        <Setter Target="SearchPhotosView.DesiredWidth" Value="300"/>
-                    </VisualState.Setters>
-                </VisualState>
-            </VisualStateGroup>
-        </VisualStateManager.VisualStateGroups>-->
     </Grid>
 </Page>

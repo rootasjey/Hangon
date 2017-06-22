@@ -5,14 +5,22 @@ _Powered by [Unsplash](https://unsplash.com)_
 
 ## screenshots
 
-<img src="./hangon_app.png" height="400" alt="hangon app" />
+### pc
+
+<img src="./user_photos.png" height="400" alt="hangon app" />
+
+<img src="./user_photos_and_collections.png" height="400" alt="hangon app" />
+
+### mobile
+
+<img src="./mobile_collection.png" height="400" alt="hangon app" />
 
 ## features
 
 * change periodically wallpaper
 * change periodically lockscreen
 * browse new and featured photos
-
+* search photos
 
 ## setup
 Steps to build and run this project:
@@ -35,9 +43,9 @@ You can contribute to improve this project by:
 ## todo
 
 * Browse by categories
-* Add search
 
 ## platforms
 
 * Windows Mobile 10
 * Windows 10
+* Xbox

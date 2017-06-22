@@ -22,40 +22,47 @@ namespace Hangon.Views {
         #region variables
         private DataSource PageDataSource { get; set; }
 
-        float _RecentAnimationDelay { get; set; }
+        private float _RecentAnimationDelay { get; set; }
 
-        float _CuratedAnimationDelay { get; set; }
+        private float _CuratedAnimationDelay { get; set; }
 
-        float _SearchAnimationDelay { get; set; }
+        private float _SearchAnimationDelay { get; set; }
 
-        static Photo _LastSelectedPhoto { get; set; }
+        private static Photo _LastSelectedPhoto { get; set; }
 
-        bool _BlockLoadedAnimation { get; set; }
+        private bool _BlockLoadedAnimation { get; set; }
 
         private static int _LastSelectedPivotIndex { get; set; }
 
-        CoreDispatcher UIDispatcher { get; set; }
+        private CoreDispatcher UIDispatcher { get; set; }
 
-        Timer _TimerWordSuggestion { get; set; }
-        Timer _TimerSearchBackground { get; set; }
+        private Timer _TimerWordSuggestion { get; set; }
+
+        private Timer _TimerSearchBackground { get; set; }
+
+        private float _CmdBarOpenedOffset { get; set; }
+
+        private static bool _AreSearchResultsActivated { get; set; }
+
         #endregion variables
 
         public HomePage() {
             InitializeComponent();
-            UIDispatcher = CoreWindow.GetForCurrentThread().Dispatcher;
+            InitializeVariables();
 
             ApplyCommandBarBarFrostedGlass();
             BindAppDataSource();
 
             RestorePivotPosition();
             StartNavigationToAnimation();
-            LoadRecentData();
         }
 
         #region navigation
 
         protected override void OnNavigatedFrom(NavigationEventArgs e) {
             CoreWindow.GetForCurrentThread().KeyDown -= Page_KeyDown;
+            FreeMemory();
+
             base.OnNavigatedFrom(e);
         }
 
@@ -74,24 +81,6 @@ namespace Hangon.Views {
 
         void RestorePivotPosition() {
             PagePivot.SelectedIndex = _LastSelectedPivotIndex;
-            AutoShowSearchResults();
-
-            void AutoShowSearchResults()
-            {
-                if (_LastSelectedPivotIndex != 2) {
-                    return;
-                }
-
-                if (PageDataSource.PhotosSearchResults?.Count > 0) {
-                    HideSearchPanel();
-                    ShowSearchResults();
-                    return;
-                }
-
-                //FocusSearchBox();
-                //StartWordsSuggestions();
-                //StartSearchBackgroundSlideShow();
-            }
         }
 
         void StartNavigationToAnimation() {
@@ -157,7 +146,7 @@ namespace Hangon.Views {
                 SearchPhotosView.Loaded += (s, e) => {
                     SearchPhotosView.ScrollIntoView(_LastSelectedPhoto);
                     var item = (GridViewItem)SearchPhotosView.ContainerFromItem(_LastSelectedPhoto);
-                    if (item == null) return;
+                    if (item == null) { animation.Cancel(); return; }
 
                     var control = (UserControl)item.ContentTemplateRoot;
                     var image = (Image)control.FindName("PhotoImage");
@@ -173,6 +162,16 @@ namespace Hangon.Views {
         }
 
         #region data
+        private void InitializeVariables() {
+            _CmdBarOpenedOffset = 15;
+            UIDispatcher = CoreWindow.GetForCurrentThread().Dispatcher;
+        }
+
+        private void FreeMemory() {
+            StopSearchBackgroundSlideShow();
+            StopWordsSuggestion();
+        }
+
         private void BindAppDataSource() {
             if (App.AppDataSource == null) {
                 App.AppDataSource = new DataSource();
@@ -260,11 +259,12 @@ namespace Hangon.Views {
 
         #region events
         private void PagePivot_SelectionChanged(object sender, SelectionChangedEventArgs e) {
-            UseAppBarMinimalMode();
+            UseCmdBarMinimalMode();
             _LastSelectedPivotIndex = PagePivot.SelectedIndex;
 
             switch (PagePivot.SelectedIndex) {
                 case 0:
+                    LoadRecentData();
                     ShowResfreshCmd();
                     HideShowSearchCmd();
                     StopWordsSuggestion();
@@ -282,15 +282,18 @@ namespace Hangon.Views {
                 case 2:
                     HideResfreshCmd();
 
-                    if (SearchPanel.Visibility == Visibility.Collapsed ||
-                        PageDataSource.PhotosSearchResults?.Count > 0) {
+                    if (_AreSearchResultsActivated) {
+                        HideSearchPanel();
+                        ShowSearchResults();
 
-                        UseAppBarCompactMode();
+                        UpdateCmdBarOpenedOffset(2);
+                        UseCmdBarCompactMode();
                         ShowShowSearchCmd();
                         return;
                     }
 
                     FocusSearchBox();
+                    UpdateCmdBarOpenedOffset(0);
                     StartWordsSuggestions();
                     StartSearchBackgroundSlideShow();
                     break;
@@ -424,11 +427,12 @@ namespace Hangon.Views {
 
             glassVisual.StartAnimation("Size", bindSizeAnimation);
 
-
             glassHost.Offset(0, 50).Start();
 
+            // EVENTS
+            // ------
             AppBar.Opening += (s, e) => {
-                glassHost.Offset(0, 0).Start();
+                glassHost.Offset(0, _CmdBarOpenedOffset).Start();
             };
 
             AppBar.Closing += (s, e) => {
@@ -438,7 +442,6 @@ namespace Hangon.Views {
                 } else if (AppBar.ClosedDisplayMode == AppBarClosedDisplayMode.Minimal) {
                     glassHost.Offset(0, 50).Start();
                 }
-                
             };
         }
 
@@ -477,26 +480,53 @@ namespace Hangon.Views {
             HideSearchEmptyView();
             ShowSearchPanel();
 
+            HideShowSearchCmd();
+            UseCmdBarMinimalMode();
+            UpdateCmdBarOpenedOffset(0);
+            
             StartSearchBackgroundSlideShow();
             StartWordsSuggestions();
         }
 
-        void UseAppBarMinimalMode() {
+        void UseCmdBarMinimalMode() {
             AppBarFrozenHost.Offset(0, 50).Start();
             AppBar.ClosedDisplayMode = AppBarClosedDisplayMode.Minimal;
         }
 
-        void UseAppBarCompactMode() {
+        void UseCmdBarCompactMode() {
             AppBarFrozenHost.Offset(0, 27).Start();
             AppBar.ClosedDisplayMode = AppBarClosedDisplayMode.Compact;
         }
 
         void ShowShowSearchCmd() {
             CmdShowSearch.Visibility = Visibility.Visible;
+            UpdateCmdBarOpenedOffset(2);
         }
 
         void HideShowSearchCmd() {
             CmdShowSearch.Visibility = Visibility.Collapsed;
+            UpdateCmdBarOpenedOffset(1);
+        }
+
+        /// <summary>
+        /// Update the CommandBar opened offset
+        /// It changes according to icons' label length
+        /// </summary>
+        /// <param name="lines">The icon's label max lines</param>
+        void UpdateCmdBarOpenedOffset(int lines) {
+            switch (lines) {
+                case 0:
+                    _CmdBarOpenedOffset = 28;
+                    break;
+                case 1:
+                    _CmdBarOpenedOffset = 15;
+                    break;
+                case 2:
+                    _CmdBarOpenedOffset = 0;
+                    break;
+                default:
+                    break;
+            }
         }
         #endregion commandbar
 
@@ -509,8 +539,9 @@ namespace Hangon.Views {
         }
 
         private async void Search(string query) {
-            if (string.IsNullOrEmpty(query) || string.IsNullOrWhiteSpace(query)
-                || query.Length < 3) {
+            if (string.IsNullOrEmpty(query) || 
+                string.IsNullOrWhiteSpace(query) || 
+                query.Length < 3) {
 
                 var loader = new Windows.ApplicationModel.Resources.ResourceLoader();
                 var message = loader.GetString("SearchQueryMinimum");
@@ -519,7 +550,7 @@ namespace Hangon.Views {
                 return;
             }
 
-            StopSearchBackgroundSlideShow();
+            
             HideSearchPanel();
             ShowLoadingSearch();
 
@@ -529,7 +560,7 @@ namespace Hangon.Views {
 
             if (PageDataSource.PhotosSearchResults.Count > 0) {
                 ShowSearchResults();
-                UseAppBarCompactMode();
+                UseCmdBarCompactMode();
                 ShowShowSearchCmd();
 
             } else {
@@ -552,25 +583,37 @@ namespace Hangon.Views {
             }
         }
 
-        void ShowSearchResults() {
+        async void ShowSearchResults() {
+            _AreSearchResultsActivated = true;
+
             SearchPhotosView.ItemsSource = PageDataSource.PhotosSearchResults;
+
+            await SearchPhotosView.Fade(0, 0).Offset(0, 20, 0).StartAsync();
+
             SearchPhotosView.Visibility = Visibility.Visible;
+            SearchPhotosView.Fade(1).Offset(0, 0).Start();
         }
 
-        void HideSearchPanel() {
-            SearchPanel.Visibility = Visibility.Collapsed;
-        }
-
-        void HideSearchEmptyView() {
-            SearchEmptyView.Visibility = Visibility.Collapsed;
-        }
-
-        void HideSearchResults() {
+        async void HideSearchResults() {
+            await SearchPhotosView.Fade().Offset(0, 20).StartAsync();
             SearchPhotosView.Visibility = Visibility.Collapsed;
         }
 
         void ShowSearchPanel() {
-            SearchPanel.Visibility = Visibility.Visible;
+            _AreSearchResultsActivated = false;
+
+            SearchPanel.AnimateSlideIn();
+        }
+
+        void HideSearchPanel() {
+            SearchPanel.Visibility = Visibility.Collapsed;
+
+            StopWordsSuggestion();
+            StopSearchBackgroundSlideShow();
+        }
+
+        void HideSearchEmptyView() {
+            SearchEmptyView.Visibility = Visibility.Collapsed;
         }
 
         async void FocusSearchBox() {
@@ -582,7 +625,7 @@ namespace Hangon.Views {
 
         void StartWordsSuggestions() {
             string[] words = {
-                "nature", "space", "desk", "oceans",
+                "nature", "landscape", "desk", "oceans",
                 "city", "road", "people", "love", "sky",
                 "mountains", "man", "woman", "nasa",
                 "summer", "home", "food", "happy"
@@ -658,7 +701,9 @@ namespace Hangon.Views {
 
         #endregion search
 
+
         #region notifications
+
         private void FlyoutNotification_Dismiss(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e) {
             HideNotification();
         }
@@ -692,10 +737,8 @@ namespace Hangon.Views {
 
             FlyoutNotification.Visibility = Visibility.Collapsed;
         }
+        
         #endregion notifications
-
-        private void RecentViewStates_CurrentStateChanged(object sender, VisualStateChangedEventArgs e) {
-
-        }
+        
     }
 }

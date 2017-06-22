@@ -145,7 +145,7 @@
     <value>recherche de photos sur Unplash...</value>
   </data>
   <data name="SearchSentenceSuggestion.Text" xml:space="preserve">
-    <value>commence par taper un mot-clé</value>
+    <value>commencez par taper un mot-clé</value>
   </data>
   <data name="Theme.Text" xml:space="preserve">
     <value>thème</value>
@@ -158,5 +158,35 @@
   </data>
   <data name="SearchQueryMinimum" xml:space="preserve">
     <value>Veuillez entrer un mot d'au moins 3 lettres</value>
+  </data>
+  <data name="CmdCrop.Label" xml:space="preserve">
+    <value>recadrer</value>
+  </data>
+  <data name="CmdDownload.Label" xml:space="preserve">
+    <value>télécharger</value>
+  </data>
+  <data name="CmdSetAs.Label" xml:space="preserve">
+    <value>définir comme...</value>
+  </data>
+  <data name="CmdToggleCaption.Label" xml:space="preserve">
+    <value>masquer les stats</value>
+  </data>
+  <data name="DownloadingPhoto.Text" xml:space="preserve">
+    <value>téléchargement de la photo...</value>
+  </data>
+  <data name="FlyoutLockscreen.Text" xml:space="preserve">
+    <value>écran de verrouillage</value>
+  </data>
+  <data name="FlyoutWallpaper.Text" xml:space="preserve">
+    <value>fond d'écran</value>
+  </data>
+  <data name="HideCaption" xml:space="preserve">
+    <value>hide caption</value>
+  </data>
+  <data name="SearchingPhotos.Text" xml:space="preserve">
+    <value>recherche de photos depuis Unsplash...</value>
+  </data>
+  <data name="ShowCaption" xml:space="preserve">
+    <value>montrer les stats</value>
   </data>
 </root>

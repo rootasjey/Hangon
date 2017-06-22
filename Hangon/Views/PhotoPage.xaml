@@ -189,19 +189,21 @@
                     Canvas.ZIndex="3"
                     Background="Transparent"
                     VerticalAlignment="Bottom">
-            
-            <AppBarButton x:Name="CmdCrop" Visibility="Collapsed" Label="crop" Icon="Crop" Tapped="CmdCrop_Tapped"/>
-            <AppBarButton x:Name="CmdToggleCaption" Label="hide caption" Tapped="CmdToggleCaption_Tapped">
+
+            <AppBarButton x:Name="CmdCrop" x:Uid="CmdCrop" 
+                          Visibility="Collapsed" Label="crop" Icon="Crop" Tapped="CmdCrop_Tapped"/>
+            <AppBarButton x:Name="CmdToggleCaption" x:Uid="CmdToggleCaption" 
+                          Label="hide caption" Tapped="CmdToggleCaption_Tapped">
                 <AppBarButton.Icon>
                     <BitmapIcon x:Name="CmdToggleCaptionIcon" UriSource="ms-appx:///Assets/Icons/hide.png" />
                 </AppBarButton.Icon>
             </AppBarButton>
-            <AppBarButton x:Name="CmdDownload" Label="download" Icon="Download" Tapped="CmdDownload_Tapped"/>
-            <AppBarButton x:Name="CmdSetAs" Label="set as..." Icon="SetLockScreen">
+            <AppBarButton x:Name="CmdDownload" x:Uid="CmdDownload" Label="download" Icon="Download" Tapped="CmdDownload_Tapped"/>
+            <AppBarButton x:Name="CmdSetAs" x:Uid="CmdSetAs" Label="set as..." Icon="SetLockScreen">
                 <AppBarButton.Flyout>
                     <MenuFlyout>
-                        <MenuFlyoutItem Text="wallpaper" Tapped="CmdSetWallpaper"/>
-                        <MenuFlyoutItem Text="lockscreen" Tapped="CmdSetLockscreen"/>
+                        <MenuFlyoutItem x:Uid="FlyoutWallpaper" Text="wallpaper" Tapped="CmdSetWallpaper"/>
+                        <MenuFlyoutItem x:Uid="FlyoutLockscreen" Text="lockscreen" Tapped="CmdSetLockscreen"/>
                     </MenuFlyout>
                 </AppBarButton.Flyout>
             </AppBarButton>

@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Microsoft.Toolkit.Uwp.UI.Animations;
+using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.UI.Xaml;
@@ -152,6 +154,37 @@ namespace Hangon.Services {
                 await tcs.Task;
             } finally {
                 scrollViewer.ViewChanged -= viewChanged;
+            }
+        }
+
+        public static async Task AnimateSlideIn(this Panel view) {
+            view.Opacity = 0;
+            view.Visibility = Visibility.Visible;
+
+            List<double> opacities = new List<double>();
+
+            var children = view.Children;
+            foreach (var child in children) {
+                opacities.Add(child.Opacity);
+                child.Opacity = 0;
+                await child.Offset(0, 20, 0).StartAsync();
+            }
+
+            view.Opacity = 1;
+
+            AnimateView();
+
+            void AnimateView()
+            {
+                int index = 0;
+                var delay = 0;
+                foreach (var child in children) {
+                    delay += 200;
+                    child.Fade((float)opacities[index], 1000, delay)
+                         .Offset(0, 0, 1000, delay)
+                         .Start();
+                    index++;
+                }
             }
         }
     }

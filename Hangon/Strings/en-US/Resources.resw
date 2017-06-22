@@ -159,4 +159,34 @@
   <data name="SearchQueryMinimum" xml:space="preserve">
     <value>Please enter a word containing at least 3 characters</value>
   </data>
+  <data name="CmdCrop.Label" xml:space="preserve">
+    <value>crop</value>
+  </data>
+  <data name="CmdDownload.Label" xml:space="preserve">
+    <value>download</value>
+  </data>
+  <data name="CmdSetAs.Label" xml:space="preserve">
+    <value>set as...</value>
+  </data>
+  <data name="CmdToggleCaption.Label" xml:space="preserve">
+    <value>hide caption</value>
+  </data>
+  <data name="DownloadingPhoto.Text" xml:space="preserve">
+    <value>downloading photo...</value>
+  </data>
+  <data name="FlyoutLockscreen.Text" xml:space="preserve">
+    <value>lockscreen</value>
+  </data>
+  <data name="FlyoutWallpaper.Text" xml:space="preserve">
+    <value>wallpaper</value>
+  </data>
+  <data name="HideCaption" xml:space="preserve">
+    <value>hide caption</value>
+  </data>
+  <data name="SearchingPhotos.Text" xml:space="preserve">
+    <value>searching photos from Unsplash...</value>
+  </data>
+  <data name="ShowCaption" xml:space="preserve">
+    <value>show caption</value>
+  </data>
 </root>

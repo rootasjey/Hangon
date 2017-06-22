@@ -309,7 +309,10 @@ namespace Hangon.Views {
                     .Start();
 
                 CmdToggleCaptionIcon.UriSource = new Uri("ms-appx:///Assets/Icons/hide.png");
-                CmdToggleCaption.Label = "hide caption";
+
+                var loader = new Windows.ApplicationModel.Resources.ResourceLoader();
+                var label = loader.GetString("HideCaption");
+                CmdToggleCaption.Label = label;
             }
 
             void hideCaption()
@@ -320,7 +323,10 @@ namespace Hangon.Views {
                     .Start();
 
                 CmdToggleCaptionIcon.UriSource = new Uri("ms-appx:///Assets/Icons/show.png");
-                CmdToggleCaption.Label = "show caption";
+
+                var loader = new Windows.ApplicationModel.Resources.ResourceLoader();
+                var label = loader.GetString("ShowCaption");
+                CmdToggleCaption.Label = label;
             }
         }
 
