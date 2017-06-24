@@ -147,7 +147,7 @@
   <data name="SearchSentenceSuggestion.Text" xml:space="preserve">
     <value>begin by typing a keyword</value>
   </data>
-  <data name="Theme.Text" xml:space="preserve">
+  <data name="ThemeText.Text" xml:space="preserve">
     <value>theme</value>
   </data>
   <data name="ThemeSwitch.OffContent" xml:space="preserve">
@@ -159,11 +159,20 @@
   <data name="SearchQueryMinimum" xml:space="preserve">
     <value>Please enter a word containing at least 3 characters</value>
   </data>
+  <data name="CmdCopyLink.Label" xml:space="preserve">
+    <value>copy link</value>
+  </data>
   <data name="CmdCrop.Label" xml:space="preserve">
     <value>crop</value>
   </data>
   <data name="CmdDownload.Label" xml:space="preserve">
     <value>download</value>
+  </data>
+  <data name="CmdOpenInBrowser.Label" xml:space="preserve">
+    <value>open in browser</value>
+  </data>
+  <data name="CmdRefresh.Label" xml:space="preserve">
+    <value>refresh</value>
   </data>
   <data name="CmdSetAs.Label" xml:space="preserve">
     <value>set as...</value>
@@ -183,10 +192,121 @@
   <data name="HideCaption" xml:space="preserve">
     <value>hide caption</value>
   </data>
+  <data name="LanguageLabel.Text" xml:space="preserve">
+    <value>language</value>
+  </data>
+  <data name="PivotPersonalization.Header" xml:space="preserve">
+    <value>personalization</value>
+  </data>
   <data name="SearchingPhotos.Text" xml:space="preserve">
     <value>searching photos from Unsplash...</value>
   </data>
   <data name="ShowCaption" xml:space="preserve">
     <value>show caption</value>
+  </data>
+  <data name="AutoResolutionDownloadText" xml:space="preserve">
+    <value>Always download photo in the following resolution</value>
+  </data>
+  <data name="AutoSaveDownloadText.Text" xml:space="preserve">
+    <value>Save downloads automatically to Pictures library</value>
+  </data>
+  <data name="BackgroundTasksHeader.Header" xml:space="preserve">
+    <value>background tasks</value>
+  </data>
+  <data name="ButtonRestart.Content" xml:space="preserve">
+    <value>restart</value>
+  </data>
+  <data name="ChooseLanguage.Text" xml:space="preserve">
+    <value>Choose your language</value>
+  </data>
+  <data name="CollectionEmptyView.Text" xml:space="preserve">
+    <value>This user has no collection</value>
+  </data>
+  <data name="DownloadText.Text" xml:space="preserve">
+    <value>downloads</value>
+  </data>
+  <data name="FeedbackButton.Content" xml:space="preserve">
+    <value>send a suggestion</value>
+  </data>
+  <data name="FeedbackEmailText.Text" xml:space="preserve">
+    <value>Send an email if you encounter issues or if you've suggestions</value>
+  </data>
+  <data name="FeedbackText.Text" xml:space="preserve">
+    <value>feedback</value>
+  </data>
+  <data name="ItemDay.Content" xml:space="preserve">
+    <value>once a day</value>
+  </data>
+  <data name="ItemFifteenMinutes.Content" xml:space="preserve">
+    <value>15min</value>
+  </data>
+  <data name="ItemFull.Content" xml:space="preserve">
+    <value>full</value>
+  </data>
+  <data name="ItemFullText.Text" xml:space="preserve">
+    <value>full</value>
+  </data>
+  <data name="ItemHalfHour.Content" xml:space="preserve">
+    <value>half an hour</value>
+  </data>
+  <data name="ItemHour.Content" xml:space="preserve">
+    <value>every hour</value>
+  </data>
+  <data name="ItemRaw.Content" xml:space="preserve">
+    <value>raw</value>
+  </data>
+  <data name="ItemRawText.Text" xml:space="preserve">
+    <value>raw</value>
+  </data>
+  <data name="ItemRegular.Content" xml:space="preserve">
+    <value>regular</value>
+  </data>
+  <data name="ItemRegularText.Text" xml:space="preserve">
+    <value>regular</value>
+  </data>
+  <data name="ItemSmall.Content" xml:space="preserve">
+    <value>small</value>
+  </data>
+  <data name="ItemSmallText.Text" xml:space="preserve">
+    <value>small</value>
+  </data>
+  <data name="ItemThreeHours.Content" xml:space="preserve">
+    <value>every 3 hours</value>
+  </data>
+  <data name="LastUpdatedTask.Text" xml:space="preserve">
+    <value>never run</value>
+  </data>
+  <data name="LastWallTaskError.Text" xml:space="preserve">
+    <value>no error</value>
+  </data>
+  <data name="LockscreenIntervalUpdates.Header" xml:space="preserve">
+    <value>period</value>
+  </data>
+  <data name="LockscreenText.Text" xml:space="preserve">
+    <value>lockscreen</value>
+  </data>
+  <data name="NotationSentenceText.Text" xml:space="preserve">
+    <value>Don't forget to give the app a note on the store ;)</value>
+  </data>
+  <data name="NoteButton.Content" xml:space="preserve">
+    <value>give a note</value>
+  </data>
+  <data name="PeriodicLockscreenText.Text" xml:space="preserve">
+    <value>Periodically update lockscreen background</value>
+  </data>
+  <data name="PeriodicWallpaperText.Text" xml:space="preserve">
+    <value>Periodically update wallpaper</value>
+  </data>
+  <data name="PhotosProviderText.Text" xml:space="preserve">
+    <value>All photos are from </value>
+  </data>
+  <data name="PivotItemAbout.Header" xml:space="preserve">
+    <value>about</value>
+  </data>
+  <data name="TaskNotWorkingText.Text" xml:space="preserve">
+    <value>If the task doesn't work properly, restart it</value>
+  </data>
+  <data name="WallpaperText.Text" xml:space="preserve">
+    <value>wallpaper</value>
   </data>
 </root>

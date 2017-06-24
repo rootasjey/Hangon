@@ -324,7 +324,9 @@
                                 Visibility="Collapsed"
                                 Margin="0,60,0,0"
                                 HorizontalAlignment="Center">
+                        
                         <TextBlock Text="This user has no collection" 
+                                   x:Uid="CollectionEmptyView"
                                     FontSize="20"
                                     Opacity=".6"/>
                     </StackPanel>
@@ -348,9 +350,12 @@
                     Canvas.ZIndex="3"
                     Background="Transparent"
                     VerticalAlignment="Bottom">
-            <AppBarButton x:Name="CmdRefresh" Label="refresh" Icon="Refresh" Tapped="CmdRefresh_Tapped"/>
-            <AppBarButton x:Name="CmdCopyLink" Label="copy link" Icon="Link" Tapped="CmdCopyLink_Tapped"/>
-            <AppBarButton x:Name="CmdOpenInBrowser" Label="open in browser" Icon="Globe" Tapped="CmdOpenInBrowser_Tapped"/>
+            <AppBarButton x:Name="CmdRefresh" x:Uid="CmdRefresh" Label="refresh" Icon="Refresh" Tapped="CmdRefresh_Tapped"/>
+            <AppBarButton x:Name="CmdCopyLink" x:Uid="CmdCopyLink" Label="copy link" Icon="Link" Tapped="CmdCopyLink_Tapped"/>
+            <AppBarButton x:Name="CmdOpenInBrowser" x:Uid="CmdOpenInBrowser"
+                          Label="open in browser" 
+                          Icon="Globe" 
+                          Tapped="CmdOpenInBrowser_Tapped"/>
         </CommandBar>
 
         <Grid x:Name="AppBarFrozenHost" Canvas.ZIndex="2" Height="75" VerticalAlignment="Bottom"/>

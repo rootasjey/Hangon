@@ -54,7 +54,7 @@ namespace Hangon.Views {
             BindAppDataSource();
 
             RestorePivotPosition();
-            StartNavigationToAnimation();
+            //StartNavigationToAnimation();
         }
 
         #region navigation
@@ -217,7 +217,7 @@ namespace Hangon.Views {
         }
 
         private async void LoadCuratedData() {
-            FindName("CuratedPhotosPivotItemContent");
+            //FindName("CuratedPhotosPivotItemContent");
 
             if (PageDataSource.CuratedPhotos?.Count > 0) {
                 CuratedView.ItemsSource = PageDataSource.CuratedPhotos;
@@ -264,7 +264,10 @@ namespace Hangon.Views {
 
             switch (PagePivot.SelectedIndex) {
                 case 0:
+                    FindName("RecentPhotosPivotItemContent");
                     LoadRecentData();
+                    StartNavigationToAnimation();
+
                     ShowResfreshCmd();
                     HideShowSearchCmd();
                     StopWordsSuggestion();
@@ -272,7 +275,10 @@ namespace Hangon.Views {
                     break;
 
                 case 1:
+                    FindName("CuratedPhotosPivotItemContent");
                     LoadCuratedData();
+                    StartNavigationToAnimation();
+
                     ShowResfreshCmd();
                     HideShowSearchCmd();
                     StopWordsSuggestion();
@@ -280,6 +286,8 @@ namespace Hangon.Views {
                     break;
 
                 case 2:
+                    FindName("SearchPivotItemContent");
+                    StartNavigationToAnimation();
                     HideResfreshCmd();
 
                     if (_AreSearchResultsActivated) {

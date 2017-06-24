@@ -8,10 +8,10 @@
 
     <Page.Resources>
         <MenuFlyout x:Name="FlyoutDownload">
-            <MenuFlyoutItem Text="raw" Tapped="CmdDownloadResolution_Tapped"/>
-            <MenuFlyoutItem Text="full" Tapped="CmdDownloadResolution_Tapped"/>
-            <MenuFlyoutItem Text="regular" Tapped="CmdDownloadResolution_Tapped"/>
-            <MenuFlyoutItem Text="small" Tapped="CmdDownloadResolution_Tapped"/>
+            <MenuFlyoutItem Text="raw" x:Uid="ItemRawText" Tapped="CmdDownloadResolution_Tapped"/>
+            <MenuFlyoutItem Text="full" x:Uid="ItemFullText" Tapped="CmdDownloadResolution_Tapped"/>
+            <MenuFlyoutItem Text="regular" x:Uid="ItemRegularText" Tapped="CmdDownloadResolution_Tapped"/>
+            <MenuFlyoutItem Text="small" x:Uid="ItemSmallText" Tapped="CmdDownloadResolution_Tapped"/>
         </MenuFlyout>
     </Page.Resources>
 
@@ -202,8 +202,12 @@
             <AppBarButton x:Name="CmdSetAs" x:Uid="CmdSetAs" Label="set as..." Icon="SetLockScreen">
                 <AppBarButton.Flyout>
                     <MenuFlyout>
-                        <MenuFlyoutItem x:Uid="FlyoutWallpaper" Text="wallpaper" Tapped="CmdSetWallpaper"/>
-                        <MenuFlyoutItem x:Uid="FlyoutLockscreen" Text="lockscreen" Tapped="CmdSetLockscreen"/>
+                        <MenuFlyoutItem x:Uid="FlyoutWallpaper" 
+                                        Text="wallpaper" 
+                                        Tapped="CmdSetWallpaper"/>
+                        <MenuFlyoutItem x:Uid="FlyoutLockscreen"
+                                        Text="lockscreen" 
+                                        Tapped="CmdSetLockscreen"/>
                     </MenuFlyout>
                 </AppBarButton.Flyout>
             </AppBarButton>

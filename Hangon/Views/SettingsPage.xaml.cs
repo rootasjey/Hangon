@@ -59,7 +59,7 @@ namespace Hangon.Views {
         }
 
         private async void NoteButton_Click(object sender, RoutedEventArgs e) {
-            string appID = "9wzdncrcwfqr";
+            string appID = "9PF0GQ81HNDF";
             var op = await Windows.System.Launcher.LaunchUriAsync(new Uri("ms-windows-store://review/?ProductId=" + appID));
         }
         #endregion about
@@ -216,7 +216,7 @@ namespace Hangon.Views {
 
         private void DefaultPhotoResolution_SelectionChanged(object sender, SelectionChangedEventArgs e) {
             var item = (ComboBoxItem)DefaultPhotoResolution.SelectedValue;
-            var resolution = (string)item.Content;
+            var resolution = (string)item.Tag;
 
             if (!Settings.UseDefaultDownloadResolution()) return;
             if (resolution == Settings.GetDefaultDownloadResolution()) return;

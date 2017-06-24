@@ -3,6 +3,9 @@ Minimalist wallpaper changer for Windows 10.
 
 _Powered by [Unsplash](https://unsplash.com)_
 
+<a href="https://www.microsoft.com/store/apps/9PF0GQ81HNDF?ocid=badge"><img width="200" src="https://assets.windowsphone.com/f2f77ec7-9ba9-4850-9ebe-77e366d08adc/English_Get_it_Win_10_InvariantCulture_Default.png" alt="Get it on Windows 10" /></a>
+
+
 ## screenshots
 
 ### pc
@@ -40,12 +43,9 @@ You can contribute to improve this project by:
 * submitting new ideas / features suggestions 
 * reporting a bug
 
-## todo
-
-* Browse by categories
-
 ## platforms
 
 * Windows Mobile 10
 * Windows 10
 * Xbox
+* Hololens
