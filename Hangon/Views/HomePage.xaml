@@ -118,8 +118,9 @@
                                 <RowDefinition Height="*"/>
                             </Grid.RowDefinitions>
                             <ProgressBar x:Name="ProgressPage" IsIndeterminate="True"/>
-                            <TextBlock  x:Uid="LoadingPhotos" 
-                                        Text="Loading photos from Unsplash..." 
+                            <TextBlock  x:Uid="LoadingPhotos"
+                                        Text="Loading photos from Unsplash..."
+                                        Typography.Capitals="SmallCaps"
                                         FontSize="20" Grid.Row="1"/>
                         </Grid>
 
@@ -130,8 +131,9 @@
 
                             <TextBlock x:Uid="RecentPhotoFetchFailed" 
                                        Text="Sorry, I couldn't get recent photos from Unsplash :("
-                                        FontSize="20"
-                                        TextWrapping="Wrap"/>
+                                       Typography.Capitals="SmallCaps"
+                                       FontSize="20"
+                                       TextWrapping="Wrap"/>
                             <Button Content="try again" 
                                     Margin="0,20"
                                     HorizontalAlignment="Center"/>
@@ -197,8 +199,10 @@
                                 <RowDefinition Height="20"/>
                                 <RowDefinition Height="*"/>
                             </Grid.RowDefinitions>
+                            
                             <ProgressBar x:Name="CuratedProgressPage" IsIndeterminate="True"/>
                             <TextBlock x:Uid="LoadingPhotos" 
+                                       Typography.Capitals="SmallCaps"
                                        Text="Loading photos from Unsplash..." 
                                        FontSize="20" Grid.Row="1"/>
                         </Grid>
@@ -211,6 +215,7 @@
                             <TextBlock x:Uid="CuratedPhotosFetchFailed" 
                                        Text="Sorry, I couldn't get curated photos from Unsplash :("
                                        FontSize="20"
+                                       Typography.Capitals="SmallCaps"
                                        TextWrapping="Wrap"/>
                             <Button Content="try again" 
                                     Margin="0,20"
@@ -299,10 +304,13 @@
                                 <RowDefinition Height="20"/>
                                 <RowDefinition Height="*"/>
                             </Grid.RowDefinitions>
+                            
                             <ProgressBar x:Name="SearchProgressPage" IsIndeterminate="True"/>
                             <TextBlock x:Uid="SearchingPhotos" 
                                        Text="searching photos from Unsplash..." 
-                                       FontSize="20" Grid.Row="1"/>
+                                       FontSize="20" 
+                                       Typography.Capitals="SmallCaps"
+                                       Grid.Row="1"/>
                         </Grid>
 
                         <StackPanel x:Name="SearchEmptyView"
@@ -313,6 +321,7 @@
                             <TextBlock x:Uid="NoResultsSearchPhotos" 
                                        Text="There's no photos for this keyword"
                                        FontSize="20"
+                                       Typography.Capitals="SmallCaps"
                                        TextWrapping="Wrap"/>
                         </StackPanel>
 

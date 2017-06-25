@@ -32,6 +32,14 @@ namespace Hangon.Data {
             return await RecentPhotos.Fetch();
         }
 
+        public async Task<int> ReloadRecentPhotos() {
+            if (RecentPhotos == null) return 0;
+
+            RecentPhotos.Clear();
+            RecentPhotos.Page = 0;
+            return await RecentPhotos.Fetch();
+        }
+
         public async Task<int> FetchCuratedPhotos() {
             if (CuratedPhotos == null) CuratedPhotos = new PhotosCollection();
 
@@ -41,6 +49,14 @@ namespace Hangon.Data {
             CuratedPhotos.Clear();
             CuratedPhotos.Page = 0;
             CuratedPhotos.Url = url;
+            return await CuratedPhotos.Fetch();
+        }
+
+        public async Task<int> ReloadCuratedPhotos() {
+            if (CuratedPhotos == null) return 0;
+
+            CuratedPhotos.Clear();
+            CuratedPhotos.Page = 0;
             return await CuratedPhotos.Fetch();
         }
 

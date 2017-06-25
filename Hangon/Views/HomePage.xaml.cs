@@ -186,73 +186,64 @@ namespace Hangon.Views {
                 return;
             }
 
-            ShowLoadingView();
+            ShowRecentLoadingView();
 
             var added = await PageDataSource.FetchRecentPhotos();
 
-            HideLoadingView();
+            HideRecentLoadingView();
 
             if (added > 0) {
                 RecentView.ItemsSource = PageDataSource.RecentPhotos;
 
             } else {
-                ShowEmptyView();
+                ShowRecentEmptyView();
                 RecentView.Visibility = Visibility.Collapsed;
-            }
-
-            void ShowLoadingView()
-            {
-                RecentLoadingView.Visibility = Visibility.Visible;
-            }
-
-            void HideLoadingView()
-            {
-                RecentLoadingView.Visibility = Visibility.Collapsed;
-            }
-
-            void ShowEmptyView()
-            {
-                RecentEmptyView.Visibility = Visibility.Visible;
             }
         }
 
-        private async void LoadCuratedData() {
-            //FindName("CuratedPhotosPivotItemContent");
+        void ShowRecentLoadingView() {
+            RecentLoadingView.Visibility = Visibility.Visible;
+        }
 
+        void HideRecentLoadingView() {
+            RecentLoadingView.Visibility = Visibility.Collapsed;
+        }
+
+        void ShowRecentEmptyView() {
+            RecentEmptyView.Visibility = Visibility.Visible;
+        }
+
+        private async void LoadCuratedData() {
             if (PageDataSource.CuratedPhotos?.Count > 0) {
                 CuratedView.ItemsSource = PageDataSource.CuratedPhotos;
                 return;
             }
 
-            ShowLoadingView();
+            ShowCuratedLoadingView();
 
             var added = await PageDataSource.FetchCuratedPhotos();
 
-            HideLoadingView();
+            HideCuratedLoadingView();
 
             if (added>0) {
                 CuratedView.ItemsSource = PageDataSource.CuratedPhotos;
 
             } else {
-                ShowEmptyView();
+                ShowCuratedEmptyView();
                 CuratedView.Visibility = Visibility.Collapsed;
             }
+        }
 
+        void ShowCuratedLoadingView() {
+            CuratedLoadingView.Visibility = Visibility.Visible;
+        }
 
-            void ShowLoadingView()
-            {
-                CuratedLoadingView.Visibility = Visibility.Visible;
-            }
+        void HideCuratedLoadingView() {
+            CuratedLoadingView.Visibility = Visibility.Collapsed;
+        }
 
-            void HideLoadingView()
-            {
-                CuratedLoadingView.Visibility = Visibility.Collapsed;
-            }
-
-            void ShowEmptyView()
-            {
-                CuratedEmptyView.Visibility = Visibility.Visible;
-            }
+        void ShowCuratedEmptyView() {
+            CuratedEmptyView.Visibility = Visibility.Visible;
         }
 
         #endregion data 
@@ -469,16 +460,26 @@ namespace Hangon.Views {
                     break;
             }
 
-            void ReloadRecentData()
+            async void ReloadRecentData()
             {
-                PageDataSource.RecentPhotos.Clear();
-                LoadRecentData();
+                ShowRecentLoadingView();
+                await PageDataSource.ReloadRecentPhotos();
+                HideRecentLoadingView();
+
+                if (PageDataSource.RecentPhotos.Count == 0) {
+                    ShowRecentEmptyView();
+                }
             }
 
-            void ReloadCuratedData()
+            async void ReloadCuratedData()
             {
-                PageDataSource.CuratedPhotos.Clear();
-                LoadCuratedData();
+                ShowCuratedLoadingView();
+                await PageDataSource.ReloadCuratedPhotos();
+                HideCuratedLoadingView();
+
+                if (PageDataSource.CuratedPhotos.Count == 0) {
+                    ShowCuratedEmptyView();
+                }
             }
             
         }

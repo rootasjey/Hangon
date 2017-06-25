@@ -229,7 +229,7 @@
     <value>envoyer une suggestion</value>
   </data>
   <data name="FeedbackEmailText.Text" xml:space="preserve">
-    <value>envoyez-moi un email si vous rencontrer un problème ou si vous avez une suggestion</value>
+    <value>Envoyez-moi un email si vous rencontrer un problème ou si vous avez une suggestion</value>
   </data>
   <data name="FeedbackText.Text" xml:space="preserve">
     <value>retours d'expérience</value>

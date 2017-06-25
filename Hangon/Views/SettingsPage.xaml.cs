@@ -7,6 +7,7 @@ using Windows.ApplicationModel.Email;
 using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Navigation;
 
 namespace Hangon.Views {
@@ -15,13 +16,37 @@ namespace Hangon.Views {
 
         public SettingsPage() {
             InitializeComponent();
+            SetUpPageAnimation();
             LoadData();
+
             UIDispatcher = CoreWindow.GetForCurrentThread().Dispatcher;
+
+            AnimatePersonalizationPivot();
         }
+
+        #region animations
+        private void SetUpPageAnimation() {
+            TransitionCollection collection = new TransitionCollection();
+            NavigationThemeTransition theme = new NavigationThemeTransition();
+
+            var info = new ContinuumNavigationTransitionInfo();
+
+            theme.DefaultNavigationTransitionInfo = info;
+            collection.Add(theme);
+            Transitions = collection;
+        }
+        
+
+        private void AnimatePersonalizationPivot() {
+            PersonalizationContentPanel.AnimateSlideIn();
+        }
+
+        #endregion animations
 
         private void LoadData() {
             WallSwitch.IsOn = BackgroundTask.IsWallTaskActive();
             LockscreenSwitch.IsOn = BackgroundTask.IsLockscreenTaskActive();
+
             UpdateWallTaskActivityText();
             UpdateLockscreenTaskActivityText();
         }
@@ -373,5 +398,6 @@ namespace Hangon.Views {
             FlyoutNotification.Visibility = Visibility.Collapsed;
         }
         #endregion notifications
+
     }
 }

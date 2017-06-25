@@ -18,14 +18,14 @@
                 <TextBlock x:Name="FlyoutText" Text=""/>
             </StackPanel>
         </FlyoutPresenter>
-        
-        <Pivot x:Name="PivotSettings">
-            <PivotItem x:Name="PivotPersonalization"
+
+        <Pivot x:Name="PagePivot">
+            <PivotItem x:Name="PersonalizationPivotItem"
                        x:Uid="PivotPersonalization"
                        Header="personalization">
                 <ScrollViewer Margin="0,20,0,0">
-                    <StackPanel>
-                        <StackPanel>
+                    <StackPanel x:Name="PersonalizationContentPanel">
+                        <StackPanel x:Name="LanguagePanel">
                             <TextBlock Text="language" x:Uid="LanguageLabel" FontSize="24"/>
                             <TextBlock Text="Choose your language"
                                        x:Uid="ChooseLanguage"
@@ -38,7 +38,7 @@
                             </ComboBox>
                         </StackPanel>
 
-                        <StackPanel Margin="0,20,0,0">
+                        <StackPanel x:Name="ThemePanel" Margin="0,20,0,0">
                             <TextBlock x:Uid="ThemeText" Text="thème" FontSize="24"/>
                             <ToggleSwitch x:Name="ThemeSwitch"
                                           x:Uid="ThemeSwitch"
@@ -48,7 +48,7 @@
                                           Toggled="ThemeSwitch_Toggled"/>
                         </StackPanel>
 
-                        <StackPanel Margin="0,20,0,0">
+                        <StackPanel x:Name="DownloadsLocationPanel" Margin="0,20,0,0">
                             <TextBlock Text="downloads" x:Uid="DownloadText" FontSize="24"/>
                             <TextBlock Text="Save downloads automatically to Pictures library"
                                        x:Uid="AutoSaveDownloadText"
@@ -58,7 +58,7 @@
                                           Toggled="ToggleAutoSaveDownloads_Toggled"/>
                         </StackPanel>
 
-                        <StackPanel Margin="0,20,0,0">
+                        <StackPanel x:Name="DownloadResolutionPanel" Margin="0,20,0,0">
                             <TextBlock Text="Always download photo in the following resolution"
                                        x:Uid="AutoResolutionDownloadText"
                                        Opacity=".6"/>
@@ -85,7 +85,7 @@
             <PivotItem Header="background tasks"
                        x:Uid="BackgroundTasksHeader">
                 <ScrollViewer>
-                    <StackPanel Margin="0,0,0,40">
+                    <StackPanel x:Name="TasksCotnentPanel" Margin="0,0,0,40">
                         <StackPanel>
                             <TextBlock FontSize="24" x:Uid="WallpaperText" Text="wallpaper"/>
                             <TextBlock Text="Periodically update wallpaper" 
@@ -178,8 +178,8 @@
                     </StackPanel>
                 </ScrollViewer>
             </PivotItem>
-            
-            <PivotItem Header="about" x:Uid="PivotItemAbout">
+
+            <PivotItem Header="about" x:Uid="AboutPivotItem">
                 <ScrollViewer Margin="0,20,0,0">
                     <StackPanel>
                         <TextBlock Text="feedback" x:Uid="FeedbackText" FontSize="24"/>

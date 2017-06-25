@@ -187,5 +187,43 @@ namespace Hangon.Services {
                 }
             }
         }
+
+        //public static async Task AnimateDeepSlideIn(this Panel view) {
+        //    view.Opacity = 0;
+        //    view.Visibility = Visibility.Visible;
+
+        //    List<double> opacities = new List<double>();
+
+        //    var children = view.Children;            
+
+        //    foreach (var child in children) {
+        //        opacities.Add(child.Opacity);
+        //        child.Opacity = 0;
+        //        await child.Offset(0, 20, 0).StartAsync();
+
+        //        Panel childPanel = child.GetChildOfType<StackPanel>();
+        //        if (childPanel == null) child.GetChildOfType<Grid>();
+        //        if (childPanel != null) {
+        //            await AnimateDeepSlideIn(childPanel);
+        //        }
+        //    }
+
+        //    view.Opacity = 1;
+
+        //    AnimateView();
+
+        //    void AnimateView()
+        //    {
+        //        int index = 0;
+        //        var delay = 0;
+        //        foreach (var child in children) {
+        //            delay += 200;
+        //            child.Fade((float)opacities[index], 500, delay)
+        //                 .Offset(0, 0, 500, delay)
+        //                 .Start();
+        //            index++;
+        //        }
+        //    }
+        //}
     }
 }
