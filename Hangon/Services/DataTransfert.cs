@@ -41,8 +41,6 @@ namespace Hangon.Services {
 
             dataPackage.SetText(text);
             Clipboard.SetContent(dataPackage);
-
-            ShowLocalToast("Link copied!");
         }
 
         public static void ShowLocalToast(string message) {

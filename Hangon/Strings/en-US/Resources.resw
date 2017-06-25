@@ -238,7 +238,7 @@
     <value>once a day</value>
   </data>
   <data name="ItemFifteenMinutes.Content" xml:space="preserve">
-    <value>15min</value>
+    <value>15 min</value>
   </data>
   <data name="ItemFull.Content" xml:space="preserve">
     <value>full</value>
@@ -308,5 +308,44 @@
   </data>
   <data name="WallpaperText.Text" xml:space="preserve">
     <value>wallpaper</value>
+  </data>
+  <data name="LockscreenSetFailed" xml:space="preserve">
+    <value>Ops. There I couldn't set your lockscreen background :( Try again or contact the developer.</value>
+  </data>
+  <data name="LockscreenSetSuccess" xml:space="preserve">
+    <value>The photo has been correctly set has your locksreen background :)</value>
+  </data>
+  <data name="SavePhotoFailed" xml:space="preserve">
+    <value>The photo couldn't be saved :(</value>
+  </data>
+  <data name="SavePhotoSuccess" xml:space="preserve">
+    <value>The photo was saved</value>
+  </data>
+  <data name="SettingLockscreen" xml:space="preserve">
+    <value>Setting lockscreen background...</value>
+  </data>
+  <data name="SettingWallpaper" xml:space="preserve">
+    <value>Settings wallpapaer...</value>
+  </data>
+  <data name="WallpaperSetFailed" xml:space="preserve">
+    <value>Ops. There I couldn't set your wallpaper :( Try again or contact the developer.</value>
+  </data>
+  <data name="WallpaperSetSuccess" xml:space="preserve">
+    <value>The photo has been correctly set as your wallpaper :)</value>
+  </data>
+  <data name="CmdCopyLinkText.Text" xml:space="preserve">
+    <value>Copy link</value>
+  </data>
+  <data name="CmdSetAsText.Text" xml:space="preserve">
+    <value>Set as...</value>
+  </data>
+  <data name="CmdDownloadText.Text" xml:space="preserve">
+    <value>Download</value>
+  </data>
+  <data name="CmdOpenInBrowserText.Text" xml:space="preserve">
+    <value>Open in browser</value>
+  </data>
+  <data name="CopyLinkSuccess" xml:space="preserve">
+    <value>Lien copié!</value>
   </data>
 </root>

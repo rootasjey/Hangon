@@ -309,4 +309,43 @@
   <data name="WallpaperText.Text" xml:space="preserve">
     <value>fond d'écran</value>
   </data>
+  <data name="LockscreenSetFailed" xml:space="preserve">
+    <value>Oups. la photo n'a pas pu être définie en tant qu'écran de verrouillage :( Retentez l'opération ou contactez le développeur.</value>
+  </data>
+  <data name="LockscreenSetSuccess" xml:space="preserve">
+    <value>La photo a correctement été définie en tant qu'écran de verrouillage :)</value>
+  </data>
+  <data name="SavePhotoFailed" xml:space="preserve">
+    <value>La photo n'a pas pu être enregistrée :( Retentez l'opération ou contactez le développeur</value>
+  </data>
+  <data name="SavePhotoSuccess" xml:space="preserve">
+    <value>La photo a été enregistrée</value>
+  </data>
+  <data name="SettingLockscreen" xml:space="preserve">
+    <value>Application de l'écran de verrouillage...</value>
+  </data>
+  <data name="SettingWallpaper" xml:space="preserve">
+    <value>Application du fond d'écran...</value>
+  </data>
+  <data name="WallpaperSetFailed" xml:space="preserve">
+    <value>Oups, la photo n'a pas pu être définie en tant que fond d'écran. :( Retentez l'opération ou contactez le développeur.</value>
+  </data>
+  <data name="WallpaperSetSuccess" xml:space="preserve">
+    <value>La photo a correctement été définie en tant que votre fond d'écran :)</value>
+  </data>
+  <data name="CmdCopyLinkText.Text" xml:space="preserve">
+    <value>Copier le lien</value>
+  </data>
+  <data name="CmdSetAsText.Text" xml:space="preserve">
+    <value>Définir comme...</value>
+  </data>
+  <data name="CmdDownloadText.Text" xml:space="preserve">
+    <value>Télécharger</value>
+  </data>
+  <data name="CmdOpenInBrowserText.Text" xml:space="preserve">
+    <value>Ouvrir dans le navigateur</value>
+  </data>
+  <data name="CopyLinkSuccess" xml:space="preserve">
+    <value>Link copied!</value>
+  </data>
 </root>

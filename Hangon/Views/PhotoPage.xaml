@@ -8,10 +8,10 @@
 
     <Page.Resources>
         <MenuFlyout x:Name="FlyoutDownload">
-            <MenuFlyoutItem Text="raw" x:Uid="ItemRawText" Tapped="CmdDownloadResolution_Tapped"/>
-            <MenuFlyoutItem Text="full" x:Uid="ItemFullText" Tapped="CmdDownloadResolution_Tapped"/>
-            <MenuFlyoutItem Text="regular" x:Uid="ItemRegularText" Tapped="CmdDownloadResolution_Tapped"/>
-            <MenuFlyoutItem Text="small" x:Uid="ItemSmallText" Tapped="CmdDownloadResolution_Tapped"/>
+            <MenuFlyoutItem Tag="raw" x:Uid="ItemRawText" Tapped="CmdDownloadResolution_Tapped"/>
+            <MenuFlyoutItem Tag="full" x:Uid="ItemFullText" Tapped="CmdDownloadResolution_Tapped"/>
+            <MenuFlyoutItem Tag="regular" x:Uid="ItemRegularText" Tapped="CmdDownloadResolution_Tapped"/>
+            <MenuFlyoutItem Tag="small" x:Uid="ItemSmallText" Tapped="CmdDownloadResolution_Tapped"/>
         </MenuFlyout>
     </Page.Resources>
 
@@ -204,10 +204,10 @@
                     <MenuFlyout>
                         <MenuFlyoutItem x:Uid="FlyoutWallpaper" 
                                         Text="wallpaper" 
-                                        Tapped="CmdSetWallpaper"/>
+                                        Tapped="CmdSetAsWallpaper"/>
                         <MenuFlyoutItem x:Uid="FlyoutLockscreen"
                                         Text="lockscreen" 
-                                        Tapped="CmdSetLockscreen"/>
+                                        Tapped="CmdSetAsLockscreen"/>
                     </MenuFlyout>
                 </AppBarButton.Flyout>
             </AppBarButton>

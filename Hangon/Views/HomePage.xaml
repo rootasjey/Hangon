@@ -20,9 +20,10 @@
         <DataTemplate x:Key="PhotoTemplate" x:DataType="data:Photo">
             <UserControl>
                 <StackPanel x:Name="PhotoItem"
-                                    Opacity="0"
-                                    Tapped="PhotoItem_Tapped"
-                                    Loaded="PhotoItem_Loaded">
+                            Opacity="0"
+                            Tapped="PhotoItem_Tapped"
+                            RightTapped="PhotoItem_RightTapped"
+                            Loaded="PhotoItem_Loaded">
 
                     <Border x:Name="PhotoBorder" Width="300">
                         <Border.Clip>
@@ -73,6 +74,36 @@
                 </StackPanel>
             </UserControl>
         </DataTemplate>
+
+        <MenuFlyout x:Name="PhotoRightTappedFlyout">
+            <MenuFlyoutItem x:Name="CmdCopyLink" 
+                            x:Uid="CmdCopyLinkText" 
+                            Text="Copy link" 
+                            Tapped="CmdCopyLink_Tapped"/>
+
+            <MenuFlyoutItem x:Name="CmdOpenInBrowser"
+                            Text="Open in browser"
+                            x:Uid="CmdOpenInBrowserText"
+                            Tapped="CmdOpenInBrowser_Tapped"/>
+
+            <MenuFlyoutSubItem x:Name="CmdSetAs" x:Uid="CmdSetAsText" Text="Set as...">
+                <MenuFlyoutItem x:Name="CmdSetAsWallpaper" 
+                                x:Uid="FlyoutWallpaper" 
+                                Text="wallpaper" 
+                                Tapped="CmdSetAsWallpaper_Tapped"/>
+                <MenuFlyoutItem x:Name="CmdSetAsLockscreen" 
+                                x:Uid="FlyoutLockscreen" 
+                                Text="lockscreen" 
+                                Tapped="CmdSetAsLockscreen_Tapped"/>
+            </MenuFlyoutSubItem>
+
+            <MenuFlyoutSubItem x:Name="CmdDownload" x:Uid="CmdDownloadText" Text="Download">
+                <MenuFlyoutItem Tag="raw" x:Uid="ItemRawText" Tapped="CmdDownloadResolution_Tapped"/>
+                <MenuFlyoutItem Tag="full" x:Uid="ItemFullText" Tapped="CmdDownloadResolution_Tapped"/>
+                <MenuFlyoutItem Tag="regular" x:Uid="ItemRegularText" Tapped="CmdDownloadResolution_Tapped"/>
+                <MenuFlyoutItem Tag="small" x:Uid="ItemSmallText" Tapped="CmdDownloadResolution_Tapped"/>
+            </MenuFlyoutSubItem>
+        </MenuFlyout>
     </Page.Resources>
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
@@ -85,6 +116,11 @@
                          Tapped="FlyoutNotification_Dismiss">
             <StackPanel>
                 <TextBlock x:Name="FlyoutText" Text=""/>
+                <Grid x:Name="ProgressGrid" Visibility="Collapsed">
+                    <ProgressBar x:Name="ProgressIndeterminate"
+                                 FlowDirection="RightToLeft" IsIndeterminate="True" Canvas.ZIndex="1"/>
+                    <ProgressBar x:Name="ProgressDeterminate" IsIndeterminate="False" />
+                </Grid>
             </StackPanel>
         </FlyoutPresenter>
 

@@ -16,9 +16,11 @@ using Windows.UI.Composition;
 using Windows.UI.Xaml.Input;
 using System.Threading;
 using Windows.UI.Xaml.Media.Imaging;
+using Windows.ApplicationModel.Resources;
 
 namespace Hangon.Views {
     public sealed partial class HomePage : Page {
+
         #region variables
         private DataSource PageDataSource { get; set; }
 
@@ -34,7 +36,7 @@ namespace Hangon.Views {
 
         private static int _LastSelectedPivotIndex { get; set; }
 
-        private CoreDispatcher UIDispatcher { get; set; }
+        private CoreDispatcher _UIDispatcher { get; set; }
 
         private Timer _TimerWordSuggestion { get; set; }
 
@@ -44,12 +46,13 @@ namespace Hangon.Views {
 
         private static bool _AreSearchResultsActivated { get; set; }
 
+        ResourceLoader _ResourcesLoader { get; set; }
         #endregion variables
 
         public HomePage() {
             InitializeComponent();
             InitializeVariables();
-
+            
             ApplyCommandBarBarFrostedGlass();
             BindAppDataSource();
 
@@ -126,7 +129,8 @@ namespace Hangon.Views {
         #region data
         private void InitializeVariables() {
             _CmdBarOpenedOffset = 15;
-            UIDispatcher = CoreWindow.GetForCurrentThread().Dispatcher;
+            _ResourcesLoader = new ResourceLoader();
+            _UIDispatcher = CoreWindow.GetForCurrentThread().Dispatcher;
         }
 
         private void FreeMemory() {
@@ -589,7 +593,7 @@ namespace Hangon.Views {
         }
 
         async void FocusSearchBox() {
-            await UIDispatcher.RunAsync(CoreDispatcherPriority.Normal, () => {
+            await _UIDispatcher.RunAsync(CoreDispatcherPriority.Normal, () => {
                 SearchBox.Focus(FocusState.Programmatic);
                 SearchBox.Focus(FocusState.Programmatic);
             });
@@ -607,7 +611,7 @@ namespace Hangon.Views {
             var autoEvent = new AutoResetEvent(false);
 
             _TimerWordSuggestion = new Timer(async (object state) => {
-                await UIDispatcher.RunAsync(CoreDispatcherPriority.Normal, () => {
+                await _UIDispatcher.RunAsync(CoreDispatcherPriority.Normal, () => {
                     UpdateTermSuggestion();
                 });
             }, autoEvent, TimeSpan.FromSeconds(5), TimeSpan.FromSeconds(5));
@@ -635,7 +639,7 @@ namespace Hangon.Views {
             ShowPageBackground();
 
             _TimerSearchBackground = new Timer(async (object state) => {
-                await UIDispatcher.RunAsync(CoreDispatcherPriority.Normal, () => {
+                await _UIDispatcher.RunAsync(CoreDispatcherPriority.Normal, () => {
                     UpdateBackground();
                 });
             }, autoEvent, TimeSpan.FromSeconds(5), TimeSpan.FromMilliseconds(duration));
@@ -695,7 +699,7 @@ namespace Hangon.Views {
 
             var autoEvent = new AutoResetEvent(false);
             var timer = new Timer(async (object state) => {
-                UIDispatcher.RunAsync(CoreDispatcherPriority.Normal, () => {
+                _UIDispatcher.RunAsync(CoreDispatcherPriority.Normal, () => {
                     HideNotification();
                 });
             }, autoEvent, TimeSpan.FromSeconds(5), new TimeSpan());
@@ -709,8 +713,122 @@ namespace Hangon.Views {
 
             FlyoutNotification.Visibility = Visibility.Collapsed;
         }
-        
+
         #endregion notifications
-        
+
+        #region rightTapped flyout
+        void ShowProgress(string message = "") {
+            ProgressDeterminate.Value = 0;
+            FlyoutNotification.Visibility = Visibility.Visible;
+
+            if (string.IsNullOrEmpty(message)) return;
+            FlyoutText.Text = message;
+        }
+
+        void HideProgress() {
+            FlyoutNotification.Visibility = Visibility.Collapsed;
+        }
+
+        private void HttpProgressCallback(Windows.Web.Http.HttpProgress progress) {
+            if (progress.TotalBytesToReceive == null) return;
+
+            ProgressDeterminate.Minimum = 0;
+            ProgressDeterminate.Maximum = (double)progress.TotalBytesToReceive;
+            ProgressDeterminate.Value = progress.BytesReceived;
+        }
+
+        private void PhotoItem_RightTapped(object sender, RightTappedRoutedEventArgs e) {
+            var panel = (StackPanel)sender;
+            var photo = (Photo)panel.DataContext;
+
+            _LastSelectedPhoto = photo;
+            PhotoRightTappedFlyout.ShowAt(panel);
+        }
+
+        private void CmdCopyLink_Tapped(object sender, TappedRoutedEventArgs e) {
+            var successMessage = _ResourcesLoader.GetString("CopyLinkSuccess");
+
+            DataTransfer.Copy(_LastSelectedPhoto.Links.Html);
+            Notify(successMessage);
+        }
+
+        private async void CmdSetAsWallpaper_Tapped(object sender, TappedRoutedEventArgs e) {
+            var progressMessage = _ResourcesLoader.GetString("SettingWallpaper");
+            var successMessage = _ResourcesLoader.GetString("WallpaperSetSuccess");
+            var failedMessage = _ResourcesLoader.GetString("WallpaperSetFailed");
+
+            ShowProgress(progressMessage);
+            var success = await Wallpaper.SetAsWallpaper(_LastSelectedPhoto, HttpProgressCallback);
+            HideProgress();
+
+            if (success) Notify(successMessage);
+            else Notify(failedMessage);
+        }
+
+        private async void CmdSetAsLockscreen_Tapped(object sender, TappedRoutedEventArgs e) {
+            var progressMessage = _ResourcesLoader.GetString("SettingLockscreen");
+            var successMessage = _ResourcesLoader.GetString("LockscreenSetSuccess");
+            var failedMessage = _ResourcesLoader.GetString("LockscreenSetFailed");
+
+            ShowProgress(progressMessage);
+            var success = await Wallpaper.SetAsLockscreen(_LastSelectedPhoto, HttpProgressCallback);
+            HideProgress();
+
+            if (success) Notify(successMessage);
+            else Notify(failedMessage);
+        }
+
+        private async void CmdOpenInBrowser_Tapped(object sender, TappedRoutedEventArgs e) {
+            if (_LastSelectedPhoto == null || _LastSelectedPhoto.Links == null) return;
+
+            var tracking = "?utm_source=Hangon&utm_medium=referral&utm_campaign=" + Unsplash.ApplicationId;
+            var userUri = new Uri(string.Format("{0}{1}", _LastSelectedPhoto.Links.Html, tracking));
+            var success = await Windows.System.Launcher.LaunchUriAsync(userUri);
+        }
+
+        private void CmdDownloadResolution_Tapped(object sender, TappedRoutedEventArgs e) {
+            var cmd = (MenuFlyoutItem)sender;
+            var resolution = (string)cmd.Tag;
+            Download(resolution);
+        }
+
+        async void Download(string size = "") {
+            ShowProgress();
+            var result = false;
+
+            if (string.IsNullOrEmpty(size)) {
+                result = await Wallpaper.SaveToPicturesLibrary(_LastSelectedPhoto, HttpProgressCallback);
+
+            } else {
+                string url = getURL();
+                result = await Wallpaper.SaveToPicturesLibrary(_LastSelectedPhoto, HttpProgressCallback, url);
+            }
+
+            HideProgress();
+
+            var successMessage = _ResourcesLoader.GetString("SavePhotoSuccess");
+            var failedMessage = _ResourcesLoader.GetString("SavePhotoFailed");
+
+            if (result) Notify(successMessage);
+            else Notify(failedMessage);
+
+            string getURL()
+            {
+                switch (size) {
+                    case "raw":
+                        return _LastSelectedPhoto.Urls.Raw;
+                    case "full":
+                        return _LastSelectedPhoto.Urls.Full;
+                    case "regular":
+                        return _LastSelectedPhoto.Urls.Regular;
+                    case "small":
+                        return _LastSelectedPhoto.Urls.Small;
+                    default:
+                        return _LastSelectedPhoto.Urls.Regular;
+                }
+            }
+        }
+
+        #endregion rightTapped flyout
     }
 }

@@ -20,6 +20,7 @@ using Windows.Foundation;
 using System.Globalization;
 using System.Threading;
 using Windows.UI;
+using Windows.ApplicationModel.Resources;
 
 namespace Hangon.Views {
     public sealed partial class PhotoPage : Page {
@@ -38,6 +39,8 @@ namespace Hangon.Views {
         private double PhotoCaptionTopMargin { get; set; }
 
         private bool PhotoCaptionIsVisible { get; set; }
+
+        ResourceLoader _ResourcesLoader { get; set; }
         #endregion variables
 
         public PhotoPage() {
@@ -47,6 +50,7 @@ namespace Hangon.Views {
             GetDeviceType();
             ApplyCommandBarBarFrostedGlass();
 
+            _ResourcesLoader = new ResourceLoader();
             PhotoCaptionIsVisible = true;
         }
 
@@ -183,8 +187,11 @@ namespace Hangon.Views {
 
             HideProgress();
 
-            if (result) Notify("The photo was saved."); 
-            else Notify("The photo couldn't be saved :(");
+            var successMessage = _ResourcesLoader.GetString("SavePhotoSuccess");
+            var failedMessage = _ResourcesLoader.GetString("SavePhotoFailed");
+
+            if (result) Notify(successMessage); 
+            else Notify(failedMessage);
 
             string getURL()
             {
@@ -257,22 +264,30 @@ namespace Hangon.Views {
             };
         }
 
-        private async void CmdSetWallpaper(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e) {
-            ShowProgress("Setting wallpaper");
+        private async void CmdSetAsWallpaper(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e) {
+            var progressMessage = _ResourcesLoader.GetString("SettingWallpaper");
+            var successMessage = _ResourcesLoader.GetString("WallpaperSetSuccess");
+            var failedMessage = _ResourcesLoader.GetString("WallpaperSetFailed");
+
+            ShowProgress(progressMessage);
             var success = await Wallpaper.SetAsWallpaper(CurrentPhoto, HttpProgressCallback);
             HideProgress();
 
-            if (success) Notify("The photo has been correctly set has your wallpaper!");
-            else Notify("Ops. There I couldn't set your wallpaper :( Try again or contact the developer.");
+            if (success) Notify(successMessage);
+            else Notify(failedMessage);
         }
 
-        private async void CmdSetLockscreen(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e) {
-            ShowProgress("Setting lockscreen background");
+        private async void CmdSetAsLockscreen(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e) {
+            var progressMessage = _ResourcesLoader.GetString("SettingLockscreen");
+            var successMessage = _ResourcesLoader.GetString("LockscreenSetSuccess");
+            var failedMessage = _ResourcesLoader.GetString("LockscreenSetFailed");
+
+            ShowProgress(progressMessage);
             var success = await Wallpaper.SetAsLockscreen(CurrentPhoto, HttpProgressCallback);
             HideProgress();
 
-            if (success) Notify("The photo has been correctly set has your locksreen background!");
-            else Notify("Ops. There I couldn't set your lockscreen background :( Try again or contact the developer.");
+            if (success) Notify(successMessage);
+            else Notify(failedMessage);
         }
 
         private void CmdDownload_Tapped(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e) {
@@ -288,7 +303,7 @@ namespace Hangon.Views {
 
         private void CmdDownloadResolution_Tapped(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e) {
             var cmd = (MenuFlyoutItem)sender;
-            var resolution = cmd.Text;
+            var resolution = (string)cmd.Tag;
             Download(resolution);
         }
 
@@ -314,9 +329,8 @@ namespace Hangon.Views {
                     .Start();
 
                 CmdToggleCaptionIcon.UriSource = new Uri("ms-appx:///Assets/Icons/hide.png");
-
-                var loader = new Windows.ApplicationModel.Resources.ResourceLoader();
-                var label = loader.GetString("HideCaption");
+                
+                var label = _ResourcesLoader.GetString("HideCaption");
                 CmdToggleCaption.Label = label;
             }
 
@@ -328,9 +342,8 @@ namespace Hangon.Views {
                     .Start();
 
                 CmdToggleCaptionIcon.UriSource = new Uri("ms-appx:///Assets/Icons/show.png");
-
-                var loader = new Windows.ApplicationModel.Resources.ResourceLoader();
-                var label = loader.GetString("ShowCaption");
+                
+                var label = _ResourcesLoader.GetString("ShowCaption");
                 CmdToggleCaption.Label = label;
             }
         }
