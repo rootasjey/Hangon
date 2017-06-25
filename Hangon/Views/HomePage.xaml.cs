@@ -54,7 +54,6 @@ namespace Hangon.Views {
             BindAppDataSource();
 
             RestorePivotPosition();
-            //StartNavigationToAnimation();
         }
 
         #region navigation
@@ -84,7 +83,7 @@ namespace Hangon.Views {
         }
 
         void StartNavigationToAnimation() {
-            var animation = ConnectedAnimationService.GetForCurrentView().GetAnimation("PhotoImage");
+            var animation = ConnectedAnimationService.GetForCurrentView().GetAnimation("PhotoImageBack");
 
             if (animation == null || _LastSelectedPhoto == null) {
                 return;
@@ -104,59 +103,22 @@ namespace Hangon.Views {
 
             void animateRecent()
             {
-
                 RecentView.Loaded += (s, e) => {
-                    RecentView.ScrollIntoView(_LastSelectedPhoto);
-                    var item = (GridViewItem)RecentView.ContainerFromItem(_LastSelectedPhoto);
-                    if (item == null) return;
-
-                    var control = (UserControl)item.ContentTemplateRoot;
-                    var image = (Image)control.FindName("PhotoImage");
-                    if (image == null) return;
-
-                    image.Opacity = 0;
-                    image.Loaded += (_s, _e) => {
-                        image.Opacity = 1;
-                        animation.TryStart(image);
-                    };
+                    UI.AnimateBackItemToList(RecentView, _LastSelectedPhoto, animation);
                 };
             }
 
             void animateCurated()
             {
                 CuratedView.Loaded += (s, e) => {
-                    CuratedView.ScrollIntoView(_LastSelectedPhoto);
-                    var item = (GridViewItem)CuratedView.ContainerFromItem(_LastSelectedPhoto);
-                    if (item == null) return;
-
-                    var control = (UserControl)item.ContentTemplateRoot;
-                    var image = (Image)control.FindName("PhotoImage");
-                    if (image == null) return;
-
-                    image.Opacity = 0;
-                    image.Loaded += (_s, _e) => {
-                        image.Opacity = 1;
-                        animation.TryStart(image);
-                    };
+                    UI.AnimateBackItemToList(CuratedView, _LastSelectedPhoto, animation);
                 };
             }
 
             void animateSearchResults()
             {
                 SearchPhotosView.Loaded += (s, e) => {
-                    SearchPhotosView.ScrollIntoView(_LastSelectedPhoto);
-                    var item = (GridViewItem)SearchPhotosView.ContainerFromItem(_LastSelectedPhoto);
-                    if (item == null) { animation.Cancel(); return; }
-
-                    var control = (UserControl)item.ContentTemplateRoot;
-                    var image = (Image)control.FindName("PhotoImage");
-                    if (image == null) return;
-
-                    image.Opacity = 0;
-                    image.Loaded += (_s, _e) => {
-                        image.Opacity = 1;
-                        animation.TryStart(image);
-                    };
+                    UI.AnimateBackItemToList(SearchPhotosView, _LastSelectedPhoto, animation);
                 };
             }
         }
@@ -292,6 +254,7 @@ namespace Hangon.Views {
                     }
 
                     FocusSearchBox();
+                    HideSearchResults();
                     UpdateCmdBarOpenedOffset(0);
                     StartWordsSuggestions();
                     StartSearchBackgroundSlideShow();

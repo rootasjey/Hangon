@@ -61,7 +61,12 @@ namespace Hangon.Views {
         #region navigation
 
         protected override void OnNavigatingFrom(NavigatingCancelEventArgs e) {
-            ConnectedAnimationService.GetForCurrentView().PrepareToAnimate("PhotoImage", PhotoView);
+            if (e.NavigationMode == NavigationMode.New) {
+                ConnectedAnimationService.GetForCurrentView().PrepareToAnimate("PhotoImage", PhotoView);
+            } else if (e.NavigationMode == NavigationMode.Back) {
+                ConnectedAnimationService.GetForCurrentView().PrepareToAnimate("PhotoImageBack", PhotoView);
+            }
+            
             CoreWindow.GetForCurrentThread().KeyDown -= Page_KeyDown;
             base.OnNavigatingFrom(e);
         }

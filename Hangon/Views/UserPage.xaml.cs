@@ -15,6 +15,7 @@ using Windows.UI.Xaml.Hosting;
 using Microsoft.Graphics.Canvas.Effects;
 using Windows.UI.Composition;
 using Windows.UI;
+using Microsoft.Toolkit.Uwp.UI.Controls;
 
 namespace Hangon.Views {
     public sealed partial class UserPage : Page {
@@ -134,12 +135,10 @@ namespace Hangon.Views {
 
             var animationService = ConnectedAnimationService.GetForCurrentView();
 
-            //UserName.Text = photo.User.Name;
-            //UserLocation.Text = photo.User.Location ?? "";
-
             AnimateProfileImage();
             AnimateBackground();
             AnimateCollectionCover();
+            AnimatePhotoCover();
 
 
             void AnimateProfileImage()
@@ -155,12 +154,12 @@ namespace Hangon.Views {
                 }
 
                 UserImageSource.UriSource = new Uri(Unsplash.GetProfileImageLink(CurrentUser));
-
             }
 
             void AnimateBackground()
             {
                 var backgroundAnimation = animationService.GetAnimation("PhotoImage");
+
                 if (backgroundAnimation != null) {
                     ImageBackground.Opacity = 0;
                     ImageBackground.ImageOpened += (s, e) => {
@@ -177,6 +176,24 @@ namespace Hangon.Views {
                 ImageBackground.Source = new BitmapImage(new Uri(photo.Urls.Regular));
             }
 
+            void AnimatePhotoCover()
+            {
+                var photoAnimation = animationService.GetAnimation("PhotoImageBack");
+
+                if (photoAnimation == null || LastPhotoSelected == null) return;
+
+                if (LastPivotIndexSelected == 0) {
+                    UserPhotosListView.Loaded += (s, e) => {
+                        UI.AnimateBackItemToList(UserPhotosListView, LastPhotoSelected, photoAnimation);
+                    };
+
+                } else if (LastPivotIndexSelected == 1) {
+                    UserPhotosGridView.Loaded += (s, e) => {
+                        UI.AnimateBackItemToList(UserPhotosGridView, LastPhotoSelected, photoAnimation);
+                    };
+                }
+            }
+
             void AnimateCollectionCover()
             {
                 var collectionCoverAnimation = animationService.GetAnimation("CollectionCoverImage");
@@ -185,38 +202,12 @@ namespace Hangon.Views {
 
                 if (LastPivotIndexSelected == 0) {
                     UserCollectionsListView.Loaded += (s, e) => {
-                        UserCollectionsListView.ScrollIntoView(LastCollectionSelected);
-
-                        var item = (ListViewItem)UserCollectionsListView.ContainerFromItem(LastCollectionSelected);
-                        if (item == null) { collectionCoverAnimation.Cancel(); return; }
-
-                        var stack = (Grid)item.ContentTemplateRoot;
-                        var image = (Image)stack.FindName("PhotoImage");
-                        if (image == null) { collectionCoverAnimation.Cancel(); return; }
-
-                        image.Opacity = 0;
-                        image.Loaded += (_s, _e) => {
-                            image.Opacity = 1;
-                            collectionCoverAnimation.TryStart(image);
-                        };
+                        UI.AnimateBackItemToList(UserCollectionsListView, LastCollectionSelected, collectionCoverAnimation);
                     };
 
                 } else if (LastPivotIndexSelected == 2) {
                     UserCollectionsGrid.Loaded += (s, e) => {
-                        UserCollectionsGrid.ScrollIntoView(LastCollectionSelected);
-
-                        var item = (GridViewItem)UserCollectionsGrid.ContainerFromItem(LastCollectionSelected);
-                        if (item == null) { collectionCoverAnimation.Cancel(); return; }
-
-                        var stack = (Grid)item.ContentTemplateRoot;
-                        var image = (Image)stack.FindName("PhotoImage");
-                        if (image == null) { collectionCoverAnimation.Cancel(); return; }
-
-                        image.Opacity = 0;
-                        image.Loaded += (_s, _e) => {
-                            image.Opacity = 1;
-                            collectionCoverAnimation.TryStart(image);
-                        };
+                        UI.AnimateBackItemToList(UserCollectionsGrid, LastCollectionSelected, collectionCoverAnimation);
                     };
                 }
             }

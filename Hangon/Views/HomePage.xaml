@@ -327,7 +327,7 @@
 
                         <!-- DATA -->
                         <controls:AdaptiveGridView x:Name="SearchPhotosView"
-                                                   Visibility="Collapsed"
+                                                   Visibility="Visible"
                                                    DesiredWidth="300"
                                                    ItemHeight="300"
                                                    ItemsSource="{x:Bind PageDataSource.PhotosSearchResults, Mode=OneWay}"

@@ -1,4 +1,5 @@
 ﻿using Microsoft.Toolkit.Uwp.UI.Animations;
+using Microsoft.Toolkit.Uwp.UI.Controls;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -7,6 +8,7 @@ using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Media.Animation;
 
 namespace Hangon.Services {
     public static class UI {
@@ -154,6 +156,41 @@ namespace Hangon.Services {
                 await tcs.Task;
             } finally {
                 scrollViewer.ViewChanged -= viewChanged;
+            }
+        }
+        
+        public static void AnimateBackItemToList(ListViewBase list, object lastSelectedItem, ConnectedAnimation connectedAnimation) {
+            list.ScrollIntoView(lastSelectedItem);
+
+            if (list.GetType() == typeof(ListView)) {
+                var item = (ListViewItem)list.ContainerFromItem(lastSelectedItem);
+                if (item == null) { connectedAnimation.Cancel(); return; }
+
+                var pane = (FrameworkElement)item.ContentTemplateRoot;
+
+                var image = (Image)pane.FindName("PhotoImage");
+                if (image == null) { connectedAnimation.Cancel(); return; }
+
+                image.Opacity = 0;
+                image.Loaded += (_s, _e) => {
+                    image.Opacity = 1;
+                    connectedAnimation.TryStart(image);
+                };
+
+            } else if (list.GetType() == typeof(AdaptiveGridView) || list.GetType() == typeof(GridView)) {
+                var item = (GridViewItem)list.ContainerFromItem(lastSelectedItem);
+                if (item == null) { connectedAnimation.Cancel(); return; }
+
+                var pane = (FrameworkElement)item.ContentTemplateRoot;
+
+                var image = (Image)pane.FindName("PhotoImage");
+                if (image == null) { connectedAnimation.Cancel(); return; }
+
+                image.Opacity = 0;
+                image.Loaded += (_s, _e) => {
+                    image.Opacity = 1;
+                    connectedAnimation.TryStart(image);
+                };
             }
         }
 
