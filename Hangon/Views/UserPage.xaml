@@ -174,9 +174,10 @@
                RequestedTheme="Dark"
                Style="{StaticResource PivotCenteredHeadersStyle}">
 
-            <PivotItem x:Name="UserInfosView" Header="infos">
+            <PivotItem x:Name="UserInfosPivotItem" Header="infos">
                 <ScrollViewer>
                     <StackPanel x:Name="UserView"
+                                x:DeferLoadStrategy="Lazy"
                                 Margin="0,60,0,0"
                                 Padding="0,0,0,100">
 
@@ -305,21 +306,26 @@
                             </ListView.ItemsPanel>
                         </ListView>
 
-                </StackPanel>
+                    </StackPanel>
                 </ScrollViewer>
             </PivotItem>
 
-            <PivotItem x:Name="UserPhotosView" Header="photos">
-                <controls:AdaptiveGridView x:Name="UserPhotosGridView"
-                                            DesiredWidth="150"
-                                            ItemHeight="150"
-                                            ItemTemplate="{StaticResource PhotoTemplate}"
-                                            animations:ReorderGridAnimation.Duration="300">
-                </controls:AdaptiveGridView>
+            <PivotItem x:Name="UserPhotosPivotItem" Header="photos">
+                <Grid x:Name="UserPhotosPivotItemContent"
+                      x:DeferLoadStrategy="Lazy">
+                    <controls:AdaptiveGridView x:Name="UserPhotosGridView"
+                                                DesiredWidth="150"
+                                                ItemHeight="150"
+                                                ItemTemplate="{StaticResource PhotoTemplate}"
+                                                animations:ReorderGridAnimation.Duration="300">
+                    </controls:AdaptiveGridView>
+                </Grid>
             </PivotItem>
             
-            <PivotItem x:Name="UserCollectionsView" Header="collections">
-                <Grid>
+            <PivotItem x:Name="UserCollectionsPivotItem" Header="collections">
+                <Grid x:Name="UserCollectionsPivotItemContent"
+                      x:DeferLoadStrategy="Lazy">
+                    
                     <StackPanel x:Name="CollectionEmptyView"
                                 Visibility="Collapsed"
                                 Margin="0,60,0,0"
