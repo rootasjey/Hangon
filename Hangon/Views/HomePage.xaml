@@ -115,12 +115,50 @@
                          Height="20" VerticalAlignment="Top"
                          Tapped="FlyoutNotification_Dismiss">
             <StackPanel>
-                <TextBlock x:Name="FlyoutText" Text=""/>
+                <TextBlock x:Name="FlyoutText" Text="" TextWrapping="Wrap"/>
                 <Grid x:Name="ProgressGrid" Visibility="Collapsed">
                     <ProgressBar x:Name="ProgressIndeterminate"
                                  FlowDirection="RightToLeft" IsIndeterminate="True" Canvas.ZIndex="1"/>
                     <ProgressBar x:Name="ProgressDeterminate" IsIndeterminate="False" />
                 </Grid>
+            </StackPanel>
+        </FlyoutPresenter>
+
+        <FlyoutPresenter x:Name="UpdateChangeLogFlyout"
+                         Visibility="Collapsed"
+                         VerticalAlignment="Center"
+                         Margin="0,0,0,0"
+                         Canvas.ZIndex="2">
+            
+            <StackPanel ScrollViewer.VerticalScrollBarVisibility="Disabled"
+                        Padding="0,20">
+                <TextBlock Text="Update 1.1.0" FontSize="24"
+                               Typography.Capitals="SmallCaps"/>
+
+                <TextBlock Text="30 June 2017" Opacity=".5"/>
+
+                <RichTextBlock TextWrapping="Wrap" Margin="0,20,0,0">
+                    <Paragraph>
+                        <Span>-Add curated section</Span>
+                        <LineBreak/>
+                        <Span>-Add search section</Span>
+                        <LineBreak/>
+                        <Span>-Add right tap/hold (touch) context menu on photos</Span>
+                        <LineBreak/>
+                        <Span>-Support French and English languages</Span>
+                        <LineBreak/>
+                        <Span>-Support dark and white themes</Span>
+                        <LineBreak/>
+                        <Span>-Add animations on SettingsPage</Span>
+                        <LineBreak/>
+                        <Span>-Fix reload command</Span>
+                    </Paragraph>
+                </RichTextBlock>
+                
+                <Button x:Name="ChangelogDismissButton" 
+                            Content="okay" 
+                            HorizontalAlignment="Right"
+                            Tapped="ChangelogDismissButton_Tapped"/>
             </StackPanel>
         </FlyoutPresenter>
 

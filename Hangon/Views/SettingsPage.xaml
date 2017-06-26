@@ -213,6 +213,31 @@
                                 <Hyperlink NavigateUri="https://unsplash.com/">Unsplash</Hyperlink>
                             </Paragraph>
                         </RichTextBlock>
+
+                        <StackPanel x:Name="UpdateChangelogPanel">
+                            <TextBlock Text="last update 1.1.0" FontSize="24"/>
+
+                            <TextBlock Text="30 June 2017" Opacity=".5"/>
+
+                            <RichTextBlock TextWrapping="Wrap" Margin="0,20,0,0">
+                                <Paragraph>
+                                    <Span>-Add curated section</Span>
+                                    <LineBreak/>
+                                    <Span>-Add search section</Span>
+                                    <LineBreak/>
+                                    <Span>-Add right tap/hold (touch) context menu on photos</Span>
+                                    <LineBreak/>
+                                    <Span>-Support French and English languages</Span>
+                                    <LineBreak/>
+                                    <Span>-Support dark and white themes</Span>
+                                    <LineBreak/>
+                                    <Span>-Add animations on SettingsPage</Span>
+                                    <LineBreak/>
+                                    <Span>-Fix reload command</Span>
+                                </Paragraph>
+                            </RichTextBlock>
+                            <StackPanel/>
+                        </StackPanel>
                     </StackPanel>
                 </ScrollViewer>
             </PivotItem>

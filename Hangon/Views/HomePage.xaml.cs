@@ -55,8 +55,9 @@ namespace Hangon.Views {
             
             ApplyCommandBarBarFrostedGlass();
             BindAppDataSource();
-
             RestorePivotPosition();
+
+            ShowUpdateChangelogIfIsNewLaunch();
         }
 
         #region navigation
@@ -830,5 +831,33 @@ namespace Hangon.Views {
         }
 
         #endregion rightTapped flyout
+
+        private void ShowUpdateChangelogIfIsNewLaunch() {
+            if (Settings.IsNewUpdatedLaunch()) {
+                ShowLastUpdateChangelog();
+            }            
+        }
+
+        private async void ShowLastUpdateChangelog() {
+            PagePivot.IsEnabled = false;
+            await UpdateChangeLogFlyout.Scale(.9f, .9f, 0, 0, 0).Fade(0).StartAsync();
+            UpdateChangeLogFlyout.Visibility = Visibility.Visible;
+
+            var x = (float)UpdateChangeLogFlyout.ActualWidth / 2;
+            var y = (float)UpdateChangeLogFlyout.ActualHeight / 2;
+
+            await UpdateChangeLogFlyout.Scale(1f, 1f, x, y).Fade(1).StartAsync();
+            PagePivot.Blur(10, 500, 500).Start();
+        }
+
+        private async void ChangelogDismissButton_Tapped(object sender, TappedRoutedEventArgs e) {
+            var x = (float)UpdateChangeLogFlyout.ActualWidth / 2;
+            var y = (float)UpdateChangeLogFlyout.ActualHeight / 2;
+
+            await UpdateChangeLogFlyout.Scale(.9f, .9f, x, y).Fade(0).StartAsync();
+            UpdateChangeLogFlyout.Visibility = Visibility.Collapsed;
+            PagePivot.Blur(0).Start();
+            PagePivot.IsEnabled = true;
+        }
     }
 }

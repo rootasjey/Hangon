@@ -346,6 +346,6 @@
     <value>Open in browser</value>
   </data>
   <data name="CopyLinkSuccess" xml:space="preserve">
-    <value>Lien copié!</value>
+    <value>Link copied!</value>
   </data>
 </root>

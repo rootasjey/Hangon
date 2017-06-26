@@ -1,4 +1,5 @@
-﻿using Windows.Storage;
+﻿using Windows.ApplicationModel;
+using Windows.Storage;
 using Windows.System.UserProfile;
 using Windows.UI.Xaml;
 
@@ -41,6 +42,11 @@ namespace Hangon.Services {
             }
         }
 
+        private static string AppVersionKey {
+            get {
+                return "AppVersion";
+            }
+        }
         #endregion keys
 
         #region path
@@ -124,5 +130,34 @@ namespace Hangon.Services {
             App.UpdateAppTheme();
         }
         #endregion theme
+
+        #region appversion
+        public static bool IsNewUpdatedLaunch() {
+            var isNewUpdatedLaunch = true;
+            var currentVersion = GetAppVersion();
+            var settingsValues = ApplicationData.Current.LocalSettings.Values;
+
+            if (settingsValues.ContainsKey(AppVersionKey)) {
+                string savedVersion = (string)settingsValues[AppVersionKey];
+                
+
+                if (savedVersion == currentVersion) {
+                    isNewUpdatedLaunch = false;
+                }
+                else { settingsValues[AppVersionKey] = currentVersion; }
+            } else { settingsValues[AppVersionKey] = currentVersion; }
+
+            return isNewUpdatedLaunch;
+        }
+
+        public static string GetAppVersion() {
+            Package package = Package.Current;
+            PackageId packageId = package.Id;
+            PackageVersion version = packageId.Version;
+
+            return string.Format("{0}.{1}.{2}.{3}", version.Major, version.Minor, version.Build, version.Revision);
+
+        }
+        #endregion appversion
     }
 }
