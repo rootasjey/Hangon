@@ -1,5 +1,4 @@
 ﻿using Hangon.Data;
-using Hangon.Models;
 using Hangon.Services;
 using Microsoft.Toolkit.Uwp.UI.Animations;
 using System;
@@ -18,6 +17,7 @@ using Windows.UI;
 using Windows.ApplicationModel.Resources;
 using System.Threading;
 using Windows.UI.Xaml.Input;
+using Unsplasharp.Models;
 
 namespace Hangon.Views {
     public sealed partial class CollectionPage : Page {
@@ -101,8 +101,12 @@ namespace Hangon.Views {
         }
 
         private void LoadUserInfos() {
-            UserName.Text = CurrentCollection.User.Name;
-            UserLocation.Text = CurrentCollection.User.Location;
+            UserName.Text = PageDataSource.GetUsernameFormated(CurrentCollection.User);
+            
+            if (string.IsNullOrEmpty(CurrentCollection.User.Location)) {
+                PanelUserLocation.Visibility = Visibility.Collapsed;
+
+            } else { UserLocation.Text = CurrentCollection.User.Location; }
         }
 
         /// <summary>
@@ -131,6 +135,7 @@ namespace Hangon.Views {
                 PhotosListView.Visibility = Visibility.Collapsed;
                 PhotosGridView.Visibility = Visibility.Collapsed;
                 EmptyViewPhotos.Visibility = Visibility.Visible;
+                EmptyViewPhotosListView.Visibility = Visibility.Visible;
             }
         }
 
@@ -149,6 +154,11 @@ namespace Hangon.Views {
             void AnimateCollectionCover()
             {
                 var coverAnimation = animationService.GetAnimation("CollectionCoverImage");
+
+                if (CurrentCollection.CoverPhoto == null) {
+                    coverAnimation.Cancel();
+                    return;
+                }
 
                 if (coverAnimation != null) {
                     CollectionCoverImage.Opacity = 0;
@@ -178,7 +188,7 @@ namespace Hangon.Views {
                     };
                 }
                 
-                UserImageSource.UriSource = new Uri(Unsplash.GetProfileImageLink(CurrentCollection.User));
+                UserImageSource.UriSource = new Uri(PageDataSource.GetProfileImageLink(CurrentCollection.User));
             }
 
             void AnimatePhotoImage()
@@ -346,7 +356,7 @@ namespace Hangon.Views {
         private async void CmdOpenInBrowser_Tapped(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e) {
             if (CurrentCollection?.Links == null) return; // get info on question mark
 
-            var tracking = "?utm_source=Hangon&utm_medium=referral&utm_campaign=" + Unsplash.ApplicationId;
+            var tracking = "?utm_source=Hangon&utm_medium=referral&utm_campaign=" + Credentials.ApplicationId;
             var userUri = new Uri(string.Format("{0}{1}", CurrentCollection.Links.Html, tracking));
             var success = await Windows.System.Launcher.LaunchUriAsync(userUri);
         }
@@ -354,7 +364,7 @@ namespace Hangon.Views {
         private void CmdCopyLink_Tapped(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e) {
             if (CurrentCollection?.Links == null) return;
 
-            var tracking = "?utm_source=Hangon&utm_medium=referral&utm_campaign=" + Unsplash.ApplicationId;
+            var tracking = "?utm_source=Hangon&utm_medium=referral&utm_campaign=" + Credentials.ApplicationId;
             var userUri = string.Format("{0}{1}", CurrentCollection.Links.Html, tracking);
             DataTransfer.Copy(userUri);
         }
@@ -464,7 +474,7 @@ namespace Hangon.Views {
         private async void CmdOpenPhotoInBrowser_Tapped(object sender, TappedRoutedEventArgs e) {
             if (LastPhotoSelected == null || LastPhotoSelected.Links == null) return;
 
-            var tracking = "?utm_source=Hangon&utm_medium=referral&utm_campaign=" + Unsplash.ApplicationId;
+            var tracking = "?utm_source=Hangon&utm_medium=referral&utm_campaign=" + Credentials.ApplicationId;
             var userUri = new Uri(string.Format("{0}{1}", LastPhotoSelected.Links.Html, tracking));
             var success = await Windows.System.Launcher.LaunchUriAsync(userUri);
         }

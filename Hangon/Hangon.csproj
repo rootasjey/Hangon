@@ -19,7 +19,7 @@
     <WindowsXamlEnableOverview>true</WindowsXamlEnableOverview>
     <PackageCertificateKeyFile>Hangon_StoreKey.pfx</PackageCertificateKeyFile>
     <PackageCertificateThumbprint>EEBF6A809E70C326EA8C8F7C607C7B1B6DE6476F</PackageCertificateThumbprint>
-    <AppxAutoIncrementPackageRevision>True</AppxAutoIncrementPackageRevision>
+    <AppxAutoIncrementPackageRevision>False</AppxAutoIncrementPackageRevision>
     <AppxBundle>Always</AppxBundle>
     <AppxBundlePlatforms>x86|x64|arm</AppxBundlePlatforms>
   </PropertyGroup>
@@ -100,17 +100,17 @@
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
     <Compile Include="Converters\UriParser.cs" />
+    <Compile Include="Data\CollectionsList.cs" />
+    <Compile Include="Data\Credentials.cs" />
     <Compile Include="Data\DataSource.cs" />
-    <Compile Include="Data\Unsplash.cs" />
-    <Compile Include="Models\Collection.cs" />
-    <Compile Include="Models\User.cs" />
-    <Compile Include="Models\Photo.cs" />
+    <Compile Include="Data\PhotosList.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Services\BackgroundTask.cs" />
+    <Compile Include="Services\BackgroundTasks.cs" />
     <Compile Include="Services\DataTransfert.cs" />
     <Compile Include="Services\Events.cs" />
     <Compile Include="Services\Settings.cs" />
     <Compile Include="Services\Storage.cs" />
+    <Compile Include="Services\TileDesigner.cs" />
     <Compile Include="Services\UI.cs" />
     <Compile Include="Services\Wallpaper.cs" />
     <Compile Include="Views\CollectionPage.xaml.cs">
@@ -135,8 +135,8 @@
     </AppxManifest>
     <None Include="Hangon_StoreKey.pfx" />
     <None Include="Hangon_TemporaryKey.pfx" />
-    <PRIResource Include="Strings\fr-FR\Resources.resw" />
-    <PRIResource Include="Strings\en-US\Resources.resw" />
+    <PRIResource Include="Strings\fr\Resources.resw" />
+    <PRIResource Include="Strings\en\Resources.resw" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Assets\BadgeLogo.scale-100.png" />
@@ -224,19 +224,22 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform">
-      <Version>5.3.3</Version>
+      <Version>5.3.4</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.Toolkit.Uwp.Notifications">
-      <Version>1.4.1</Version>
+      <Version>1.5.1</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.Toolkit.Uwp.UI.Animations">
-      <Version>1.4.1</Version>
+      <Version>1.5.1</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.Toolkit.Uwp.UI.Controls">
-      <Version>1.4.1</Version>
+      <Version>1.5.1</Version>
     </PackageReference>
     <PackageReference Include="Newtonsoft.Json">
-      <Version>10.0.2</Version>
+      <Version>10.0.3</Version>
+    </PackageReference>
+    <PackageReference Include="unplasharp.api">
+      <Version>0.5.1</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
@@ -253,6 +256,7 @@
       <Name>Tasks</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>
   </PropertyGroup>

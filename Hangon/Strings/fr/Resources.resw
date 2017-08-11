@@ -190,7 +190,7 @@
     <value>fond d'écran</value>
   </data>
   <data name="HideCaption" xml:space="preserve">
-    <value>hide caption</value>
+    <value>masquer les stats</value>
   </data>
   <data name="LanguageLabel.Text" xml:space="preserve">
     <value>langue</value>
@@ -204,7 +204,7 @@
   <data name="ShowCaption" xml:space="preserve">
     <value>montrer les stats</value>
   </data>
-  <data name="AutoResolutionDownloadText" xml:space="preserve">
+  <data name="AutoResolutionDownloadText.Text" xml:space="preserve">
     <value>Toujours télécharger les photos dans la résolution suivante</value>
   </data>
   <data name="AutoSaveDownloadText.Text" xml:space="preserve">
@@ -347,5 +347,35 @@
   </data>
   <data name="CopyLinkSuccess" xml:space="preserve">
     <value>Link copied!</value>
+  </data>
+  <data name="NoError" xml:space="preserve">
+    <value>aucune erreur</value>
+  </data>
+  <data name="PeriodicTile.Text" xml:space="preserve">
+    <value>Mettre à jour la tuile dynamique périodiquement</value>
+  </data>
+  <data name="Tile.Text" xml:space="preserve">
+    <value>tuile</value>
+  </data>
+  <data name="TileIntervalUpdates.Header" xml:space="preserve">
+    <value>période</value>
+  </data>
+  <data name="AboutPivotItem.Header" xml:space="preserve">
+    <value>à propos</value>
+  </data>
+  <data name="CmdSettings.Label" xml:space="preserve">
+    <value>paramètres</value>
+  </data>
+  <data name="CmdShowSearch.Label" xml:space="preserve">
+    <value>recherche</value>
+  </data>
+  <data name="TextSearchSentenceSuggestion.Text" xml:space="preserve">
+    <value>commencez par taper un mot-clé...</value>
+  </data>
+  <data name="NoPhotosYet.Text" xml:space="preserve">
+    <value>Pas de photos pour l'instant :(</value>
+  </data>
+  <data name="ItemSixHours.Content" xml:space="preserve">
+    <value>toutes les 6 heures</value>
   </data>
 </root>

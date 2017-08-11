@@ -6,7 +6,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
     xmlns:animations="using:Microsoft.Toolkit.Uwp.UI.Animations"
-    xmlns:data="using:Hangon.Models"
+    xmlns:data="using:Unsplasharp.Models"
     mc:Ignorable="d">
 
     <Page.Resources>
@@ -200,7 +200,7 @@
                          Height="20" VerticalAlignment="Top"
                          Tapped="FlyoutNotification_Dismiss">
             <StackPanel>
-                <TextBlock x:Name="FlyoutText" Text=""/>
+                <TextBlock x:Name="FlyoutText" Text="" TextWrapping="Wrap"/>
                 <Grid x:Name="ProgressGrid" Visibility="Collapsed">
                     <ProgressBar x:Name="ProgressIndeterminate"
                                  FlowDirection="RightToLeft" IsIndeterminate="True" Canvas.ZIndex="1"/>

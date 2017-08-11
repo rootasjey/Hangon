@@ -1,5 +1,4 @@
 ﻿using System;
-using Hangon.Models;
 using Hangon.Services;
 using Windows.UI.Xaml;
 using Windows.UI.Core;
@@ -21,6 +20,7 @@ using System.Globalization;
 using System.Threading;
 using Windows.UI;
 using Windows.ApplicationModel.Resources;
+using Unsplasharp.Models;
 
 namespace Hangon.Views {
     public sealed partial class PhotoPage : Page {
@@ -109,8 +109,8 @@ namespace Hangon.Views {
 
             void PopulateUSer()
             {
-                UserImageSource.UriSource = new Uri(Unsplash.GetProfileImageLink(CurrentPhoto.User));
-                UserName.Text = CurrentPhoto.User.Name;
+                UserImageSource.UriSource = new Uri(PageDataSource.GetProfileImageLink(CurrentPhoto.User));
+                UserName.Text = PageDataSource.GetUsernameFormated(CurrentPhoto.User);
                 UserLocation.Text = CurrentPhoto.User.Location ?? "";
 
                 if (string.IsNullOrEmpty(UserLocation.Text))
@@ -306,12 +306,7 @@ namespace Hangon.Views {
             var resolution = (string)cmd.Tag;
             Download(resolution);
         }
-
-        /// <summary>
-        /// Show/Hide photo's caption
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+        
         private void CmdToggleCaption_Tapped(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e) {
             if (PhotoCaptionIsVisible) {
                 hideCaption();
@@ -372,6 +367,7 @@ namespace Hangon.Views {
             if (photo == null) return;
 
             var animation = ConnectedAnimationService.GetForCurrentView().GetAnimation("PhotoImage");
+
             if (animation != null) {
                 //PhotoView.Opacity = 0;
                 PhotoView.ImageOpened += (s, e) => {
@@ -473,7 +469,7 @@ namespace Hangon.Views {
         }
 
         private async void OpenPhotoInBrowser_Tapped(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e) {
-            var tracking = "?utm_source=Hangon&utm_medium=referral&utm_campaign=" + Unsplash.ApplicationId;
+            var tracking = "?utm_source=Hangon&utm_medium=referral&utm_campaign=" + Credentials.ApplicationId;
             var photoUri = new Uri(string.Format("{0}{1}", CurrentPhoto.Links.Html, tracking));
             var success = await Windows.System.Launcher.LaunchUriAsync(photoUri);
         }

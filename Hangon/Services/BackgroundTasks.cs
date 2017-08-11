@@ -3,7 +3,7 @@ using Windows.ApplicationModel.Background;
 using Windows.Storage;
 
 namespace Hangon.Services {
-    public class BackgroundTask {
+    public class BackgroundTasks {
         #region variables
         private static string WallTaskName {
             get {
@@ -40,7 +40,64 @@ namespace Hangon.Services {
                 return "LockscreenTaskInterval";
             }
         }
+
+        private static string TileTaskName {
+            get {
+                return "TileUpdaterTask";
+            }
+        }
+
+        private static string TileTaskEntryPoint {
+            get {
+                return "Tasks.TileUpdater";
+            }
+        }
+
+        private static string TileTaskInterval {
+            get {
+                return "TileTaskInterval";
+            }
+        }
         #endregion variables
+
+        #region tile task
+        public static bool IsTileTaskActive() {
+            foreach (var task in BackgroundTaskRegistration.AllTasks) {
+                if (task.Value.Name == TileTaskName) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public static void RegisterTileTask(uint interval) {
+            RegisterBackgroundTask(
+                TileTaskName,
+                TileTaskEntryPoint,
+                interval
+            );
+        }
+
+        public static void UnregisterTileTask() {
+            UnregisterBackgroundTask(TileTaskName);
+        }
+
+        public static void SaveTileTaskInterval(uint interval) {
+            var settingsValues = ApplicationData.Current.LocalSettings.Values;
+            settingsValues[TileTaskInterval] = interval;
+        }
+
+        public static uint GetTileTaskInterval() {
+            var settingsValues = ApplicationData.Current.LocalSettings.Values;
+            return settingsValues.ContainsKey(TileTaskInterval) ? (uint)settingsValues[TileTaskInterval] : 60;
+        }
+
+        public static ApplicationDataCompositeValue GetTileTaskActivity() {
+            var key = "TileUpdaterTask" + "Activity";
+            var settingsValues = ApplicationData.Current.LocalSettings.Values;
+            return settingsValues.ContainsKey(key) ? (ApplicationDataCompositeValue)settingsValues[key] : null;
+        }
+        #endregion tile task
 
         #region wall task
         public static bool IsWallTaskActive() {

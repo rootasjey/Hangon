@@ -44,8 +44,9 @@ namespace Hangon.Views {
         #endregion animations
 
         private void LoadData() {
-            WallSwitch.IsOn = BackgroundTask.IsWallTaskActive();
-            LockscreenSwitch.IsOn = BackgroundTask.IsLockscreenTaskActive();
+            WallSwitch.IsOn = BackgroundTasks.IsWallTaskActive();
+            LockscreenSwitch.IsOn = BackgroundTasks.IsLockscreenTaskActive();
+            TileSwitch.IsOn = BackgroundTasks.IsTileTaskActive();
 
             UpdateWallTaskActivityText();
             UpdateLockscreenTaskActivityText();
@@ -90,8 +91,13 @@ namespace Hangon.Views {
         #endregion about
 
         #region tasks
+
+        // ---------
+        // WALL TASK
+        // ---------
+        #region wall task
         private void UpdateWallTaskActivityText() {
-            var activity = BackgroundTask.GetWallTaskActivity();
+            var activity = BackgroundTasks.GetWallTaskActivity();
             if (activity == null) return;
             LastUpdatedTask.Text = "Wallpaper task last run on: " + activity["DateTime"];
 
@@ -100,35 +106,21 @@ namespace Hangon.Views {
             }
         }
 
-        private void UpdateLockscreenTaskActivityText() {
-            var activity = BackgroundTask.GetLockscreenTaskActivity();
-            if (activity == null) return;
-            LastUpdatedLockscreenTask.Text = "Wallpaper task last run on: " + activity["DateTime"];
 
-            if (activity["Exception"] != null) {
-                LastLockscreenTaskError.Text = activity["Exception"].ToString();
-            }
-        }
-
-        /// <summary>
-        /// Add or remove background task when the toggle changes state
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         private void WallSwitch_Toggled(object sender, RoutedEventArgs e) {
             var toggle = (ToggleSwitch)sender;
             if (toggle.IsOn) {
                 ShowWallTaskActivity();
 
-                if (BackgroundTask.IsWallTaskActive()) {
+                if (BackgroundTasks.IsWallTaskActive()) {
                     return;
                 }
-                
-                BackgroundTask.RegisterWallTask(GetWallIntervalUpdate());
+
+                BackgroundTasks.RegisterWallTask(GetWallIntervalUpdate());
 
             } else {
                 HideWallTaskActivity();
-                BackgroundTask.UnregisterWallTask();
+                BackgroundTasks.UnregisterWallTask();
             }
         }
 
@@ -147,8 +139,8 @@ namespace Hangon.Views {
                 return;
             }
 
-            BackgroundTask.UnregisterWallTask();
-            BackgroundTask.RegisterWallTask(GetWallIntervalUpdate());
+            BackgroundTasks.UnregisterWallTask();
+            BackgroundTasks.RegisterWallTask(GetWallIntervalUpdate());
         }
 
         private uint GetWallIntervalUpdate() {
@@ -157,21 +149,42 @@ namespace Hangon.Views {
             return uint.Parse(value);
         }
 
+        private void RestartWallTask_Tapped(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e) {
+            BackgroundTasks.UnregisterWallTask();
+            BackgroundTasks.RegisterWallTask(GetWallIntervalUpdate());
+        }
+        #endregion wall task
+
+
+        // ---------------
+        // LOCKSCREEN TASK
+        // ---------------
+        #region lockscreen task
+        private void UpdateLockscreenTaskActivityText() {
+            var activity = BackgroundTasks.GetLockscreenTaskActivity();
+            if (activity == null) return;
+            LastUpdatedLockscreenTask.Text = "Wallpaper task last run on: " + activity["DateTime"];
+
+            if (activity["Exception"] != null) {
+                LastLockscreenTaskError.Text = activity["Exception"].ToString();
+            }
+        }
+
         private void LockscreenSwitch_Toggled(object sender, RoutedEventArgs e) {
             var toggle = (ToggleSwitch)sender;
 
             if (toggle.IsOn) {
                 ShowLockscreenTaskActivity();
 
-                if (BackgroundTask.IsLockscreenTaskActive()) {
+                if (BackgroundTasks.IsLockscreenTaskActive()) {
                     return;
                 }
 
-                BackgroundTask.RegisterLockscreenTask(GetLockscreenIntervalUpdates());
+                BackgroundTasks.RegisterLockscreenTask(GetLockscreenIntervalUpdates());
 
             } else {
                 HideLockscreenTaskActivity();
-                BackgroundTask.UnregisterLockscreenTask();
+                BackgroundTasks.UnregisterLockscreenTask();
             }
         }
 
@@ -186,7 +199,7 @@ namespace Hangon.Views {
         }
 
         private void LockscreenIntervalUpdates_Loaded(object sender, RoutedEventArgs e) {
-            var currentInterval = BackgroundTask.GetLockscreenTaskInterval();
+            var currentInterval = BackgroundTasks.GetLockscreenTaskInterval();
 
 
             for (int i = 0; i < LockscreenIntervalUpdates.Items.Count; i++) {
@@ -205,8 +218,8 @@ namespace Hangon.Views {
                 return;
             }
 
-            BackgroundTask.UnregisterLockscreenTask();
-            BackgroundTask.RegisterLockscreenTask(GetLockscreenIntervalUpdates());
+            BackgroundTasks.UnregisterLockscreenTask();
+            BackgroundTasks.RegisterLockscreenTask(GetLockscreenIntervalUpdates());
         }
 
         private uint GetLockscreenIntervalUpdates() {
@@ -215,15 +228,82 @@ namespace Hangon.Views {
             return uint.Parse(value);
         }
 
-        private void RestartWallTask_Tapped(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e) {
-            BackgroundTask.UnregisterWallTask();
-            BackgroundTask.RegisterWallTask(GetWallIntervalUpdate());
+        private void RestartLockscreenTask_Tapped(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e) {
+            BackgroundTasks.UnregisterLockscreenTask();
+            BackgroundTasks.RegisterLockscreenTask(GetLockscreenIntervalUpdates());
         }
 
-        private void RestartLockscreenTask_Tapped(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e) {
-            BackgroundTask.UnregisterLockscreenTask();
-            BackgroundTask.RegisterLockscreenTask(GetLockscreenIntervalUpdates());
+        #endregion lockscreen task
+
+
+        // ---------
+        // TILE TASK
+        // ---------
+        #region tile task
+        private void TileSwitch_Toggled(object sender, RoutedEventArgs e) {
+            var toggle = (ToggleSwitch)sender;
+
+            if (toggle.IsOn) {
+                ShowTileTaskActivity();
+
+                if (BackgroundTasks.IsTileTaskActive()) {
+                    return;
+                }
+
+                BackgroundTasks.RegisterTileTask(GetTileIntervalUpdates());
+
+            } else {
+                HideTileTaskActivity();
+                BackgroundTasks.UnregisterTileTask();
+            }
         }
+
+        void ShowTileTaskActivity() {
+            TileIntervalUpdates.Visibility = Visibility.Visible;
+            TileTaskActivity.Visibility = Visibility.Visible;
+        }
+
+        void HideTileTaskActivity() {
+            TileIntervalUpdates.Visibility = Visibility.Collapsed;
+            TileTaskActivity.Visibility = Visibility.Collapsed;
+        }
+
+        private uint GetTileIntervalUpdates() {
+            var item = (ComboBoxItem)TileIntervalUpdates.SelectedItem;
+            string value = (string)item.Tag;
+            return uint.Parse(value);
+        }
+
+        private void TileIntervalUpdates_Loaded(object sender, RoutedEventArgs e) {
+            var currentInterval = BackgroundTasks.GetTileTaskInterval();
+
+            for (int i = 0; i < TileIntervalUpdates.Items.Count; i++) {
+                var item = (ComboBoxItem)TileIntervalUpdates.Items[i];
+                var itemInterval = uint.Parse((string)item.Tag);
+
+                if (itemInterval == currentInterval) {
+                    TileIntervalUpdates.SelectedIndex = i;
+                    break;
+                }
+            }
+        }
+
+        private void TileIntervalUpdate_SelectionChanged(object sender, SelectionChangedEventArgs e) {
+            if (!TileSwitch.IsOn) {
+                return;
+            }
+
+            BackgroundTasks.UnregisterTileTask();
+            BackgroundTasks.RegisterTileTask(GetTileIntervalUpdates());
+        }
+
+        private void RestartTileTask_Tapped(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e) {
+            BackgroundTasks.UnregisterTileTask();
+            BackgroundTasks.RegisterTileTask(GetTileIntervalUpdates());
+        }
+
+        #endregion tile task
+
         #endregion tasks
 
         #region personalization

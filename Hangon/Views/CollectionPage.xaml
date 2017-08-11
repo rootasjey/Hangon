@@ -4,9 +4,9 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-     xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
+    xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
     xmlns:animations="using:Microsoft.Toolkit.Uwp.UI.Animations"
-    xmlns:data="using:Hangon.Models"
+    xmlns:data="using:Unsplasharp.Models"
     mc:Ignorable="d">
 
     <Page.Resources>
@@ -83,7 +83,7 @@
                          Height="20" VerticalAlignment="Top"
                          Tapped="FlyoutNotification_Dismiss">
             <StackPanel>
-                <TextBlock x:Name="FlyoutText" Text=""/>
+                <TextBlock x:Name="FlyoutText" Text="" TextWrapping="Wrap"/>
                 <Grid x:Name="ProgressGrid" Visibility="Collapsed">
                     <ProgressBar x:Name="ProgressIndeterminate"
                                  FlowDirection="RightToLeft" IsIndeterminate="True" Canvas.ZIndex="1"/>
@@ -209,6 +209,10 @@
                                 </ItemsPanelTemplate>
                             </ListView.ItemsPanel>
                         </ListView>
+
+                        <StackPanel x:Name="EmptyViewPhotosListView" Margin="0,30" Visibility="Collapsed">
+                            <TextBlock x:Uid="NoPhotosYet" Text="No photos yet :(" TextAlignment="Center"/>
+                        </StackPanel>
                     </StackPanel>
                 </ScrollViewer>
             </PivotItem>
@@ -227,7 +231,8 @@
                                 Visibility="Collapsed"
                                 VerticalAlignment="Center"
                                 HorizontalAlignment="Center">
-                        <TextBlock Text="Sorry, I couldn't get the collection's photos :("
+                        <TextBlock x:Uid="NoPhotosYet" 
+                                   Text="No photos yet :("
                                    FontSize="22"
                                    TextWrapping="Wrap"/>
                     </StackPanel>

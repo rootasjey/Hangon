@@ -6,7 +6,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:animations="using:Microsoft.Toolkit.Uwp.UI.Animations"
     xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
-    xmlns:data="using:Hangon.Models"
+    xmlns:models="using:Unsplasharp.Models"
     mc:Ignorable="d">
     
     <Page.Resources>
@@ -17,7 +17,7 @@
             <Setter Property="Margin" Value="0"/>
         </Style>
 
-        <DataTemplate x:Key="PhotoTemplate" x:DataType="data:Photo">
+        <DataTemplate x:Key="PhotoTemplate" x:DataType="models:Photo">
             <UserControl>
                 <StackPanel x:Name="PhotoItem"
                             Opacity="0"
@@ -127,7 +127,6 @@
         <FlyoutPresenter x:Name="UpdateChangeLogFlyout"
                          Visibility="Collapsed"
                          VerticalAlignment="Center"
-                         Margin="0,0,0,0"
                          Canvas.ZIndex="2">
             
             <StackPanel ScrollViewer.VerticalScrollBarVisibility="Disabled"
@@ -449,10 +448,10 @@
                     Background="Transparent"
                     VerticalAlignment="Bottom"
                     ClosedDisplayMode="Compact">
-            <AppBarButton x:Name="CmdShowSearch" Label="show search" Icon="Find" Tapped="CmdShowSearch_Tapped"/>
-            <AppBarButton x:Name="CmdRefresh" Label="refresh" Icon="Refresh" Tapped="CmdRefresh_Tapped"/>
+            <AppBarButton x:Name="CmdShowSearch" x:Uid="CmdShowSearch" Label="show search" Icon="Find" Tapped="CmdShowSearch_Tapped"/>
+            <AppBarButton x:Name="CmdRefresh" x:Uid="CmdRefresh" Label="refresh" Icon="Refresh" Tapped="CmdRefresh_Tapped"/>
             <CommandBar.SecondaryCommands>
-                <AppBarButton x:Name="CmdSettings" Label="settings" Tapped="CmdSettings_Tapped"/>
+                <AppBarButton x:Name="CmdSettings" x:Uid="CmdSettings" Label="settings" Tapped="CmdSettings_Tapped"/>
             </CommandBar.SecondaryCommands>
         </CommandBar>
 

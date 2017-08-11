@@ -24,7 +24,7 @@
                          Height="20" VerticalAlignment="Top"
                          Tapped="FlyoutNotification_Dismiss">
             <StackPanel>
-                <TextBlock x:Name="FlyoutText" Text="downloading photo..."/>
+                <TextBlock x:Name="FlyoutText" Text="downloading photo..." TextWrapping="Wrap"/>
                 <Grid x:Name="ProgressGrid">
                     <ProgressBar x:Name="ProgressIndeterminate"
                                  FlowDirection="RightToLeft" IsIndeterminate="True" Canvas.ZIndex="1"/>

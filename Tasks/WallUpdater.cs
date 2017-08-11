@@ -2,15 +2,15 @@
 using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Tasks.Models;
 using Windows.ApplicationModel.Background;
 using Windows.Storage;
-using Newtonsoft.Json.Linq;
 using Windows.System.UserProfile;
-using System.Net.Http.Headers;
+using Unsplasharp.Models;
+using Tasks.Data;
 
 namespace Tasks {
     public sealed class WallUpdater : IBackgroundTask {
+        #region variables
         BackgroundTaskDeferral _deferral;
         volatile bool _cancelRequested = false;
 
@@ -26,6 +26,8 @@ namespace Tasks {
             }
         }
 
+        #endregion variables
+
         /// <summary>
         /// Task's Entry Point
         /// </summary>
@@ -38,7 +40,7 @@ namespace Tasks {
 
             Photo photo = await GetRandom();
 
-            StorageFile file = await DownloadImagefromServer(photo.URLRegular, photo.Id);
+            StorageFile file = await DownloadImagefromServer(photo.Urls.Regular, photo.Id);
 
             if (taskInstance.Task.Name == WallTaskName) {
                 await SetWallpaperAsync(file);
@@ -85,29 +87,8 @@ namespace Tasks {
         }
 
         private async Task<Photo> GetRandom() {
-            Photo paper = new Photo();
-
-            HttpClient http = new HttpClient();
-            http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Client-ID", "16246a4d58baa698a0a720106aab4ecedfe241c72205586da6ab9393424894a8");
-            HttpResponseMessage response = null;
-
-            try {
-                response = await http.GetAsync("https://api.unsplash.com/photos/random");
-                response.EnsureSuccessStatusCode();
-                string responseBodyAsText = await response.Content.ReadAsStringAsync();
-
-                JObject json = JObject.Parse(responseBodyAsText);
-
-                paper.Id = (string)json.GetValue("id");
-                paper.Likes = (int)json.GetValue("likes");
-                paper.URLRaw = (string)json["urls"]["raw"];
-                paper.URLRegular = (string)json["urls"]["regular"];
-                paper.Thumbnail = (string)json["urls"]["thumb"];
-
-                return paper;
-            } catch/* (HttpRequestException hre)*/ {
-                return paper;
-            }
+            var client = new Unsplasharp.Client(Credentials.ApplicationId);
+            return await client.GetRandomPhoto();
         }
 
         private async Task<StorageFile> DownloadImagefromServer(string URI, string filename) {

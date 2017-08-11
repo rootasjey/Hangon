@@ -1,6 +1,5 @@
 ﻿using System;
 using Hangon.Data;
-using Hangon.Models;
 using Hangon.Services;
 using Microsoft.Toolkit.Uwp.UI.Animations;
 using Microsoft.Toolkit.Uwp.UI.Controls;
@@ -17,6 +16,7 @@ using Windows.UI.Xaml.Input;
 using System.Threading;
 using Windows.UI.Xaml.Media.Imaging;
 using Windows.ApplicationModel.Resources;
+using Unsplasharp.Models;
 
 namespace Hangon.Views {
     public sealed partial class HomePage : Page {
@@ -161,6 +161,7 @@ namespace Hangon.Views {
 
             if (added > 0) {
                 RecentView.ItemsSource = PageDataSource.RecentPhotos;
+                TileDesigner.UpdatePrimary();
 
             } else {
                 ShowRecentEmptyView();
@@ -678,7 +679,6 @@ namespace Hangon.Views {
 
         #endregion search
 
-
         #region notifications
 
         private void FlyoutNotification_Dismiss(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e) {
@@ -782,7 +782,7 @@ namespace Hangon.Views {
         private async void CmdOpenInBrowser_Tapped(object sender, TappedRoutedEventArgs e) {
             if (_LastSelectedPhoto == null || _LastSelectedPhoto.Links == null) return;
 
-            var tracking = "?utm_source=Hangon&utm_medium=referral&utm_campaign=" + Unsplash.ApplicationId;
+            var tracking = "?utm_source=Hangon&utm_medium=referral&utm_campaign=" + Credentials.ApplicationId;
             var userUri = new Uri(string.Format("{0}{1}", _LastSelectedPhoto.Links.Html, tracking));
             var success = await Windows.System.Launcher.LaunchUriAsync(userUri);
         }
@@ -832,6 +832,7 @@ namespace Hangon.Views {
 
         #endregion rightTapped flyout
 
+        #region update changelog
         private void ShowUpdateChangelogIfIsNewLaunch() {
             if (Settings.IsNewUpdatedLaunch()) {
                 ShowLastUpdateChangelog();
@@ -859,5 +860,7 @@ namespace Hangon.Views {
             PagePivot.Blur(0).Start();
             PagePivot.IsEnabled = true;
         }
+
+        #endregion update changelog
     }
 }

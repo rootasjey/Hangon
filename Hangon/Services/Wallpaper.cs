@@ -1,13 +1,12 @@
 ﻿using System;
-using Hangon.Models;
 using Windows.System.UserProfile;
 using System.Threading.Tasks;
 using Windows.Storage;
-using System.IO;
 using System.Collections.Generic;
 using System.Threading;
 using Windows.Web.Http;
 using Windows.Storage.Streams;
+using Unsplasharp.Models;
 
 namespace Hangon.Services {
     public class Wallpaper {

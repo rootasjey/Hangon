@@ -107,21 +107,27 @@
     <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Models\Photo.cs" />
+    <Compile Include="Data\Credentials.cs" />
+    <Compile Include="Services\TileDesigner.cs" />
+    <Compile Include="TileUpdater.cs" />
     <Compile Include="WallUpdater.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform">
-      <Version>5.3.3</Version>
+      <Version>5.3.4</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.Toolkit.Uwp.Notifications">
-      <Version>1.4.1</Version>
+      <Version>1.5.1</Version>
     </PackageReference>
     <PackageReference Include="Newtonsoft.Json">
-      <Version>10.0.2</Version>
+      <Version>10.0.3</Version>
+    </PackageReference>
+    <PackageReference Include="unplasharp.api">
+      <Version>0.5.1</Version>
     </PackageReference>
   </ItemGroup>
+  <ItemGroup />
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>
   </PropertyGroup>

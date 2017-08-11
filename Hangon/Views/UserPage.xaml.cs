@@ -1,5 +1,4 @@
 ﻿using Hangon.Data;
-using Hangon.Models;
 using Hangon.Services;
 using Microsoft.Toolkit.Uwp.UI.Animations;
 using System;
@@ -17,6 +16,7 @@ using Windows.UI.Composition;
 using Windows.UI;
 using Windows.ApplicationModel.Resources;
 using System.Threading;
+using Unsplasharp.Models;
 
 namespace Hangon.Views {
     public sealed partial class UserPage : Page {
@@ -103,13 +103,11 @@ namespace Hangon.Views {
             UserInfosPivotItem.FindName("UserView");
             PopulateCachedStats();
 
-            CurrentUser = await PageDataSource.GetUser(CurrentPhoto.User.Username);
-
             PopulateStats();
 
             void PopulateCachedStats()
             {
-                UserName.Text = CurrentPhoto.User.Name;
+                UserName.Text = PageDataSource.GetUsernameFormated(CurrentPhoto.User);
                 UserLocation.Text = CurrentPhoto.User.Location ?? "";
 
                 if (string.IsNullOrEmpty(UserLocation.Text)) {
@@ -130,7 +128,7 @@ namespace Hangon.Views {
         private async void LoadUserPhotos() {
             UserPhotosPivotItem.FindName("UserPhotosPivotItemContent");
 
-            await PageDataSource.GetUserPhotos(CurrentPhoto.User.Username);
+            await PageDataSource.GetUserPhotos(PageDataSource.GetUsername(CurrentPhoto.User));
             UserPhotosGridView.ItemsSource = PageDataSource.UserPhotos;
 
             BindPhotosListView();
@@ -146,7 +144,7 @@ namespace Hangon.Views {
         private async void LoadUserCollections() {
             UserCollectionsPivotItem.FindName("UserCollectionsPivotItemContent");
 
-            await PageDataSource.GetUserCollections(CurrentPhoto.User.Username);
+            await PageDataSource.GetUserCollections(PageDataSource.GetUsername(CurrentPhoto.User));
 
             if (PageDataSource.UserCollections.Count > 0) {
                 UserCollectionsGrid.ItemsSource = PageDataSource.UserCollections;
@@ -204,7 +202,7 @@ namespace Hangon.Views {
                     };
                 }
 
-                UserImageSource.UriSource = new Uri(Unsplash.GetProfileImageLink(CurrentUser));
+                UserImageSource.UriSource = new Uri(PageDataSource.GetProfileImageLink(CurrentUser));
             }
 
             void AnimateBackground()
@@ -373,7 +371,7 @@ namespace Hangon.Views {
         private async void CmdOpenInBrowser_Tapped(object sender, TappedRoutedEventArgs e) {
             if (CurrentUser == null || CurrentUser.Links == null) return;
 
-            var tracking = "?utm_source=Hangon&utm_medium=referral&utm_campaign=" + Unsplash.ApplicationId;
+            var tracking = "?utm_source=Hangon&utm_medium=referral&utm_campaign=" + Credentials.ApplicationId;
             var userUri = new Uri(string.Format("{0}{1}", CurrentUser.Links.Html, tracking));
             var success = await Windows.System.Launcher.LaunchUriAsync(userUri);
         }
@@ -381,7 +379,7 @@ namespace Hangon.Views {
         private void CmdCopyLink_Tapped(object sender, TappedRoutedEventArgs e) {
             if (CurrentUser?.Links == null) return;
 
-            var tracking = "?utm_source=Hangon&utm_medium=referral&utm_campaign=" + Unsplash.ApplicationId;
+            var tracking = "?utm_source=Hangon&utm_medium=referral&utm_campaign=" + Credentials.ApplicationId;
             var userUri = string.Format("{0}{1}", CurrentUser.Links.Html, tracking);
             DataTransfer.Copy(userUri);
 
@@ -626,7 +624,7 @@ namespace Hangon.Views {
         private async void CmdOpenPhotoInBrowser_Tapped(object sender, TappedRoutedEventArgs e) {
             if (_LastSelectedPhoto == null || _LastSelectedPhoto.Links == null) return;
 
-            var tracking = "?utm_source=Hangon&utm_medium=referral&utm_campaign=" + Unsplash.ApplicationId;
+            var tracking = "?utm_source=Hangon&utm_medium=referral&utm_campaign=" + Credentials.ApplicationId;
             var userUri = new Uri(string.Format("{0}{1}", _LastSelectedPhoto.Links.Html, tracking));
             var success = await Windows.System.Launcher.LaunchUriAsync(userUri);
         }

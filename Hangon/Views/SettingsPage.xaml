@@ -15,7 +15,7 @@
                          Height="20" VerticalAlignment="Top"
                          Tapped="FlyoutNotification_Dismiss">
             <StackPanel>
-                <TextBlock x:Name="FlyoutText" Text=""/>
+                <TextBlock x:Name="FlyoutText" Text="" TextWrapping="Wrap"/>
             </StackPanel>
         </FlyoutPresenter>
 
@@ -85,7 +85,7 @@
             <PivotItem Header="background tasks"
                        x:Uid="BackgroundTasksHeader">
                 <ScrollViewer>
-                    <StackPanel x:Name="TasksCotnentPanel" Margin="0,0,0,40">
+                    <StackPanel Margin="0,20,0,40">
                         <StackPanel>
                             <TextBlock FontSize="24" x:Uid="WallpaperText" Text="wallpaper"/>
                             <TextBlock Text="Periodically update wallpaper" 
@@ -175,6 +175,51 @@
                                 </StackPanel>
                             </StackPanel>
                         </StackPanel>
+
+                        <StackPanel>
+                            <TextBlock FontSize="24" x:Uid="Tile" Text="tile"/>
+                            <TextBlock Text="Periodically update primary tile"
+                                       x:Uid="PeriodicTile"
+                                       TextWrapping="Wrap" Opacity=".6"/>
+
+                            <ToggleSwitch x:Name="TileSwitch"
+                                      Toggled="TileSwitch_Toggled"/>
+
+
+                            <ComboBox x:Name="TileIntervalUpdates"
+                                      x:Uid="TileIntervalUpdates"
+                                      Header="period"
+                                      Visibility="Collapsed"
+                                      Margin="0, 20"
+                                      SelectedIndex="2"
+                                      Loaded="TileIntervalUpdates_Loaded"
+                                      SelectionChanged="TileIntervalUpdate_SelectionChanged">
+                                <ComboBoxItem Content="every hour" x:Uid="ItemHour" Tag="60"/>
+                                <ComboBoxItem Content="every 3 hours" x:Uid="ItemThreeHours" Tag="180"/>
+                                <ComboBoxItem Content="every 6 hours" x:Uid="ItemSixHours" Tag="360"/>
+                                <ComboBoxItem Content="once a day" x:Uid="ItemDay" Tag="1380"/>
+                            </ComboBox>
+
+                            <StackPanel x:Name="TileTaskActivity" Margin="0,10" Visibility="Collapsed">
+                                <TextBlock x:Name="LastUpdatedTileTask"
+                                           x:Uid="LastUpdatedTask"
+                                           Text="Never run" Opacity=".6"/>
+
+                                <TextBlock x:Name="TileTaskError"
+                                           x:Uid="NoError"
+                                           Text="No error" Opacity=".6"/>
+
+                                <StackPanel Margin="0,20,0,20">
+                                    <TextBlock Text="If the task doesn't work properly, restart it"
+                                               x:Uid="TaskNotWorkingText"
+                                               Opacity=".6"/>
+                                    <Button Content="restart"
+                                            x:Uid="ButtonRestart"
+                                            Margin="0,10,0,0" 
+                                            Tapped="RestartTileTask_Tapped"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </StackPanel>
                     </StackPanel>
                 </ScrollViewer>
             </PivotItem>
@@ -215,25 +260,16 @@
                         </RichTextBlock>
 
                         <StackPanel x:Name="UpdateChangelogPanel">
-                            <TextBlock Text="last update 1.1.0" FontSize="24"/>
+                            <TextBlock Text="last update 1.2.0" FontSize="24"/>
 
-                            <TextBlock Text="30 June 2017" Opacity=".5"/>
+                            <TextBlock Text="11 August 2017" Opacity=".5"/>
 
                             <RichTextBlock TextWrapping="Wrap" Margin="0,20,0,0">
                                 <Paragraph>
-                                    <Span>-Add curated section</Span>
+                                    <Span>-Add primary live tile</Span>
                                     <LineBreak/>
-                                    <Span>-Add search section</Span>
+                                    <Span>-Fix some translations</Span>
                                     <LineBreak/>
-                                    <Span>-Add right tap/hold (touch) context menu on photos</Span>
-                                    <LineBreak/>
-                                    <Span>-Support French and English languages</Span>
-                                    <LineBreak/>
-                                    <Span>-Support dark and white themes</Span>
-                                    <LineBreak/>
-                                    <Span>-Add animations on SettingsPage</Span>
-                                    <LineBreak/>
-                                    <Span>-Fix reload command</Span>
                                 </Paragraph>
                             </RichTextBlock>
                             <StackPanel/>
