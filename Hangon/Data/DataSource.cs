@@ -1,11 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Unsplasharp;
 using Unsplasharp.Models;
 
 namespace Hangon.Data {
     public class DataSource {
         #region variables
-        private Unsplasharp.Client _Client { get; set; }
+        private UnsplasharpClient _Client { get; set; }
 
         public PhotosList RecentPhotos { get; set; }
 
@@ -24,7 +25,7 @@ namespace Hangon.Data {
         #region methods
 
         public DataSource() {
-            _Client = new Unsplasharp.Client(Credentials.ApplicationId);
+            _Client = new UnsplasharpClient(Credentials.ApplicationId);
         }
 
         public async Task<int> FetchRecentPhotos() {
@@ -179,7 +180,6 @@ namespace Hangon.Data {
 
         public string GetUsername(User user) {
             return user.Username ??
-                   user.Name ??
                    string.Format("{0}{1}", user.FirstName, user.LastName).ToLower();
         }
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
+using Unsplasharp;
 using Unsplasharp.Models;
 using Windows.Foundation;
 using Windows.UI.Xaml.Data;
@@ -10,7 +11,7 @@ namespace Hangon.Data {
         public string Url { get; set; }
         public int Page { get; set; }
         public bool HasMoreItems { get; set; }
-        private Unsplasharp.Client _Client { get; set; }
+        private UnsplasharpClient _Client { get; set; }
 
         public async Task<int> Fetch() {
             HasMoreItems = true;
@@ -19,7 +20,7 @@ namespace Hangon.Data {
             int added = 0;
             string fetchURL = string.Format("{0}?page={1}", Url, Page);
 
-            _Client = _Client ?? new Unsplasharp.Client(Credentials.ApplicationId);
+            _Client = _Client ?? new UnsplasharpClient(Credentials.ApplicationId);
 
             try {
                 var collections = await _Client.FetchCollectionsList(fetchURL);

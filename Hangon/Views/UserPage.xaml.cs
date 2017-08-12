@@ -542,7 +542,7 @@ namespace Hangon.Views {
 
             var autoEvent = new AutoResetEvent(false);
             var timer = new Timer(async (object state) => {
-                _UIDispatcher.RunAsync(CoreDispatcherPriority.Normal, () => {
+                await _UIDispatcher.RunAsync(CoreDispatcherPriority.Normal, () => {
                     HideNotification();
                 });
             }, autoEvent, TimeSpan.FromSeconds(5), new TimeSpan());

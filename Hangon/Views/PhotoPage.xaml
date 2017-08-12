@@ -32,12 +32,11 @@
                 </Grid>
             </StackPanel>
         </FlyoutPresenter>
-
+       
         <Grid x:Name="PhotoViewContainer" 
               Loaded="PhotoViewContainer_Loaded">
             <Image x:Name="PhotoView" Stretch="UniformToFill"
-                   VerticalAlignment="Center" HorizontalAlignment="Center">
-            </Image>
+                   VerticalAlignment="Center" HorizontalAlignment="Center"/>
 
             <Grid x:Name="PhotoDimmer"/>
         </Grid>

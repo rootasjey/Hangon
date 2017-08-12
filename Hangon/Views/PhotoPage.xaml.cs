@@ -445,7 +445,6 @@ namespace Hangon.Views {
             opacityVisual.StartAnimation("Opacity", opacityExpression);
         }
 
-
         #endregion image composition
 
         #region events
@@ -500,7 +499,7 @@ namespace Hangon.Views {
 
             var autoEvent = new AutoResetEvent(false);
             var timer = new Timer(async (object state) => {
-                UIDispatcher.RunAsync(CoreDispatcherPriority.Normal, () => {
+                await UIDispatcher.RunAsync(CoreDispatcherPriority.Normal, () => {
                     HideNotification();
                 });
             }, autoEvent, TimeSpan.FromSeconds(5), new TimeSpan());
@@ -514,6 +513,10 @@ namespace Hangon.Views {
 
             FlyoutNotification.Visibility = Visibility.Collapsed;
         }
-        
+
+        private void PhotosFlipView_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+
+        }
     }
 }

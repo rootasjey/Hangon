@@ -7,12 +7,12 @@ using Windows.Storage;
 using Windows.System.UserProfile;
 using Unsplasharp.Models;
 using Tasks.Data;
+using Unsplasharp;
 
 namespace Tasks {
     public sealed class WallUpdater : IBackgroundTask {
         #region variables
-        BackgroundTaskDeferral _deferral;
-        volatile bool _cancelRequested = false;
+        BackgroundTaskDeferral _Deferral;
 
         private static string WallTaskName {
             get {
@@ -34,7 +34,7 @@ namespace Tasks {
         /// <param name="taskInstance">Task starting the method</param>
         async void IBackgroundTask.Run(IBackgroundTaskInstance taskInstance) {
             taskInstance.Canceled += OnCanceled;
-            var deferral = taskInstance.GetDeferral();
+            _Deferral = taskInstance.GetDeferral();
 
             SaveTime(taskInstance);
 
@@ -47,10 +47,10 @@ namespace Tasks {
             } else {
                 await SetLockscreenAsync(file);
             }
-            
+
             //SaveLockscreenBackgroundName(lockImage.Name);
             //SaveAppBackground(lockImage);
-            deferral.Complete();
+            _Deferral.Complete();
         }
 
         string GetActivityKey(IBackgroundTaskInstance instance) {
@@ -61,8 +61,6 @@ namespace Tasks {
 
         private void OnCanceled(IBackgroundTaskInstance sender, BackgroundTaskCancellationReason reason) {
             // Indicate that the background task is canceled.
-            _cancelRequested = true;
-
             string key = GetActivityKey(sender);
 
             ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
@@ -87,7 +85,7 @@ namespace Tasks {
         }
 
         private async Task<Photo> GetRandom() {
-            var client = new Unsplasharp.Client(Credentials.ApplicationId);
+            var client = new UnsplasharpClient(Credentials.ApplicationId);
             return await client.GetRandomPhoto();
         }
 

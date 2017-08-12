@@ -580,7 +580,7 @@ namespace Hangon.Views {
         void ShowSearchPanel() {
             _AreSearchResultsActivated = false;
 
-            SearchPanel.AnimateSlideIn();
+            var asyncExec = SearchPanel.AnimateSlideIn();
         }
 
         void HideSearchPanel() {
