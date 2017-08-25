@@ -4,7 +4,6 @@ using Windows.UI.Xaml;
 using Windows.UI.Core;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media.Animation;
-using Windows.UI.Xaml.Media.Imaging;
 using Windows.UI.Xaml.Navigation;
 using Microsoft.Toolkit.Uwp.UI.Animations;
 using Hangon.Data;
@@ -16,7 +15,6 @@ using System.Numerics;
 using Windows.UI.ViewManagement;
 using Windows.Graphics.Display;
 using Windows.Foundation;
-using System.Globalization;
 using System.Threading;
 using Windows.UI;
 using Windows.ApplicationModel.Resources;
@@ -25,64 +23,96 @@ using Unsplasharp.Models;
 namespace Hangon.Views {
     public sealed partial class PhotoPage : Page {
         #region variables
-        public Photo CurrentPhoto { get; set; }
+        public static Photo _CurrentPhoto { get; set; }
 
-        private DataSource PageDataSource { get; set; }
+        private Image _CurrentPhotoImage { get; set; }
 
-        private Visual _backgroundVisual { get; set; }
-        private Compositor _backgroundCompositor { get; set; }
+        private DataSource _PageDataSource { get; set; }
+
+        private static PhotosList _PageItemsSource { get; set; }
+
+        private Visual _BackgroundVisual { get; set; }
+
+        private Compositor _BackgroundCompositor { get; set; }
+
         private ScrollViewer _ScrollViewer { get; set; }
+
         private CompositionPropertySet _ScrollerPropertySet { get; set; }
 
-        CoreDispatcher UIDispatcher { get; set; }
+        private CoreDispatcher _UIDispatcher { get; set; }
 
-        private double PhotoCaptionTopMargin { get; set; }
+        private double _PhotoCaptionTopMargin { get; set; }
 
-        private bool PhotoCaptionIsVisible { get; set; }
+        private bool _PhotoCaptionIsVisible { get; set; }
 
-        ResourceLoader _ResourcesLoader { get; set; }
+        private RowDefinition _RowSpacing { get; set; }
+
+        private ResourceLoader _ResourcesLoader { get; set; }
+
+        private bool _ConnectedAnimationHandled { get; set; }
         #endregion variables
 
         public PhotoPage() {
             InitializeComponent();
-            PageDataSource = App.AppDataSource;
-            UIDispatcher = CoreWindow.GetForCurrentThread().Dispatcher;
-            GetDeviceType();
+            InitializeVariables();
             ApplyCommandBarBarFrostedGlass();
+        }
 
+        private void InitializeVariables() {
+            GetDeviceType();
+
+            _PageDataSource = App.AppDataSource;
+            _UIDispatcher = CoreWindow.GetForCurrentThread().Dispatcher;
             _ResourcesLoader = new ResourceLoader();
-            PhotoCaptionIsVisible = true;
+            _PhotoCaptionIsVisible = true;
+            _ConnectedAnimationHandled = false;
         }
 
         void GetDeviceType() {
             if (Windows.System.Profile.AnalyticsInfo.VersionInfo.DeviceFamily == "Windows.Mobile") {
-                PhotoCaptionTopMargin = 280;
+                _PhotoCaptionTopMargin = 280;
             } else {
-                PhotoCaptionTopMargin = 180;
+                _PhotoCaptionTopMargin = 180;
             }
         }
-                
+
         #region navigation
 
         protected override void OnNavigatingFrom(NavigatingCancelEventArgs e) {
-            if (e.NavigationMode == NavigationMode.New) {
-                ConnectedAnimationService.GetForCurrentView().PrepareToAnimate("PhotoImage", PhotoView);
-            } else if (e.NavigationMode == NavigationMode.Back) {
-                ConnectedAnimationService.GetForCurrentView().PrepareToAnimate("PhotoImageBack", PhotoView);
-            }
-            
             CoreWindow.GetForCurrentThread().KeyDown -= Page_KeyDown;
+
+            if (e.NavigationMode == NavigationMode.New) {
+                ConnectedAnimationService.GetForCurrentView().PrepareToAnimate("PhotoImage", _CurrentPhotoImage);
+
+            } else if (e.NavigationMode == NavigationMode.Back) {
+                ConnectedAnimationService.GetForCurrentView().PrepareToAnimate("PhotoImageBack", _CurrentPhotoImage);
+
+                // Update last selected photo on previous Page
+                // which may has been changed due to FlipView
+                if (e.SourcePageType == typeof(HomePage)) {
+                    HomePage._LastSelectedPhoto = _CurrentPhoto;
+
+                } else if (e.SourcePageType == typeof(UserPage)) {
+                    UserPage._LastSelectedPhoto = _CurrentPhoto;
+
+                } else if (e.SourcePageType == typeof(CollectionPage)) {
+                    CollectionPage._LastSelectedPhoto = _CurrentPhoto;
+                }
+            }            
+
             base.OnNavigatingFrom(e);
         }
 
         protected override void OnNavigatedTo(NavigationEventArgs e) {
             CoreWindow.GetForCurrentThread().KeyDown += Page_KeyDown;
 
-            var photo = (Photo)e.Parameter;
-            CurrentPhoto = photo;
+            var parameters = (object[])e.Parameter;
 
-            HandleConnectedAnimation(photo);
-            FetchData(photo);
+            if (e.NavigationMode != NavigationMode.Back) {
+                _CurrentPhoto = (Photo)parameters[0];
+            }
+
+            _PageItemsSource = (PhotosList)parameters[1];
 
             base.OnNavigatedTo(e);
         }
@@ -92,64 +122,8 @@ namespace Hangon.Views {
                 Frame.GoBack();
             }
         }
-        
+
         #endregion navigation
-
-        #region data
-        private async void FetchData(Photo photo) {
-            CurrentPhoto = await PageDataSource.GetPhoto(photo.Id);
-            Populate();
-        }
-
-        private void Populate() {
-            PopulateUSer();
-            PopulateStats();
-            PopulateExif();
-            AnimateEntrance();
-
-            void PopulateUSer()
-            {
-                UserImageSource.UriSource = new Uri(PageDataSource.GetProfileImageLink(CurrentPhoto.User));
-                UserName.Text = PageDataSource.GetUsernameFormated(CurrentPhoto.User);
-                UserLocation.Text = CurrentPhoto.User.Location ?? "";
-
-                if (string.IsNullOrEmpty(UserLocation.Text))
-                    PanelUserLocation.Visibility = Visibility.Collapsed;
-            }
-
-            void PopulateStats()
-            {
-                DownloadsCount.Text = CurrentPhoto.Downloads.ToString();
-                LikesCount.Text = CurrentPhoto.Likes.ToString();
-            }
-
-            void PopulateExif()
-            {
-                ExifMake.Text = CurrentPhoto.Exif.Make ?? "";
-                ExifModel.Text = CurrentPhoto.Exif.Model ?? "";
-
-                if (string.IsNullOrEmpty(ExifMake.Text) && 
-                    string.IsNullOrEmpty(ExifModel.Text)) {
-                    IconCamera.Visibility = Visibility.Collapsed;
-                }
-
-                PublishedOn.Text = DateTime
-                    .ParseExact(CurrentPhoto.CreatedAt, "MM/dd/yyyy HH:mm:ss", CultureInfo.InvariantCulture)
-                    .ToLocalTime()
-                    .ToString("dd MMMM yyyy");
-            }
-
-            void AnimateEntrance()
-            {
-                PhotoCaption.Offset(0, 30, 0)
-                    .Then()
-                    .Fade(1, 500, 500)
-                    .Offset(0, 0, 500, 500)
-                    .Start();
-            }
-        }
-        
-        #endregion data
 
         #region download
 
@@ -178,11 +152,11 @@ namespace Hangon.Views {
             var result = false;
 
             if (string.IsNullOrEmpty(size)) {
-                result = await Wallpaper.SaveToPicturesLibrary(CurrentPhoto, HttpProgressCallback);
+                result = await Wallpaper.SaveToPicturesLibrary(_CurrentPhoto, HttpProgressCallback);
 
             } else {
                 string url = getURL();
-                result = await Wallpaper.SaveToPicturesLibrary(CurrentPhoto, HttpProgressCallback, url);
+                result = await Wallpaper.SaveToPicturesLibrary(_CurrentPhoto, HttpProgressCallback, url);
             }
 
             HideProgress();
@@ -190,22 +164,21 @@ namespace Hangon.Views {
             var successMessage = _ResourcesLoader.GetString("SavePhotoSuccess");
             var failedMessage = _ResourcesLoader.GetString("SavePhotoFailed");
 
-            if (result) Notify(successMessage); 
+            if (result) Notify(successMessage);
             else Notify(failedMessage);
 
-            string getURL()
-            {
+            string getURL() {
                 switch (size) {
                     case "raw":
-                        return CurrentPhoto.Urls.Raw;
+                        return _CurrentPhoto.Urls.Raw;
                     case "full":
-                        return CurrentPhoto.Urls.Full;
+                        return _CurrentPhoto.Urls.Full;
                     case "regular":
-                        return CurrentPhoto.Urls.Regular;
+                        return _CurrentPhoto.Urls.Regular;
                     case "small":
-                        return CurrentPhoto.Urls.Small;
+                        return _CurrentPhoto.Urls.Small;
                     default:
-                        return CurrentPhoto.Urls.Regular;
+                        return _CurrentPhoto.Urls.Regular;
                 }
             }
         }
@@ -270,7 +243,7 @@ namespace Hangon.Views {
             var failedMessage = _ResourcesLoader.GetString("WallpaperSetFailed");
 
             ShowProgress(progressMessage);
-            var success = await Wallpaper.SetAsWallpaper(CurrentPhoto, HttpProgressCallback);
+            var success = await Wallpaper.SetAsWallpaper(_CurrentPhoto, HttpProgressCallback);
             HideProgress();
 
             if (success) Notify(successMessage);
@@ -283,7 +256,7 @@ namespace Hangon.Views {
             var failedMessage = _ResourcesLoader.GetString("LockscreenSetFailed");
 
             ShowProgress(progressMessage);
-            var success = await Wallpaper.SetAsLockscreen(CurrentPhoto, HttpProgressCallback);
+            var success = await Wallpaper.SetAsLockscreen(_CurrentPhoto, HttpProgressCallback);
             HideProgress();
 
             if (success) Notify(successMessage);
@@ -306,41 +279,62 @@ namespace Hangon.Views {
             var resolution = (string)cmd.Tag;
             Download(resolution);
         }
-        
+
         private void CmdToggleCaption_Tapped(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e) {
-            if (PhotoCaptionIsVisible) {
-                hideCaption();
-                PhotoCaptionIsVisible = false;
-            } else {
-                showCaption();
-                PhotoCaptionIsVisible = true;
+            if (_PhotoCaptionIsVisible) {
+                HideCaption();
+                _PhotoCaptionIsVisible = false;
+                return;
             }
 
-            void showCaption()
-            {
-                PhotoCaptionContent
-                    .Offset(0, 0)
-                    .Fade(1)
-                    .Start();
+            ShowCaption();
+            _PhotoCaptionIsVisible = true;
+        }
 
-                CmdToggleCaptionIcon.UriSource = new Uri("ms-appx:///Assets/Icons/hide.png");
-                
-                var label = _ResourcesLoader.GetString("HideCaption");
-                CmdToggleCaption.Label = label;
-            }
+        void ShowCaption(Grid caption = null) {
+            Grid _caption;
 
-            void hideCaption()
-            {
-                PhotoCaptionContent
-                    .Offset(0, 300)
-                    .Fade(0)
-                    .Start();
+            if (caption != null) _caption = caption;
+            else _caption = GetCurrentCaptionItem();
 
-                CmdToggleCaptionIcon.UriSource = new Uri("ms-appx:///Assets/Icons/show.png");
-                
-                var label = _ResourcesLoader.GetString("ShowCaption");
-                CmdToggleCaption.Label = label;
-            }
+            if (_caption.Opacity == 1) return;
+
+            _caption
+                .Offset(0, 0)
+                .Fade(1)
+                .Start();
+
+            CmdToggleCaptionIcon.UriSource = new Uri("ms-appx:///Assets/Icons/hide.png");
+
+            var label = _ResourcesLoader.GetString("HideCaption");
+            CmdToggleCaption.Label = label;
+        }
+
+        void HideCaption(Grid caption = null) {
+            Grid _caption;
+
+            if (caption != null) _caption = caption;
+            else _caption = GetCurrentCaptionItem();
+
+            if (_caption.Opacity == 0) return;
+
+            _caption
+                .Offset(0, 300)
+                .Fade(0)
+                .Start();
+
+            CmdToggleCaptionIcon.UriSource = new Uri("ms-appx:///Assets/Icons/show.png");
+
+            var label = _ResourcesLoader.GetString("ShowCaption");
+            CmdToggleCaption.Label = label;
+        }
+
+        Grid GetCurrentCaptionItem() {
+            var photo = (Photo)PhotosFlipView.SelectedItem;
+            var flipViewItem = (FlipViewItem)PhotosFlipView.ContainerFromItem(photo);
+            var root = (Grid)flipViewItem.ContentTemplateRoot;
+            var caption = (Grid)root.FindName("PhotoCaptionContent");
+            return caption;
         }
 
         private void CmdCrop_Tapped(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e) {
@@ -363,42 +357,49 @@ namespace Hangon.Views {
         #endregion micro-interactions
 
         #region image composition
-        private void HandleConnectedAnimation(Photo photo) {
-            if (photo == null) return;
+        private void HandleConnectedAnimation(Image photoImage) {
+            if (_CurrentPhoto == null || photoImage == null) return;
+
+            _ConnectedAnimationHandled = true;
 
             var animation = ConnectedAnimationService.GetForCurrentView().GetAnimation("PhotoImage");
 
             if (animation != null) {
-                //PhotoView.Opacity = 0;
-                PhotoView.ImageOpened += (s, e) => {
-                    PhotoView.Opacity = 1;
-                    animation.TryStart(PhotoView);
+                //photoImage.Opacity = 0;
+                photoImage.ImageOpened += (s, e) => {
+                    photoImage.Opacity = 1;
+                    animation.TryStart(photoImage);
                 };
             }
 
-            PhotoView.Source = new BitmapImage(new Uri(photo.Urls.Regular));
+            //photoImage.Source = new BitmapImage(new Uri(_CurrentPhoto.Urls.Regular));
         }
 
         private void PhotoViewContainer_Loaded(object sender, RoutedEventArgs ev) {
-            GetPhotoCompositorVariables();
+            var PhotoViewContainer = (Grid)sender;
+            var PhotoDimmer = (Grid)PhotoViewContainer.FindName("PhotoDimmer");
+            var PhotoView = (Image)PhotoViewContainer.FindName("PhotoView");
+            var PhotoCaption = (ScrollViewer)PhotoViewContainer.FindName("PhotoCaption");
+
+            InitializeCompositorVariables(PhotoViewContainer);
 
             PhotoCaption.Loaded += (s, e) => {
-                GetScrollViewerProps();
-                AttachBlurOpacityEffects();
+                InitializeScrollViewerProps(PhotoCaption);
+                AttachBlurOpacityEffects(PhotoViewContainer, PhotoDimmer);
             };
         }
 
-        void GetPhotoCompositorVariables() {
-            _backgroundVisual = ElementCompositionPreview.GetElementVisual(PhotoViewContainer);
-            _backgroundCompositor = _backgroundVisual.Compositor;
+        void InitializeCompositorVariables(Grid PhotoViewContainer) {
+            _BackgroundVisual = ElementCompositionPreview.GetElementVisual(PhotoViewContainer);
+            _BackgroundCompositor = _BackgroundVisual.Compositor;
         }
-        
-        void GetScrollViewerProps() {
+
+        void InitializeScrollViewerProps(ScrollViewer PhotoCaption) {
             _ScrollViewer = PhotoCaption;
             _ScrollerPropertySet = ElementCompositionPreview.GetScrollViewerManipulationPropertySet(_ScrollViewer);
         }
 
-        void AttachBlurOpacityEffects() {
+        void AttachBlurOpacityEffects(Grid PhotoViewContainer, Grid PhotoDimmer) {
             // -----
             // Blur
             // -----
@@ -410,22 +411,22 @@ namespace Hangon.Views {
                 Source = new CompositionEffectSourceParameter("Backdrop")
             };
 
-            var effectFactory = _backgroundCompositor.CreateEffectFactory(blurEffect, new[] { "Blur.BlurAmount" });
+            var effectFactory = _BackgroundCompositor.CreateEffectFactory(blurEffect, new[] { "Blur.BlurAmount" });
             var effectBrush = effectFactory.CreateBrush();
 
-            var destinationBrush = _backgroundCompositor.CreateBackdropBrush();
+            var destinationBrush = _BackgroundCompositor.CreateBackdropBrush();
             effectBrush.SetSourceParameter("Backdrop", destinationBrush);
 
             var _bounds = ApplicationView.GetForCurrentView().VisibleBounds;
             var _scaleFactor = DisplayInformation.GetForCurrentView().RawPixelsPerViewPixel;
             var _size = new Size(_bounds.Width * _scaleFactor, _bounds.Height * _scaleFactor);
 
-            var blurVisual = _backgroundCompositor.CreateSpriteVisual();
+            var blurVisual = _BackgroundCompositor.CreateSpriteVisual();
             blurVisual.Size = new Vector2((float)_size.Width + 300, (float)_size.Height);
             blurVisual.Brush = effectBrush;
             ElementCompositionPreview.SetElementChildVisual(PhotoViewContainer, blurVisual);
 
-            var blurExpression = _backgroundCompositor.CreateExpressionAnimation(
+            var blurExpression = _BackgroundCompositor.CreateExpressionAnimation(
                 "Clamp(-scroller.Translation.Y / 10,0,20)");
             blurExpression.SetReferenceParameter("scroller", _ScrollerPropertySet);
 
@@ -434,12 +435,12 @@ namespace Hangon.Views {
             // --------
             // Opacity
             // --------
-            var opacityVisual = _backgroundCompositor.CreateSpriteVisual();
-            opacityVisual.Brush = _backgroundCompositor.CreateColorBrush(Windows.UI.Colors.Black);
+            var opacityVisual = _BackgroundCompositor.CreateSpriteVisual();
+            opacityVisual.Brush = _BackgroundCompositor.CreateColorBrush(Windows.UI.Colors.Black);
             opacityVisual.Size = new Vector2((float)_size.Width + 300, (float)_size.Height);
             ElementCompositionPreview.SetElementChildVisual(PhotoDimmer, opacityVisual);
 
-            var opacityExpression = _backgroundCompositor.CreateExpressionAnimation(
+            var opacityExpression = _BackgroundCompositor.CreateExpressionAnimation(
                 "Clamp((-scroller.Translation.Y) / 100, 0, 0.6)");
             opacityExpression.SetReferenceParameter("scroller", _ScrollerPropertySet);
             opacityVisual.StartAnimation("Opacity", opacityExpression);
@@ -450,6 +451,9 @@ namespace Hangon.Views {
         #region events
 
         private void PhotoCaptionContent_Loaded(object sender, RoutedEventArgs e) {
+            var photoCaption = (Grid)sender;
+            _RowSpacing = (RowDefinition)photoCaption.FindName("RowSpacing");
+
             UpdatePhotoCaptionPosition();
             Window.Current.SizeChanged += Current_SizeChanged;
         }
@@ -458,27 +462,79 @@ namespace Hangon.Views {
             UpdatePhotoCaptionPosition();
         }
 
+        private void UpdatePhotoCaptionPosition() {
+            var height = Window.Current.Bounds.Height - _PhotoCaptionTopMargin;
+            _RowSpacing.Height = new GridLength(height);
+        }
+
         private void PhotoCaptionContent_Unloaded(object sender, RoutedEventArgs e) {
             Window.Current.SizeChanged -= Current_SizeChanged;
         }
 
         private void UserView_Tapped(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e) {
+            var UserView = (StackPanel)sender;
+            var UserProfileImage = (Ellipse)UserView.FindName("UserProfileImage");
+
             ConnectedAnimationService.GetForCurrentView().PrepareToAnimate("UserProfileImage", UserProfileImage);
-            Frame.Navigate(typeof(UserPage), CurrentPhoto);
+            Frame.Navigate(typeof(UserPage), _CurrentPhoto);
         }
 
         private async void OpenPhotoInBrowser_Tapped(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e) {
             var tracking = "?utm_source=Hangon&utm_medium=referral&utm_campaign=" + Credentials.ApplicationId;
-            var photoUri = new Uri(string.Format("{0}{1}", CurrentPhoto.Links.Html, tracking));
+            var photoUri = new Uri(string.Format("{0}{1}", _CurrentPhoto.Links.Html, tracking));
             var success = await Windows.System.Launcher.LaunchUriAsync(photoUri);
         }
+
+        private void PhotosFlipView_Loaded(object sender, RoutedEventArgs e) {
+            PhotosFlipView.ItemsSource = _PageItemsSource;
+            var index = _PageItemsSource.IndexOf(_CurrentPhoto);
+
+            PhotosFlipView.SelectionChanged -= PhotosFlipView_SelectionChanged;
+            PhotosFlipView.SelectionChanged += PhotosFlipView_SelectionChanged;
+
+            PhotosFlipView.SelectedIndex = index;
+
+            ForceFetchOnFirstItemIfSelected();
+
+            void ForceFetchOnFirstItemIfSelected() {
+                if (index == 0) { FillPhotoProperties(); }
+            }
+        }
+
+        private void PhotoCaption_Loaded(object sender, RoutedEventArgs e) {
+            var PhotoCaption = (ScrollViewer)sender;
+            InitializeScrollViewerProps(PhotoCaption);
+        }
+
+        private void PhotoImage_Loaded(object sender, RoutedEventArgs e) {
+            if (_ConnectedAnimationHandled) return;
+
+            var photoImage = (Image)sender;
+            HandleConnectedAnimation(photoImage);
+
+            _CurrentPhotoImage = photoImage;
+        }
+
+        private void PhotosFlipView_SelectionChanged(object sender, SelectionChangedEventArgs e) {
+            _CurrentPhoto = (Photo)PhotosFlipView.SelectedItem;
+
+            FillPhotoProperties();
+            PhotosFlipView.UpdateLayout();
+
+            var item = (FlipViewItem)PhotosFlipView.ContainerFromItem(_CurrentPhoto);
+            if (item == null) { return; }
+
+            var root = (Grid)item.ContentTemplateRoot;
+            var photoImage = (Image)root.FindName("PhotoImage");
+
+            _CurrentPhotoImage = photoImage;
+
+            RefreshCaptionVisibility(root);
+        }
+
         #endregion events
 
-        private void UpdatePhotoCaptionPosition() {
-            var height = Window.Current.Bounds.Height - PhotoCaptionTopMargin;
-            RowSpacing.Height = new GridLength(height);
-        }
-        
+        #region others
         private void FlyoutNotification_Dismiss(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e) {
             HideNotification();
         }
@@ -499,7 +555,7 @@ namespace Hangon.Views {
 
             var autoEvent = new AutoResetEvent(false);
             var timer = new Timer(async (object state) => {
-                await UIDispatcher.RunAsync(CoreDispatcherPriority.Normal, () => {
+                await _UIDispatcher.RunAsync(CoreDispatcherPriority.Normal, () => {
                     HideNotification();
                 });
             }, autoEvent, TimeSpan.FromSeconds(5), new TimeSpan());
@@ -514,9 +570,26 @@ namespace Hangon.Views {
             FlyoutNotification.Visibility = Visibility.Collapsed;
         }
 
-        private void PhotosFlipView_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-
+        private async void FillPhotoProperties() {
+            var fullPhoto = await _PageDataSource.GetPhoto(_CurrentPhoto.Id);
+            MergePhotoData(_CurrentPhoto, fullPhoto);
         }
+
+        private void MergePhotoData(Photo target, Photo source) {
+            if (target == null || source == null) return;
+
+            target.Downloads = source.Downloads;
+            target.Exif = source.Exif;
+            target.Location = source.Location;
+        }
+
+        void RefreshCaptionVisibility(Grid root) {
+            var caption = (Grid)root.FindName("PhotoCaptionContent");
+
+            if (!_PhotoCaptionIsVisible) { HideCaption(caption); } else { ShowCaption(caption); }
+        }
+
+        #endregion others
+
     }
 }

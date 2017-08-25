@@ -99,7 +99,15 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Converters\ExifIcon.cs" />
+    <Compile Include="Converters\ExifMake.cs" />
+    <Compile Include="Converters\ExifModel.cs" />
+    <Compile Include="Converters\LocationVisibility.cs" />
+    <Compile Include="Converters\LocationName.cs" />
+    <Compile Include="Converters\CreatedAt.cs" />
     <Compile Include="Converters\UriParser.cs" />
+    <Compile Include="Converters\Username.cs" />
+    <Compile Include="Converters\UserProfileImage.cs" />
     <Compile Include="Data\CollectionsList.cs" />
     <Compile Include="Data\Credentials.cs" />
     <Compile Include="Data\DataSource.cs" />
@@ -145,6 +153,7 @@
     <Content Include="Assets\BadgeLogo.scale-200.png" />
     <Content Include="Assets\BadgeLogo.scale-400.png" />
     <Content Include="Assets\Icons\hide.png" />
+    <Content Include="Assets\Icons\location.png" />
     <Content Include="Assets\Icons\show.png" />
     <Content Include="Assets\Icons\user.png" />
     <Content Include="Assets\LargeTile.scale-100.png" />
@@ -238,8 +247,8 @@
     <PackageReference Include="Newtonsoft.Json">
       <Version>10.0.3</Version>
     </PackageReference>
-    <PackageReference Include="unplasharp.api">
-      <Version>0.5.2</Version>
+    <PackageReference Include="unsplasharp.api">
+      <Version>0.5.6</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>

@@ -41,7 +41,7 @@ You can contribute to improve this project by:
 
 * edit the code
 * create a pull request
-* submit new ideas / features suggestions 
+* submit new ideas / features suggestions
 * report a bug
 
 ## platforms
@@ -63,9 +63,7 @@ If you want ot get your personal API key from Unplash:
 4. Go to _['Your applications'](https://unsplash.com/oauth/applications)_
 5. Click on _'New Application'_ to create a new one and get an API key (and a Secret).
 
-
 ## todos
 
 * wrap text notify flyout
 * hide header when scrolling
-* Use flipview for photos view

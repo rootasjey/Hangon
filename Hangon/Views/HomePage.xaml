@@ -403,7 +403,7 @@
                                                    Visibility="Visible"
                                                    DesiredWidth="300"
                                                    ItemHeight="300"
-                                                   ItemsSource="{x:Bind PageDataSource.PhotosSearchResults, Mode=OneWay}"
+                                                   ItemsSource="{x:Bind _PageDataSource.PhotosSearchResults, Mode=OneWay}"
                                                    ItemTemplate="{StaticResource PhotoTemplate}"
                                                    animations:ReorderGridAnimation.Duration="300"
                                                    ItemContainerStyle="{StaticResource GridViewItemZeroMarginStyle}">

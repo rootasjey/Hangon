@@ -21,27 +21,27 @@ using Unsplasharp.Models;
 namespace Hangon.Views {
     public sealed partial class UserPage : Page {
         #region variables
-        private DataSource PageDataSource { get; set; }
+        private DataSource _PageDataSource { get; set; }
 
-        private Photo CurrentPhoto { get; set; }
+        private Photo _CurrentPhoto { get; set; }
 
-        private User CurrentUser { get; set; }
+        private User _CurrentUser { get; set; }
 
-        private static Photo LastPhotoSelected { get; set; }
+        public static Photo _LastSelectedPhoto { get; set; }
 
-        private static Collection LastCollectionSelected { get; set; }
+        private static Collection _LastCollectionSelected { get; set; }
 
-        private static int LastPivotIndexSelected { get; set; }
+        private static int _LastPivotIndexSelected { get; set; }
 
-        private double AnimationDelay { get; set; }
+        private double _AnimationDelay { get; set; }
 
-        private double CollectionAnimationDelay { get; set; }
+        private double _CollectionAnimationDelay { get; set; }
 
-        private double MiniCollectionAnimeDelay { get; set; }
+        private double _MiniCollectionAnimeDelay { get; set; }
 
         ResourceLoader _ResourcesLoader { get; set; }
 
-        Photo _LastSelectedPhoto { get; set; }
+        //Photo _LastSelectedPhoto { get; set; }
 
         private CoreDispatcher _UIDispatcher { get; set; }
 
@@ -55,14 +55,15 @@ namespace Hangon.Views {
         
 
         private void RestoreLastSelectedPivotIndex() {
-            PivotUserData.SelectedIndex = LastPivotIndexSelected;
+            PivotUserData.SelectedIndex = _LastPivotIndexSelected;
         }
 
         #region navigation
         protected override void OnNavigatingFrom(NavigatingCancelEventArgs e) {
             if (e.NavigationMode == NavigationMode.Back) {
-                LastPivotIndexSelected = 0;
+                _LastPivotIndexSelected = 0;
                 ConnectedAnimationService.GetForCurrentView().PrepareToAnimate("PhotoImage", ImageBackground);
+                PhotoPage._CurrentPhoto = _CurrentPhoto; // re-select last selected photo
             }
             
             CoreWindow.GetForCurrentThread().KeyDown -= Page_KeyDown;
@@ -72,25 +73,26 @@ namespace Hangon.Views {
         protected override void OnNavigatedTo(NavigationEventArgs e) {
             CoreWindow.GetForCurrentThread().KeyDown += Page_KeyDown;
 
-            CurrentPhoto = (Photo)e.Parameter;
-            CurrentUser = CurrentPhoto.User;
+            _CurrentPhoto = (Photo)e.Parameter;
+            _CurrentUser = _CurrentPhoto.User;
 
             RestoreLastSelectedPivotIndex();
 
             base.OnNavigatedTo(e);
         }
+
         #endregion navigation
 
 
         #region data
         private void InitializeVariables() {
-            PageDataSource = App.AppDataSource;
+            _PageDataSource = App.AppDataSource;
             _ResourcesLoader = new ResourceLoader();
             _UIDispatcher = CoreWindow.GetForCurrentThread().Dispatcher;
         }
 
         private void ClearData() {
-            PageDataSource.UserPhotos.Clear();
+            _PageDataSource.UserPhotos.Clear();
         }
 
         private void LoadData() {
@@ -99,7 +101,7 @@ namespace Hangon.Views {
             LoadUserCollections();
         }
         
-        private async void LoadUserData() {
+        private void LoadUserData() {
             UserInfosPivotItem.FindName("UserView");
             PopulateCachedStats();
 
@@ -107,8 +109,8 @@ namespace Hangon.Views {
 
             void PopulateCachedStats()
             {
-                UserName.Text = PageDataSource.GetUsernameFormated(CurrentPhoto.User);
-                UserLocation.Text = CurrentPhoto.User.Location ?? "";
+                UserName.Text = _PageDataSource.GetUsernameFormated(_CurrentPhoto.User);
+                UserLocation.Text = _CurrentPhoto.User.Location ?? "";
 
                 if (string.IsNullOrEmpty(UserLocation.Text)) {
                     UserLocationPanel.Visibility = Visibility.Collapsed;
@@ -117,10 +119,10 @@ namespace Hangon.Views {
 
             void PopulateStats()
             {
-                PhotosCount.Text = CurrentUser.TotalPhotos.ToString();
-                LikesCount.Text = CurrentUser.TotalLikes.ToString();
-                CollectionsCount.Text = CurrentUser.TotalCollections.ToString();
-                UserBioView.Text = CurrentUser.Bio ?? "";
+                PhotosCount.Text = _CurrentUser.TotalPhotos.ToString();
+                LikesCount.Text = _CurrentUser.TotalLikes.ToString();
+                CollectionsCount.Text = _CurrentUser.TotalCollections.ToString();
+                UserBioView.Text = _CurrentUser.Bio ?? "";
             }
             
         }
@@ -128,15 +130,15 @@ namespace Hangon.Views {
         private async void LoadUserPhotos() {
             UserPhotosPivotItem.FindName("UserPhotosPivotItemContent");
 
-            await PageDataSource.GetUserPhotos(PageDataSource.GetUsername(CurrentPhoto.User));
-            UserPhotosGridView.ItemsSource = PageDataSource.UserPhotos;
+            await _PageDataSource.GetUserPhotos(_PageDataSource.GetUsername(_CurrentPhoto.User));
+            UserPhotosGridView.ItemsSource = _PageDataSource.UserPhotos;
 
             BindPhotosListView();
 
             void BindPhotosListView()
             {
                 if (UserPhotosListView != null) {
-                    UserPhotosListView.ItemsSource = PageDataSource.UserPhotos;
+                    UserPhotosListView.ItemsSource = _PageDataSource.UserPhotos;
                 }
             }
         }
@@ -144,10 +146,10 @@ namespace Hangon.Views {
         private async void LoadUserCollections() {
             UserCollectionsPivotItem.FindName("UserCollectionsPivotItemContent");
 
-            await PageDataSource.GetUserCollections(PageDataSource.GetUsername(CurrentPhoto.User));
+            await _PageDataSource.GetUserCollections(_PageDataSource.GetUsername(_CurrentPhoto.User));
 
-            if (PageDataSource.UserCollections.Count > 0) {
-                UserCollectionsGrid.ItemsSource = PageDataSource.UserCollections;
+            if (_PageDataSource.UserCollections.Count > 0) {
+                UserCollectionsGrid.ItemsSource = _PageDataSource.UserCollections;
 
             } else {
                 UserCollectionsGrid.Visibility = Visibility.Collapsed;
@@ -159,9 +161,9 @@ namespace Hangon.Views {
             void BindCollectionListView()
             {
                 if (UserCollectionsListView != null) {
-                    UserCollectionsListView.ItemsSource = PageDataSource.UserCollections;
+                    UserCollectionsListView.ItemsSource = _PageDataSource.UserCollections;
 
-                    if (PageDataSource.UserCollections.Count == 0) {
+                    if (_PageDataSource.UserCollections.Count == 0) {
                         UserCollectionsListView.Visibility = Visibility.Collapsed;
                         UserCollectionsListViewHeader.Visibility = Visibility.Collapsed;
                     }
@@ -202,7 +204,7 @@ namespace Hangon.Views {
                     };
                 }
 
-                UserImageSource.UriSource = new Uri(PageDataSource.GetProfileImageLink(CurrentUser));
+                UserImageSource.UriSource = new Uri(_PageDataSource.GetProfileImageLink(_CurrentUser));
             }
 
             void AnimateBackground()
@@ -229,19 +231,19 @@ namespace Hangon.Views {
             {
                 var photoAnimation = animationService.GetAnimation("PhotoImageBack");
 
-                if (photoAnimation == null || LastPhotoSelected == null) {
+                if (photoAnimation == null || _LastSelectedPhoto == null) {
                     photoAnimation?.Cancel();
                     return;
                 }
 
-                if (LastPivotIndexSelected == 0) {
+                if (_LastPivotIndexSelected == 0) {
                     UserPhotosListView.Loaded += (s, e) => {
-                        UI.AnimateBackItemToList(UserPhotosListView, LastPhotoSelected, photoAnimation);
+                        UI.AnimateBackItemToList(UserPhotosListView, _LastSelectedPhoto, photoAnimation);
                     };
 
-                } else if (LastPivotIndexSelected == 1) {
+                } else if (_LastPivotIndexSelected == 1) {
                     UserPhotosGridView.Loaded += (s, e) => {
-                        UI.AnimateBackItemToList(UserPhotosGridView, LastPhotoSelected, photoAnimation);
+                        UI.AnimateBackItemToList(UserPhotosGridView, _LastSelectedPhoto, photoAnimation);
                     };
                 }
             }
@@ -250,19 +252,19 @@ namespace Hangon.Views {
             {
                 var collectionCoverAnimation = animationService.GetAnimation("CollectionCoverImage");
 
-                if (collectionCoverAnimation == null || LastCollectionSelected == null) {
+                if (collectionCoverAnimation == null || _LastCollectionSelected == null) {
                     collectionCoverAnimation?.Cancel();
                     return;
                 }
 
-                if (LastPivotIndexSelected == 0) {
+                if (_LastPivotIndexSelected == 0) {
                     UserCollectionsListView.Loaded += (s, e) => {
-                        UI.AnimateBackItemToList(UserCollectionsListView, LastCollectionSelected, collectionCoverAnimation);
+                        UI.AnimateBackItemToList(UserCollectionsListView, _LastCollectionSelected, collectionCoverAnimation);
                     };
 
-                } else if (LastPivotIndexSelected == 2) {
+                } else if (_LastPivotIndexSelected == 2) {
                     UserCollectionsGrid.Loaded += (s, e) => {
-                        UI.AnimateBackItemToList(UserCollectionsGrid, LastCollectionSelected, collectionCoverAnimation);
+                        UI.AnimateBackItemToList(UserCollectionsGrid, _LastCollectionSelected, collectionCoverAnimation);
                     };
                 }
             }
@@ -369,18 +371,18 @@ namespace Hangon.Views {
         }
 
         private async void CmdOpenInBrowser_Tapped(object sender, TappedRoutedEventArgs e) {
-            if (CurrentUser == null || CurrentUser.Links == null) return;
+            if (_CurrentUser == null || _CurrentUser.Links == null) return;
 
             var tracking = "?utm_source=Hangon&utm_medium=referral&utm_campaign=" + Credentials.ApplicationId;
-            var userUri = new Uri(string.Format("{0}{1}", CurrentUser.Links.Html, tracking));
+            var userUri = new Uri(string.Format("{0}{1}", _CurrentUser.Links.Html, tracking));
             var success = await Windows.System.Launcher.LaunchUriAsync(userUri);
         }
 
         private void CmdCopyLink_Tapped(object sender, TappedRoutedEventArgs e) {
-            if (CurrentUser?.Links == null) return;
+            if (_CurrentUser?.Links == null) return;
 
             var tracking = "?utm_source=Hangon&utm_medium=referral&utm_campaign=" + Credentials.ApplicationId;
-            var userUri = string.Format("{0}{1}", CurrentUser.Links.Html, tracking);
+            var userUri = string.Format("{0}{1}", _CurrentUser.Links.Html, tracking);
             DataTransfer.Copy(userUri);
 
             var successMessage = _ResourcesLoader.GetString("CopyLinkSuccess");
@@ -405,18 +407,18 @@ namespace Hangon.Views {
             var photoItem = (StackPanel)sender;
 
             var data = (Photo)photoItem.DataContext;
-            if (data == LastPhotoSelected) {
+            if (data == _LastSelectedPhoto) {
                 photoItem.Fade(1).Start();
-                LastPhotoSelected = null;
+                _LastSelectedPhoto = null;
                 return;
             }
 
-            AnimationDelay += 100;
+            _AnimationDelay += 100;
 
             photoItem.Offset(0, 100, 0)
                     .Then()
-                    .Fade(1, 500, AnimationDelay)
-                    .Offset(0, 0, 500, AnimationDelay)
+                    .Fade(1, 500, _AnimationDelay)
+                    .Offset(0, 0, 500, _AnimationDelay)
                     .Start();
         }
 
@@ -432,18 +434,18 @@ namespace Hangon.Views {
             var collectionItem = (Grid)sender;
 
             var data = (Collection)collectionItem.DataContext;
-            if (data == LastCollectionSelected) {
+            if (data == _LastCollectionSelected) {
                 collectionItem.Fade(1).Start();
-                LastCollectionSelected = null;
+                _LastCollectionSelected = null;
                 return;
             }
 
-            CollectionAnimationDelay += 100;
+            _CollectionAnimationDelay += 100;
 
             collectionItem.Offset(0, 100, 0)
                     .Then()
-                    .Fade(1, 500, CollectionAnimationDelay)
-                    .Offset(0, 0, 500, CollectionAnimationDelay)
+                    .Fade(1, 500, _CollectionAnimationDelay)
+                    .Offset(0, 0, 500, _CollectionAnimationDelay)
                     .Start();
         }
 
@@ -451,8 +453,8 @@ namespace Hangon.Views {
             var item = (StackPanel)sender;
             var photo = (Photo)item.DataContext;
 
-            LastPhotoSelected = photo;
-            LastCollectionSelected = null;
+            _LastSelectedPhoto = photo;
+            _LastCollectionSelected = null;
 
             var image = (Image)item.FindName("PhotoImage");
 
@@ -460,15 +462,15 @@ namespace Hangon.Views {
                 ConnectedAnimationService.GetForCurrentView().PrepareToAnimate("PhotoImage", image);
             }
 
-            Frame.Navigate(typeof(PhotoPage), photo);
+            Frame.Navigate(typeof(PhotoPage), new object[] { photo, _PageDataSource.UserPhotos });
         }
 
         private void CollectionItem_Tapped(object sender, TappedRoutedEventArgs e) {
             var item = (Grid)sender;
             var collection = (Collection)item.DataContext;
 
-            LastCollectionSelected = collection;
-            LastPhotoSelected = null;
+            _LastCollectionSelected = collection;
+            _LastSelectedPhoto = null;
 
             var image = (Image)item.FindName("PhotoImage");
 
@@ -483,23 +485,23 @@ namespace Hangon.Views {
             var collectionItem = (Grid)sender;
 
             var data = (Collection)collectionItem.DataContext;
-            if (data == LastCollectionSelected) {
+            if (data == _LastCollectionSelected) {
                 collectionItem.Fade(1).Start();
-                LastCollectionSelected = null;
+                _LastCollectionSelected = null;
                 return;
             }
 
-            MiniCollectionAnimeDelay += 100;
+            _MiniCollectionAnimeDelay += 100;
 
             collectionItem.Offset(0, 100, 0)
                     .Then()
-                    .Fade(1, 500, MiniCollectionAnimeDelay)
-                    .Offset(0, 0, 500, MiniCollectionAnimeDelay)
+                    .Fade(1, 500, _MiniCollectionAnimeDelay)
+                    .Offset(0, 0, 500, _MiniCollectionAnimeDelay)
                     .Start();
         }
 
         private void PivotUserData_SelectionChanged(object sender, SelectionChangedEventArgs e) {
-            LastPivotIndexSelected = PivotUserData.SelectedIndex;
+            _LastPivotIndexSelected = PivotUserData.SelectedIndex;
 
             switch (PivotUserData.SelectedIndex) {
                 case 0:
@@ -515,7 +517,7 @@ namespace Hangon.Views {
                     break;
             }
 
-            HandleConnectedAnimation(CurrentPhoto);
+            HandleConnectedAnimation(_CurrentPhoto);
         }
 
 

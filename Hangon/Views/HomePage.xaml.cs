@@ -22,7 +22,7 @@ namespace Hangon.Views {
     public sealed partial class HomePage : Page {
 
         #region variables
-        private DataSource PageDataSource { get; set; }
+        private DataSource _PageDataSource { get; set; }
 
         private float _RecentAnimationDelay { get; set; }
 
@@ -30,9 +30,7 @@ namespace Hangon.Views {
 
         private float _SearchAnimationDelay { get; set; }
 
-        private static Photo _LastSelectedPhoto { get; set; }
-
-        private bool _BlockLoadedAnimation { get; set; }
+        public static Photo _LastSelectedPhoto { get; set; }
 
         private static int _LastSelectedPivotIndex { get; set; }
 
@@ -71,6 +69,7 @@ namespace Hangon.Views {
 
         protected override void OnNavigatedTo(NavigationEventArgs e) {
             CoreWindow.GetForCurrentThread().KeyDown += Page_KeyDown;
+            
             base.OnNavigatedTo(e);
         }
 
@@ -92,8 +91,6 @@ namespace Hangon.Views {
             if (animation == null || _LastSelectedPhoto == null) {
                 return;
             }
-
-            _BlockLoadedAnimation = true;
 
             if (PagePivot.SelectedIndex == 0) {
                 animateRecent();
@@ -144,23 +141,23 @@ namespace Hangon.Views {
                 App.AppDataSource = new DataSource();
             }
 
-            PageDataSource = App.AppDataSource;
+            _PageDataSource = App.AppDataSource;
         }
 
         private async void LoadRecentData() {
-            if (PageDataSource.RecentPhotos?.Count > 0) {
-                RecentView.ItemsSource = PageDataSource.RecentPhotos;
+            if (_PageDataSource.RecentPhotos?.Count > 0) {
+                RecentView.ItemsSource = _PageDataSource.RecentPhotos;
                 return;
             }
 
             ShowRecentLoadingView();
 
-            var added = await PageDataSource.FetchRecentPhotos();
+            var added = await _PageDataSource.FetchRecentPhotos();
 
             HideRecentLoadingView();
 
             if (added > 0) {
-                RecentView.ItemsSource = PageDataSource.RecentPhotos;
+                RecentView.ItemsSource = _PageDataSource.RecentPhotos;
                 TileDesigner.UpdatePrimary();
 
             } else {
@@ -182,19 +179,19 @@ namespace Hangon.Views {
         }
 
         private async void LoadCuratedData() {
-            if (PageDataSource.CuratedPhotos?.Count > 0) {
-                CuratedView.ItemsSource = PageDataSource.CuratedPhotos;
+            if (_PageDataSource.CuratedPhotos?.Count > 0) {
+                CuratedView.ItemsSource = _PageDataSource.CuratedPhotos;
                 return;
             }
 
             ShowCuratedLoadingView();
 
-            var added = await PageDataSource.FetchCuratedPhotos();
+            var added = await _PageDataSource.FetchCuratedPhotos();
 
             HideCuratedLoadingView();
 
             if (added>0) {
-                CuratedView.ItemsSource = PageDataSource.CuratedPhotos;
+                CuratedView.ItemsSource = _PageDataSource.CuratedPhotos;
 
             } else {
                 ShowCuratedEmptyView();
@@ -284,8 +281,8 @@ namespace Hangon.Views {
 
         private void PhotoItem_Tapped(object sender, TappedRoutedEventArgs e) {
             var item = (StackPanel)sender;
-            var wallpaper = (Photo)item.DataContext;
-            _LastSelectedPhoto = wallpaper;
+            var photo = (Photo)item.DataContext;
+            _LastSelectedPhoto = photo;
 
             var image = (Image)item.FindName("PhotoImage");
 
@@ -293,7 +290,21 @@ namespace Hangon.Views {
                 ConnectedAnimationService.GetForCurrentView().PrepareToAnimate("PhotoImage", image);
             }
 
-            Frame.Navigate(typeof(PhotoPage), wallpaper);
+            var photosListParameter = GetCurrentPhotosListSelected();
+            Frame.Navigate(typeof(PhotoPage), new object[] { photo, photosListParameter });
+        }
+
+        private PhotosList GetCurrentPhotosListSelected() {
+            switch (_LastSelectedPivotIndex) {
+                case 0:
+                    return _PageDataSource.RecentPhotos;
+                case 1:
+                    return _PageDataSource.CuratedPhotos;
+                case 2:
+                    return _PageDataSource.PhotosSearchResults;
+                default:
+                    return _PageDataSource.RecentPhotos;
+            }
         }
 
         private void PhotoItem_Loaded(object sender, RoutedEventArgs e) {
@@ -432,10 +443,10 @@ namespace Hangon.Views {
             async void ReloadRecentData()
             {
                 ShowRecentLoadingView();
-                await PageDataSource.ReloadRecentPhotos();
+                await _PageDataSource.ReloadRecentPhotos();
                 HideRecentLoadingView();
 
-                if (PageDataSource.RecentPhotos.Count == 0) {
+                if (_PageDataSource.RecentPhotos.Count == 0) {
                     ShowRecentEmptyView();
                 }
             }
@@ -443,10 +454,10 @@ namespace Hangon.Views {
             async void ReloadCuratedData()
             {
                 ShowCuratedLoadingView();
-                await PageDataSource.ReloadCuratedPhotos();
+                await _PageDataSource.ReloadCuratedPhotos();
                 HideCuratedLoadingView();
 
-                if (PageDataSource.CuratedPhotos.Count == 0) {
+                if (_PageDataSource.CuratedPhotos.Count == 0) {
                     ShowCuratedEmptyView();
                 }
             }
@@ -532,11 +543,11 @@ namespace Hangon.Views {
             HideSearchPanel();
             ShowLoadingSearch();
 
-            var results = await PageDataSource.SearchPhotos(query);
+            var results = await _PageDataSource.SearchPhotos(query);
 
             HideLoadingSearch();
 
-            if (PageDataSource.PhotosSearchResults.Count > 0) {
+            if (_PageDataSource.PhotosSearchResults.Count > 0) {
                 ShowSearchResults();
                 UseCmdBarCompactMode();
                 ShowShowSearchCmd();
@@ -564,7 +575,7 @@ namespace Hangon.Views {
         async void ShowSearchResults() {
             _AreSearchResultsActivated = true;
 
-            SearchPhotosView.ItemsSource = PageDataSource.PhotosSearchResults;
+            SearchPhotosView.ItemsSource = _PageDataSource.PhotosSearchResults;
 
             await SearchPhotosView.Fade(0, 0).Offset(0, 20, 0).StartAsync();
 
@@ -631,7 +642,7 @@ namespace Hangon.Views {
         }
 
         private void StartSearchBackgroundSlideShow() {
-            var recents = PageDataSource.RecentPhotos;
+            var recents = _PageDataSource.RecentPhotos;
             if (recents?.Count == 0) return;
 
             var duration = 10000;
