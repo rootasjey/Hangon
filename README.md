@@ -55,9 +55,9 @@ You can contribute to improve this project by:
 
 In this project, a test API key is used which is limited to 50 requests per hour. So ensure you're not off limit.
 
-If you want ot get your personal API key from Unplash:
+If you want to get your personal API key from Unsplash:
 
-1. Go to [Unplash](https://unsplash.com)
+1. Go to [Unsplash](https://unsplash.com)
 2. Log in or create a new account
 3. In the top bar, click on _'API/Developers'_
 4. Go to _['Your applications'](https://unsplash.com/oauth/applications)_
@@ -65,5 +65,4 @@ If you want ot get your personal API key from Unplash:
 
 ## todos
 
-* wrap text notify flyout
-* hide header when scrolling
+* pull to go back

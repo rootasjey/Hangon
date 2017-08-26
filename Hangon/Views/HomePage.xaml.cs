@@ -17,6 +17,7 @@ using System.Threading;
 using Windows.UI.Xaml.Media.Imaging;
 using Windows.ApplicationModel.Resources;
 using Unsplasharp.Models;
+using Windows.UI.Xaml.Controls.Primitives;
 
 namespace Hangon.Views {
     public sealed partial class HomePage : Page {
@@ -45,6 +46,8 @@ namespace Hangon.Views {
         private static bool _AreSearchResultsActivated { get; set; }
 
         ResourceLoader _ResourcesLoader { get; set; }
+
+        private bool _IsPivotHeaderHidden { get; set; }
         #endregion variables
 
         public HomePage() {
@@ -292,20 +295,20 @@ namespace Hangon.Views {
 
             var photosListParameter = GetCurrentPhotosListSelected();
             Frame.Navigate(typeof(PhotoPage), new object[] { photo, photosListParameter });
-        }
 
-        private PhotosList GetCurrentPhotosListSelected() {
-            switch (_LastSelectedPivotIndex) {
-                case 0:
-                    return _PageDataSource.RecentPhotos;
-                case 1:
-                    return _PageDataSource.CuratedPhotos;
-                case 2:
-                    return _PageDataSource.PhotosSearchResults;
-                default:
-                    return _PageDataSource.RecentPhotos;
+            PhotosList GetCurrentPhotosListSelected() {
+                switch (_LastSelectedPivotIndex) {
+                    case 0:
+                        return _PageDataSource.RecentPhotos;
+                    case 1:
+                        return _PageDataSource.CuratedPhotos;
+                    case 2:
+                        return _PageDataSource.PhotosSearchResults;
+                    default:
+                        return _PageDataSource.RecentPhotos;
+                }
             }
-        }
+        }        
 
         private void PhotoItem_Loaded(object sender, RoutedEventArgs e) {
             var photoItem = (StackPanel)sender;
@@ -324,21 +327,43 @@ namespace Hangon.Views {
                     .Fade(1, 500, delay)
                     .Offset(0,0, 500, delay)
                     .Start();
+
+            float GetAnimationDelayPivotIndex() {
+                var step = 100;
+
+                switch (PagePivot.SelectedIndex) {
+                    case 0:
+                        return _RecentAnimationDelay += step;
+                    case 1:
+                        return _CuratedAnimationDelay += step;
+                    case 2:
+                        return _SearchAnimationDelay += step;
+                    default:
+                        return 0;
+                }
+            }
         }
 
-        float GetAnimationDelayPivotIndex() {
-            var step = 100;
+        private void GridView_Loaded(object sender, RoutedEventArgs e) {
+            var gridView = (GridView)sender;
+            var scrollViewer = gridView.GetChildOfType<ScrollViewer>();
+            double offset = 0;
 
-            switch (PagePivot.SelectedIndex) {
-                case 0:
-                    return _RecentAnimationDelay += step;
-                case 1:
-                    return _CuratedAnimationDelay += step;
-                case 2:
-                    return _SearchAnimationDelay += step;
-                default:
-                    return 0;
-            }
+            // Hide Pivot headers when scrolling
+            scrollViewer.ViewChanged += (s, ev) => {
+                if (offset < scrollViewer.VerticalOffset && !_IsPivotHeaderHidden) {
+                    PagePivot.Offset(0, -50).Start();
+                    PagePivot.Margin = new Thickness(0, 0, 0, -50);
+                    _IsPivotHeaderHidden = true;
+
+                } else if (offset > scrollViewer.VerticalOffset && _IsPivotHeaderHidden) {
+                    PagePivot.Offset(0, 0).Start();
+                    PagePivot.Margin = new Thickness();
+                    _IsPivotHeaderHidden = false;
+                }
+
+                offset = scrollViewer.VerticalOffset;
+            };
         }
         #endregion events
 
@@ -873,5 +898,6 @@ namespace Hangon.Views {
         }
 
         #endregion update changelog
+
     }
 }

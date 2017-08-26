@@ -112,9 +112,9 @@
                          Visibility="Collapsed"
                          Canvas.ZIndex="2"
                          Background="{ThemeResource SystemControlHighlightAccentBrush}" 
-                         Height="20" VerticalAlignment="Top"
+                         MinHeight="20" VerticalAlignment="Top"
                          Tapped="FlyoutNotification_Dismiss">
-            <StackPanel>
+            <StackPanel MaxWidth="200">
                 <TextBlock x:Name="FlyoutText" Text="" TextWrapping="Wrap"/>
                 <Grid x:Name="ProgressGrid" Visibility="Collapsed">
                     <ProgressBar x:Name="ProgressIndeterminate"
@@ -138,19 +138,13 @@
 
                 <RichTextBlock TextWrapping="Wrap" Margin="0,20,0,0">
                     <Paragraph>
-                        <Span>-Add curated section</Span>
+                        <Span>-Add FlipView control to quickly view full photos</Span>
                         <LineBreak/>
-                        <Span>-Add search section</Span>
+                        <Span>-Add live tile (shows last photos)</Span>
                         <LineBreak/>
-                        <Span>-Add right tap/hold (touch) context menu on photos</Span>
+                        <Span>-Hide headers when scrolling recent, curated and search lists</Span>
                         <LineBreak/>
-                        <Span>-Support French and English languages</Span>
-                        <LineBreak/>
-                        <Span>-Support dark and white themes</Span>
-                        <LineBreak/>
-                        <Span>-Add animations on SettingsPage</Span>
-                        <LineBreak/>
-                        <Span>-Fix reload command</Span>
+                        <Span>-?</Span>
                     </Paragraph>
                 </RichTextBlock>
                 
@@ -175,9 +169,10 @@
                        Margin="0"
                        x:Uid="RecentHeader"
                        Header="recent">
-                
+
                 <UserControl x:Name="RecentPhotosPivotItemContent"
-                             x:DeferLoadStrategy="Lazy"> 
+                             x:DeferLoadStrategy="Lazy">
+                    
                     <!--Visual States don't work if not in an UserControl/ContentControl-->
                     
                     <Grid>
@@ -214,11 +209,12 @@
 
                         <!-- DATA -->
                         <controls:AdaptiveGridView x:Name="RecentView"
-                                       DesiredWidth="300"
-                                       ItemHeight="300"
-                                       ItemTemplate="{StaticResource PhotoTemplate}"
-                                       animations:ReorderGridAnimation.Duration="300"
-                                       ItemContainerStyle="{StaticResource GridViewItemZeroMarginStyle}">
+                                                   DesiredWidth="300"
+                                                   ItemHeight="300"
+                                                   ItemTemplate="{StaticResource PhotoTemplate}"
+                                                   animations:ReorderGridAnimation.Duration="300"
+                                                   ItemContainerStyle="{StaticResource GridViewItemZeroMarginStyle}"
+                                                   Loaded="GridView_Loaded">
                         </controls:AdaptiveGridView>
 
                         <!-- VISUAL STATES -->
@@ -302,7 +298,8 @@
                                                    ItemHeight="300"
                                                    ItemTemplate="{StaticResource PhotoTemplate}"
                                                    animations:ReorderGridAnimation.Duration="300"
-                                                   ItemContainerStyle="{StaticResource GridViewItemZeroMarginStyle}">
+                                                   ItemContainerStyle="{StaticResource GridViewItemZeroMarginStyle}"
+                                                   Loaded="GridView_Loaded">
                         
                         </controls:AdaptiveGridView>
 
@@ -368,7 +365,7 @@
                                        Tapped="WordSuggestion_Tapped"/>
                         </StackPanel>
 
-                        <!-- LOAD VIEW -->
+                        <!-- LOADING VIEW -->
                         <Grid x:Name="SearchLoadingView" 
                               VerticalAlignment="Center" 
                               HorizontalAlignment="Center"
@@ -386,6 +383,7 @@
                                        Grid.Row="1"/>
                         </Grid>
 
+                        <!--EMPTY VIEW-->
                         <StackPanel x:Name="SearchEmptyView"
                                     Visibility="Collapsed"
                                     VerticalAlignment="Center"
@@ -406,7 +404,8 @@
                                                    ItemsSource="{x:Bind _PageDataSource.PhotosSearchResults, Mode=OneWay}"
                                                    ItemTemplate="{StaticResource PhotoTemplate}"
                                                    animations:ReorderGridAnimation.Duration="300"
-                                                   ItemContainerStyle="{StaticResource GridViewItemZeroMarginStyle}">
+                                                   ItemContainerStyle="{StaticResource GridViewItemZeroMarginStyle}"
+                                                   Loaded="GridView_Loaded">
                         </controls:AdaptiveGridView>
 
                         <!-- VISUAL STATES -->
