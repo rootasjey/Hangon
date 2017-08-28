@@ -50,6 +50,8 @@ namespace Hangon.Views {
         private ResourceLoader _ResourcesLoader { get; set; }
 
         private bool _ConnectedAnimationHandled { get; set; }
+
+        private double _InitialUserViewY { get; set; }
         #endregion variables
 
         public PhotoPage() {
@@ -465,6 +467,7 @@ namespace Hangon.Views {
         private void UpdatePhotoCaptionPosition() {
             var height = Window.Current.Bounds.Height - _PhotoCaptionTopMargin;
             _RowSpacing.Height = new GridLength(height);
+            
         }
 
         private void PhotoCaptionContent_Unloaded(object sender, RoutedEventArgs e) {
@@ -501,7 +504,7 @@ namespace Hangon.Views {
             }
         }
 
-        private void PhotoCaption_Loaded(object sender, RoutedEventArgs e) {
+        private void PhotoCaption_Loaded(object sender, RoutedEventArgs ev) {
             var PhotoCaption = (ScrollViewer)sender;
             InitializeScrollViewerProps(PhotoCaption);
         }
@@ -591,5 +594,10 @@ namespace Hangon.Views {
 
         #endregion others
 
+        private void PhotoPullBox_RefreshInvoked(DependencyObject sender, object args) {
+            if (Frame.CanGoBack) {
+                Frame.GoBack();
+            }
+        }
     }
 }

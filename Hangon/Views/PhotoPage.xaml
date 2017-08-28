@@ -5,6 +5,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:models="using:Unsplasharp.Models"
+    xmlns:pr="using:PullToRefresh.UWP"
     mc:Ignorable="d">
 
     <Page.Resources>
@@ -50,7 +51,20 @@
                             <Grid x:Name="PhotoDimmer"/>
                         </Grid>
 
-                        <ScrollViewer x:Name="PhotoCaption"
+
+                        <pr:PullToRefreshBox x:Name="PhotoPullBox" 
+                                             RefreshInvoked="PhotoPullBox_RefreshInvoked">
+                            <pr:PullToRefreshBox.TopIndicatorTemplate>
+                                <DataTemplate>
+                                    <pr:PullRefreshProgressControl Progress="{Binding}"
+                                                                   x:Uid="PullBack"
+                                                                   PullToRefreshText="Pull to go back"
+                                                                   ReleaseToRefreshText="Release to go back"/>
+                                </DataTemplate>
+                            </pr:PullToRefreshBox.TopIndicatorTemplate>
+                            
+                            <ScrollViewer x:Name="PhotoCaption"
+                                      Background="Transparent"
                                       Opacity="1"
                                       RequestedTheme="Dark"
                                       Margin="0,0,0,0"
@@ -64,7 +78,7 @@
                                 <Grid.RowDefinitions>
                                     <RowDefinition x:Name="RowSpacing" Height="500"/>
                                     <RowDefinition x:Name="RowUser" Height="140"/>
-                                    <RowDefinition x:Name="RowPhotoLocation" Height="80"/>
+                                    <RowDefinition x:Name="RowPhotoLocation"/>
                                     <RowDefinition x:Name="RowUnsplashAttribution" Height="30"/>
                                     <RowDefinition x:Name="RowStats" Height="150"/>
                                     <RowDefinition x:Name="RowExif" Height="Auto"/>
@@ -219,6 +233,7 @@
 
                             </Grid>
                         </ScrollViewer>
+                        </pr:PullToRefreshBox>
                     </Grid>
                 </DataTemplate>
             </FlipView.ItemTemplate>

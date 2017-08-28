@@ -262,14 +262,17 @@
                         <StackPanel x:Name="UpdateChangelogPanel">
                             <TextBlock Text="last update 1.2.0" FontSize="24"/>
 
-                            <TextBlock Text="11 August 2017" Opacity=".5"/>
+                            <TextBlock Text="3 September 2017" Opacity=".5"/>
 
                             <RichTextBlock TextWrapping="Wrap" Margin="0,20,0,0">
                                 <Paragraph>
-                                    <Span>-Add primary live tile</Span>
+                                    <Span>-Add FlipView to quickly go through full sized photos</Span>
                                     <LineBreak/>
-                                    <Span>-Fix some translations</Span>
+                                    <Span>-Add primary live tile (shows last photos)</Span>
                                     <LineBreak/>
+                                    <Span>-Hide headers when scrolling recent, curated and search lists</Span>
+                                    <LineBreak/>
+                                    <Span>-Pull to go back on photos FlipView</Span>
                                 </Paragraph>
                             </RichTextBlock>
                             <StackPanel/>

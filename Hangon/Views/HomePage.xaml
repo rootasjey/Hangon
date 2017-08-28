@@ -131,20 +131,20 @@
             
             <StackPanel ScrollViewer.VerticalScrollBarVisibility="Disabled"
                         Padding="0,20">
-                <TextBlock Text="Update 1.1.0" FontSize="24"
+                <TextBlock Text="Update 1.2.0" FontSize="24"
                                Typography.Capitals="SmallCaps"/>
 
-                <TextBlock Text="30 June 2017" Opacity=".5"/>
+                <TextBlock Text="3 September 2017" Opacity=".5"/>
 
                 <RichTextBlock TextWrapping="Wrap" Margin="0,20,0,0">
                     <Paragraph>
-                        <Span>-Add FlipView control to quickly view full photos</Span>
+                        <Span>-Add FlipView to quickly go through full sized photos</Span>
                         <LineBreak/>
-                        <Span>-Add live tile (shows last photos)</Span>
+                        <Span>-Add primary live tile (shows last photos)</Span>
                         <LineBreak/>
                         <Span>-Hide headers when scrolling recent, curated and search lists</Span>
                         <LineBreak/>
-                        <Span>-?</Span>
+                        <Span>-Pull to go back on photos FlipView</Span>
                     </Paragraph>
                 </RichTextBlock>
                 

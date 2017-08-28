@@ -378,4 +378,10 @@
   <data name="ItemSixHours.Content" xml:space="preserve">
     <value>toutes les 6 heures</value>
   </data>
+  <data name="PullBack.PullToRefreshText" xml:space="preserve">
+    <value>Tirez pour retourner</value>
+  </data>
+  <data name="PullBack.ReleaseToRefreshText" xml:space="preserve">
+    <value>Relâchez pour retourner</value>
+  </data>
 </root>
