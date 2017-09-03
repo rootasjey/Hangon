@@ -69,7 +69,7 @@
                                       RequestedTheme="Dark"
                                       Margin="0,0,0,0"
                                       Canvas.ZIndex="1"
-                                      Padding="0,40"
+                                      Padding="0,0"
                                       Loaded="PhotoCaption_Loaded">
 
                             <Grid x:Name="PhotoCaptionContent" 
@@ -123,7 +123,7 @@
 
                                 <StackPanel x:Name="PanelPhotoLocation"
                                             Grid.Row="2"
-                                            Margin="12,24,0,24"
+                                            Margin="12,24"
                                             HorizontalAlignment="Center"
                                             Orientation="Horizontal"
                                             Visibility="{x:Bind Location, Converter={StaticResource LocationVisibility}, Mode=OneWay}"
@@ -136,6 +136,7 @@
                                     <TextBlock x:Name="PhotoLocation"
                                                Text="{x:Bind Location, Converter={StaticResource LocationName}, Mode=OneWay}"
                                                VerticalAlignment="Center"
+                                               MaxWidth="150"
                                                TextWrapping="Wrap"
                                                FontSize="20"
                                                FontWeight="Light"/>

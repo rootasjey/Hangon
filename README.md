@@ -67,3 +67,4 @@ If you want to get your personal API key from Unsplash:
 
 * zoom on photos
 * donations
+* slideshow
