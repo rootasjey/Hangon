@@ -47,6 +47,12 @@ namespace Hangon.Services {
                 return "AppVersion";
             }
         }
+
+        private static string PhotoStretchingKey {
+            get {
+                return "PhotoStretching";
+            }
+        }
         #endregion keys
 
         #region path
@@ -130,6 +136,22 @@ namespace Hangon.Services {
             App.UpdateAppTheme();
         }
         #endregion theme
+
+        public static Windows.UI.Xaml.Media.Stretch GetDefaultPhotoStretching() {
+            ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
+            localSettings.Values.TryGetValue(PhotoStretchingKey, out var stretch);
+
+            if ((string)stretch == nameof(Windows.UI.Xaml.Media.Stretch.UniformToFill)) {
+                return Windows.UI.Xaml.Media.Stretch.UniformToFill;
+            }
+
+            return Windows.UI.Xaml.Media.Stretch.Uniform;
+        }
+
+        public static void SaveDefaultPhotoStretching(Windows.UI.Xaml.Media.Stretch stretch) {
+            ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
+            localSettings.Values[PhotoStretchingKey] = stretch.ToString();
+        }
 
         #region appversion
         public static bool IsNewUpdatedLaunch() {

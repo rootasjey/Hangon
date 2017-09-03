@@ -65,4 +65,5 @@ If you want to get your personal API key from Unsplash:
 
 ## todos
 
-* pull to go back
+* zoom on photos
+* donations

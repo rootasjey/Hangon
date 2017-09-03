@@ -43,7 +43,7 @@ namespace Hangon.Views {
 
         private double _PhotoCaptionTopMargin { get; set; }
 
-        private bool _PhotoCaptionIsVisible { get; set; }
+        private bool _IsPhotoCaptionVisible { get; set; }
 
         private RowDefinition _RowSpacing { get; set; }
 
@@ -51,7 +51,7 @@ namespace Hangon.Views {
 
         private bool _ConnectedAnimationHandled { get; set; }
 
-        private double _InitialUserViewY { get; set; }
+        private bool _IsStretched { get; set; }
         #endregion variables
 
         public PhotoPage() {
@@ -66,8 +66,10 @@ namespace Hangon.Views {
             _PageDataSource = App.AppDataSource;
             _UIDispatcher = CoreWindow.GetForCurrentThread().Dispatcher;
             _ResourcesLoader = new ResourceLoader();
-            _PhotoCaptionIsVisible = true;
+            _IsPhotoCaptionVisible = true;
             _ConnectedAnimationHandled = false;
+            _IsStretched = Settings.GetDefaultPhotoStretching() == Windows.UI.Xaml.Media.Stretch.UniformToFill;
+            UpdateCmdStretchIcon();
         }
 
         void GetDeviceType() {
@@ -283,64 +285,43 @@ namespace Hangon.Views {
         }
 
         private void CmdToggleCaption_Tapped(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e) {
-            if (_PhotoCaptionIsVisible) {
+            if (_IsPhotoCaptionVisible) {
                 HideCaption();
-                _PhotoCaptionIsVisible = false;
+                _IsPhotoCaptionVisible = false;
                 return;
             }
 
             ShowCaption();
-            _PhotoCaptionIsVisible = true;
-        }
-
-        void ShowCaption(Grid caption = null) {
-            Grid _caption;
-
-            if (caption != null) _caption = caption;
-            else _caption = GetCurrentCaptionItem();
-
-            if (_caption.Opacity == 1) return;
-
-            _caption
-                .Offset(0, 0)
-                .Fade(1)
-                .Start();
-
-            CmdToggleCaptionIcon.UriSource = new Uri("ms-appx:///Assets/Icons/hide.png");
-
-            var label = _ResourcesLoader.GetString("HideCaption");
-            CmdToggleCaption.Label = label;
-        }
-
-        void HideCaption(Grid caption = null) {
-            Grid _caption;
-
-            if (caption != null) _caption = caption;
-            else _caption = GetCurrentCaptionItem();
-
-            if (_caption.Opacity == 0) return;
-
-            _caption
-                .Offset(0, 300)
-                .Fade(0)
-                .Start();
-
-            CmdToggleCaptionIcon.UriSource = new Uri("ms-appx:///Assets/Icons/show.png");
-
-            var label = _ResourcesLoader.GetString("ShowCaption");
-            CmdToggleCaption.Label = label;
-        }
-
-        Grid GetCurrentCaptionItem() {
-            var photo = (Photo)PhotosFlipView.SelectedItem;
-            var flipViewItem = (FlipViewItem)PhotosFlipView.ContainerFromItem(photo);
-            var root = (Grid)flipViewItem.ContentTemplateRoot;
-            var caption = (Grid)root.FindName("PhotoCaptionContent");
-            return caption;
+            _IsPhotoCaptionVisible = true;
         }
 
         private void CmdCrop_Tapped(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e) {
+            
+        }
 
+        private void CmdStretch_Tapped(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e) {
+            var root = GetCurrentItemTemplateRoot();
+            var image = (Image)root.FindName("PhotoImage");
+
+            var stretch = Windows.UI.Xaml.Media.Stretch.Uniform;
+            var glyph = "\uE1D9";
+
+            if (!_IsStretched) {
+                stretch = Windows.UI.Xaml.Media.Stretch.UniformToFill;
+                glyph = "\uE1D8";
+                _IsStretched = true;
+
+            } else { _IsStretched = false; }
+
+            image.Stretch = stretch;
+            CmdStretchIcon.Glyph = glyph;
+
+            Settings.SaveDefaultPhotoStretching(stretch);
+        }
+
+        private void UpdateCmdStretchIcon() {
+            if (_IsStretched) { CmdStretchIcon.Glyph = "\uE1D8"; } 
+            else { CmdStretchIcon.Glyph = "\uE1D9"; }
         }
 
         #endregion commandbar
@@ -383,6 +364,11 @@ namespace Hangon.Views {
             var PhotoView = (Image)PhotoViewContainer.FindName("PhotoView");
             var PhotoCaption = (ScrollViewer)PhotoViewContainer.FindName("PhotoCaption");
 
+            if (PhotosFlipView.SelectedIndex == 0) {
+                var image = (Image)PhotoViewContainer.FindName("PhotoImage");
+                RefreshPhotoStretching(image);
+            }
+            
             InitializeCompositorVariables(PhotoViewContainer);
 
             PhotoCaption.Loaded += (s, e) => {
@@ -464,12 +450,6 @@ namespace Hangon.Views {
             UpdatePhotoCaptionPosition();
         }
 
-        private void UpdatePhotoCaptionPosition() {
-            var height = Window.Current.Bounds.Height - _PhotoCaptionTopMargin;
-            _RowSpacing.Height = new GridLength(height);
-            
-        }
-
         private void PhotoCaptionContent_Unloaded(object sender, RoutedEventArgs e) {
             Window.Current.SizeChanged -= Current_SizeChanged;
         }
@@ -500,7 +480,9 @@ namespace Hangon.Views {
             ForceFetchOnFirstItemIfSelected();
 
             void ForceFetchOnFirstItemIfSelected() {
-                if (index == 0) { FillPhotoProperties(); }
+                if (index == 0) {
+                    FillPhotoProperties();
+                }
             }
         }
 
@@ -528,16 +510,93 @@ namespace Hangon.Views {
             if (item == null) { return; }
 
             var root = (Grid)item.ContentTemplateRoot;
-            var photoImage = (Image)root.FindName("PhotoImage");
+            var image = (Image)root.FindName("PhotoImage");
 
-            _CurrentPhotoImage = photoImage;
+            _CurrentPhotoImage = image;
 
             RefreshCaptionVisibility(root);
+            RefreshPhotoStretching(image);
+        }
+
+        private void PhotoPullBox_RefreshInvoked(DependencyObject sender, object args) {
+            if (Frame.CanGoBack) {
+                Frame.GoBack();
+            }
         }
 
         #endregion events
 
-        #region others
+        #region others methods
+
+        void ShowCaption(Grid caption = null) {
+            Grid _caption;
+
+            if (caption != null) _caption = caption;
+            else _caption = GetCurrentCaptionItem();
+
+            if (_caption.Opacity == 1) return;
+
+            _caption
+                .Offset(0, 0)
+                .Fade(1)
+                .Start();
+
+            CmdToggleCaptionIcon.UriSource = new Uri("ms-appx:///Assets/Icons/hide.png");
+
+            var label = _ResourcesLoader.GetString("HideCaption");
+            CmdToggleCaption.Label = label;
+        }
+
+        void HideCaption(Grid caption = null) {
+            Grid _caption;
+
+            if (caption != null) _caption = caption;
+            else _caption = GetCurrentCaptionItem();
+
+            if (_caption.Opacity == 0) return;
+
+            _caption
+                .Offset(0, 300)
+                .Fade(0)
+                .Start();
+
+            CmdToggleCaptionIcon.UriSource = new Uri("ms-appx:///Assets/Icons/show.png");
+
+            var label = _ResourcesLoader.GetString("ShowCaption");
+            CmdToggleCaption.Label = label;
+
+            // Completly hide caption
+            //var root = GetCurrentItemTemplateRoot();
+            //var photoPullBox = (UIElement)root.FindName("PhotoPullBox");
+            //photoPullBox.Visibility = Visibility.Collapsed;
+        }
+
+        private Grid GetCurrentCaptionItem() {
+            var root = GetCurrentItemTemplateRoot();
+            var caption = (Grid)root.FindName("PhotoCaptionContent");
+            return caption;
+        }
+
+        private Grid GetCurrentItemTemplateRoot() {
+            var photo = (Photo)PhotosFlipView.SelectedItem;
+            var flipViewItem = (FlipViewItem)PhotosFlipView.ContainerFromItem(photo);
+            return (Grid)flipViewItem.ContentTemplateRoot;
+        }
+
+        private void RefreshPhotoStretching(Image image) {
+            if (_IsStretched) {
+                image.Stretch = Windows.UI.Xaml.Media.Stretch.UniformToFill;
+                return;
+            }
+
+            image.Stretch = Windows.UI.Xaml.Media.Stretch.Uniform;
+        }
+
+        private void UpdatePhotoCaptionPosition() {
+            var height = Window.Current.Bounds.Height - _PhotoCaptionTopMargin;
+            _RowSpacing.Height = new GridLength(height);
+        }
+
         private void FlyoutNotification_Dismiss(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e) {
             HideNotification();
         }
@@ -589,15 +648,10 @@ namespace Hangon.Views {
         void RefreshCaptionVisibility(Grid root) {
             var caption = (Grid)root.FindName("PhotoCaptionContent");
 
-            if (!_PhotoCaptionIsVisible) { HideCaption(caption); } else { ShowCaption(caption); }
+            if (!_IsPhotoCaptionVisible) { HideCaption(caption); } else { ShowCaption(caption); }
         }
 
         #endregion others
 
-        private void PhotoPullBox_RefreshInvoked(DependencyObject sender, object args) {
-            if (Frame.CanGoBack) {
-                Frame.GoBack();
-            }
-        }
     }
 }

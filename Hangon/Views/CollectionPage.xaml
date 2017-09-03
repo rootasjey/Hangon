@@ -80,9 +80,9 @@
                          Visibility="Collapsed"
                          Canvas.ZIndex="2"
                          Background="{ThemeResource SystemControlHighlightAccentBrush}" 
-                         Height="20" VerticalAlignment="Top"
+                         MinHeight="20" VerticalAlignment="Top"
                          Tapped="FlyoutNotification_Dismiss">
-            <StackPanel>
+            <StackPanel MaxWidth="200">
                 <TextBlock x:Name="FlyoutText" Text="" TextWrapping="Wrap"/>
                 <Grid x:Name="ProgressGrid" Visibility="Collapsed">
                     <ProgressBar x:Name="ProgressIndeterminate"

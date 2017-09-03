@@ -145,6 +145,8 @@
                         <Span>-Hide headers when scrolling recent, curated and search lists</Span>
                         <LineBreak/>
                         <Span>-Pull to go back on photos FlipView</Span>
+                        <LineBreak/>
+                        <Span>-Choose to see protional dimensions</Span>
                     </Paragraph>
                 </RichTextBlock>
                 

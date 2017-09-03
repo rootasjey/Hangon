@@ -4,7 +4,6 @@
             get {
                 return "b27797f08021cb0d84672e38530613898facf6d4b06c62ec7dd5a2912c9a4438";
             }
-
         }
 
         public static string Secret {
