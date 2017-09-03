@@ -26,6 +26,11 @@ namespace Tasks {
             }
         }
 
+        private static string BestPhotoResolutionKey {
+            get {
+                return "BestPhotoResolution";
+            }
+        }
         #endregion variables
 
         /// <summary>
@@ -40,7 +45,9 @@ namespace Tasks {
 
             Photo photo = await GetRandom();
 
-            StorageFile file = await DownloadImagefromServer(photo.Urls.Regular, photo.Id);
+            var urlFormat = ChooseBestPhotoFormat(photo);
+
+            StorageFile file = await DownloadImagefromServer(urlFormat, photo.Id);
 
             if (taskInstance.Task.Name == WallTaskName) {
                 await SetWallpaperAsync(file);
@@ -125,6 +132,34 @@ namespace Tasks {
                 success = await profileSettings.TrySetWallpaperImageAsync(file);
             }
             return success;
+        }
+
+        private string ChooseBestPhotoFormat(Photo photo) {
+            var url = photo.Urls.Raw;
+
+            ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
+
+            if (!localSettings.Values.ContainsKey(BestPhotoResolutionKey)) { return url; }
+
+            localSettings.Values.TryGetValue(BestPhotoResolutionKey, out var resolution);
+
+            var format = (string)resolution;
+
+            switch (format) {
+                case "small":
+                    url = photo.Urls.Small;
+                    break;
+                case "regular":
+                    url = photo.Urls.Regular;
+                    break;
+                case "full":
+                    url = photo.Urls.Full;
+                    break;
+                default:
+                    break;
+            }
+
+            return url;
         }
     }
 }

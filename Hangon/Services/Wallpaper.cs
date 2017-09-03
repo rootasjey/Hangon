@@ -7,14 +7,19 @@ using System.Threading;
 using Windows.Web.Http;
 using Windows.Storage.Streams;
 using Unsplasharp.Models;
+using Windows.UI.ViewManagement;
+using Windows.Graphics.Display;
+using Windows.Foundation;
+using System.Numerics;
 
 namespace Hangon.Services {
     public class Wallpaper {
-
         public static async Task<bool> SetAsWallpaper(Photo photo, Action<HttpProgress> httpProgressCallback) {
             bool success = false;
 
-            var file = await DownloadImage(photo.Urls.Regular, photo.Id, httpProgressCallback);
+            var urlFormat = ChooseBestPhotoFormat(photo);
+
+            var file = await DownloadImage(urlFormat, photo.Id, httpProgressCallback);
             if (file == null) return success;
 
             if (UserProfilePersonalizationSettings.IsSupported()) {
@@ -27,7 +32,9 @@ namespace Hangon.Services {
         public static async Task<bool> SetAsLockscreen(Photo photo, Action<HttpProgress> httpProgressCallback) {
             bool success = false;
 
-            var file = await DownloadImage(photo.Urls.Regular, photo.Id, httpProgressCallback);
+            var urlFormat = ChooseBestPhotoFormat(photo);
+
+            var file = await DownloadImage(urlFormat, photo.Id, httpProgressCallback);
             if (file == null) return success;
 
             if (UserProfilePersonalizationSettings.IsSupported()) {
@@ -151,5 +158,49 @@ namespace Hangon.Services {
             }
         }
         
+        private static string ChooseBestPhotoFormat(Photo photo) {
+            var url = photo.Urls.Raw;
+
+            var format = GetBestPhotoFormat();
+
+            switch (format) {
+                case "small":
+                    url = photo.Urls.Small;
+                    break;
+                case "regular":
+                    url = photo.Urls.Regular;
+                    break;
+                case "full":
+                    url = photo.Urls.Full;
+                    break;
+                default:
+                    break;
+            }
+
+            return url;
+        }
+
+        public static string GetBestPhotoFormat() {
+            // 1-Get the device screen's resolution/size
+            var bounds = ApplicationView.GetForCurrentView().VisibleBounds;
+            var scaleFactor = DisplayInformation.GetForCurrentView().RawPixelsPerViewPixel;
+            var size = new Size(bounds.Width * scaleFactor, bounds.Height * scaleFactor);
+
+            // 2-Setup levels
+            var sizeSmall = new Vector2(400, 600);
+            var sizeRegular = new Vector2(1080, 720);
+
+            if (size.Width < sizeSmall.X || size.Height < sizeSmall.Y) {
+                return "small";
+            }
+            if (size.Width < sizeRegular.X || size.Height < sizeRegular.Y) {
+                return "regular";
+            }
+            if (size.Width > sizeRegular.X || size.Height > sizeRegular.Y) {
+                return "full";
+            }
+
+            return "regular";
+        }
     }
 }

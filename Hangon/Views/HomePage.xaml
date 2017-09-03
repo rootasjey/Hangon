@@ -127,18 +127,25 @@
         <FlyoutPresenter x:Name="UpdateChangeLogFlyout"
                          Visibility="Collapsed"
                          VerticalAlignment="Center"
-                         Canvas.ZIndex="2">
+                         Canvas.ZIndex="2"
+                         ScrollViewer.VerticalScrollMode="Disabled">
             
-            <StackPanel ScrollViewer.VerticalScrollBarVisibility="Disabled"
+            <StackPanel 
+                        ScrollViewer.HorizontalScrollMode="Disabled"
+                        ScrollViewer.VerticalScrollMode="Disabled"
                         Padding="0,20">
-                <TextBlock Text="Update 1.2.0" FontSize="24"
-                               Typography.Capitals="SmallCaps"/>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="September Update" FontSize="24"
+                                   Typography.Capitals="SmallCaps"/>
+                    <FontIcon Glyph="&#xEB3C;" Margin="12,0,0,0"/>
+                </StackPanel>
+                
+                <TextBlock Text="1.7.0" Opacity=".5"/>
 
-                <TextBlock Text="3 September 2017" Opacity=".5"/>
-
-                <RichTextBlock TextWrapping="Wrap" Margin="0,20,0,0">
+                <RichTextBlock TextWrapping="Wrap" Margin="0,20,0,0"
+                               ScrollViewer.VerticalScrollMode="Disabled">
                     <Paragraph>
-                        <Span>-Add FlipView to quickly go through full sized photos</Span>
+                        <Span>-Add FlipView to quickly go through full page photo</Span>
                         <LineBreak/>
                         <Span>-Add primary live tile (shows last photos)</Span>
                         <LineBreak/>
@@ -146,7 +153,9 @@
                         <LineBreak/>
                         <Span>-Pull to go back on photos FlipView</Span>
                         <LineBreak/>
-                        <Span>-Choose to see protional dimensions</Span>
+                        <Span>-Choose to see proportional dimensions on photo page</Span>
+                        <LineBreak/>
+                        <Span>-The best resolution is now chosen when setting wallpaper/lockscreen</Span>
                     </Paragraph>
                 </RichTextBlock>
                 

@@ -58,7 +58,7 @@ namespace Hangon.Views {
             BindAppDataSource();
             RestorePivotPosition();
 
-            ShowUpdateChangelogIfIsNewLaunch();
+            CheckIfIsNewLaunch();
         }
 
         #region navigation
@@ -869,10 +869,11 @@ namespace Hangon.Views {
         #endregion rightTapped flyout
 
         #region update changelog
-        private void ShowUpdateChangelogIfIsNewLaunch() {
+        private void CheckIfIsNewLaunch() {
             if (Settings.IsNewUpdatedLaunch()) {
                 ShowLastUpdateChangelog();
-            }            
+                Settings.SaveBestPhotoResolution(Wallpaper.GetBestPhotoFormat());
+            }
         }
 
         private async void ShowLastUpdateChangelog() {

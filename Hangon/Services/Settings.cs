@@ -53,6 +53,12 @@ namespace Hangon.Services {
                 return "PhotoStretching";
             }
         }
+
+        private static string BestPhotoResolutionKey {
+            get {
+                return "BestPhotoResolution";
+            }
+        }
         #endregion keys
 
         #region path
@@ -151,6 +157,11 @@ namespace Hangon.Services {
         public static void SaveDefaultPhotoStretching(Windows.UI.Xaml.Media.Stretch stretch) {
             ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
             localSettings.Values[PhotoStretchingKey] = stretch.ToString();
+        }
+
+        public static void SaveBestPhotoResolution(string resolution) {
+            var localSettings = ApplicationData.Current.LocalSettings;
+            localSettings.Values[BestPhotoResolutionKey] = resolution;
         }
 
         #region appversion
