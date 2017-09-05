@@ -251,7 +251,7 @@
       <Version>0.3.4</Version>
     </PackageReference>
     <PackageReference Include="unsplasharp.api">
-      <Version>0.5.6</Version>
+      <Version>0.5.7</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>

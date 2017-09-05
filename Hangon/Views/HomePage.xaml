@@ -125,7 +125,7 @@
         </FlyoutPresenter>
 
         <FlyoutPresenter x:Name="UpdateChangeLogFlyout"
-                         Visibility="Visible"
+                         Visibility="Collapsed"
                          VerticalAlignment="Center"
                          Canvas.ZIndex="2"
                          ScrollViewer.VerticalScrollMode="Auto">
