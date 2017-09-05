@@ -125,44 +125,89 @@
         </FlyoutPresenter>
 
         <FlyoutPresenter x:Name="UpdateChangeLogFlyout"
-                         Visibility="Collapsed"
+                         Visibility="Visible"
                          VerticalAlignment="Center"
                          Canvas.ZIndex="2"
-                         ScrollViewer.VerticalScrollMode="Disabled">
+                         ScrollViewer.VerticalScrollMode="Auto">
             
             <StackPanel 
                         ScrollViewer.HorizontalScrollMode="Disabled"
                         ScrollViewer.VerticalScrollMode="Disabled"
                         Padding="0,20">
                 <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="September Update" FontSize="24"
-                                   Typography.Capitals="SmallCaps"/>
-                    <FontIcon Glyph="&#xEB3C;" Margin="12,0,0,0"/>
+                    <FontIcon Glyph="&#xEB3C;" FontSize="30" Margin="0,0,12,0"/>
+                    <TextBlock Text="September Update" 
+                               FontSize="38"
+                               FontWeight="Normal"
+                               Typography.Capitals="AllSmallCaps"/>
+                    
                 </StackPanel>
                 
                 <TextBlock Text="1.7.0" Opacity=".5"/>
 
-                <RichTextBlock TextWrapping="Wrap" Margin="0,20,0,0"
+                <RichTextBlock TextWrapping="Wrap" 
+                               Margin="-0,20,0,0"
                                ScrollViewer.VerticalScrollMode="Disabled">
-                    <Paragraph>
-                        <Span>-Add FlipView to quickly go through full page photo</Span>
+                    
+                    <Paragraph Margin="0,12">
+                        <Span FontSize="22" 
+                              FontWeight="Medium" 
+                              Foreground="{ThemeResource SystemControlForegroundAccentBrush}">
+                            FLIPVIEW
+                        </Span>
                         <LineBreak/>
-                        <Span>-Add primary live tile (shows last photos)</Span>
+                        <Span>Now you can flip to the next/previous photo</Span>
                         <LineBreak/>
-                        <Span>-Hide headers when scrolling recent, curated and search lists</Span>
+                        <Span>without leaving photo page.</Span>
                         <LineBreak/>
-                        <Span>-Pull to go back on photos FlipView</Span>
+                        <Span>Removing the need of going back each time</Span>
                         <LineBreak/>
-                        <Span>-Choose to see proportional dimensions on photo page</Span>
+                        <Span> to the home page will avoid finger cramp 👌</Span>
+                    </Paragraph>
+
+                    <Paragraph Margin="0,12">
+                        <Span FontSize="22" FontWeight="Medium"
+                              Foreground="{ThemeResource SystemControlForegroundAccentBrush}">
+                            LIVE TILE
+                        </Span>
                         <LineBreak/>
-                        <Span>-The best resolution is now chosen when setting wallpaper/lockscreen</Span>
+                        <Span>The main app's tile is now live and strong! ✊</Span>
+                        <LineBreak/>
+                        <Span>It now shows the last recent photos.</Span>
+                        <LineBreak/>
+                        <Span>Granted, this should have been there</Span>
+                        <LineBreak/>
+                        <Span>since the very 1st time.</Span>
+                    </Paragraph>
+                    
+                    <Paragraph Margin="0,22">
+                        <Span FontSize="22" FontWeight="Medium">OTHERS MINOR CHANGES</Span>
+                        <LineBreak/>
+                        <Span>• Hide headers when scrolling recent,</Span>
+                        <LineBreak/>
+                        <Span>curated and search lists.</Span>
+                        <LineBreak/>
+                        <LineBreak/>
+                        <Span>• Pull to go back on photos FlipView</Span>
+                        <LineBreak/>
+                        <LineBreak/>
+                        <Span>• Choose to see proportional dimensions</Span>
+                        <LineBreak/>
+                        <Span>on photo page</Span>
+                        <LineBreak/>
+                        <LineBreak/>
+                        <Span>• The best resolution is now chosen</Span>
+                        <LineBreak/>
+                        <Span>when setting wallpaper/lockscreen</Span>
                     </Paragraph>
                 </RichTextBlock>
                 
-                <Button x:Name="ChangelogDismissButton" 
-                            Content="okay" 
-                            HorizontalAlignment="Right"
-                            Tapped="ChangelogDismissButton_Tapped"/>
+                <Button x:Name="ChangelogDismissButton"
+                        Margin="0,22"
+                        Width="100"
+                        Height="40"
+                        Content="OKAY" 
+                        Tapped="ChangelogDismissButton_Tapped"/>
             </StackPanel>
         </FlyoutPresenter>
 
