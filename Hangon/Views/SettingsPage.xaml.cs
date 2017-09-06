@@ -4,6 +4,7 @@ using System;
 using System.Globalization;
 using System.Threading;
 using Windows.ApplicationModel.Email;
+using Windows.ApplicationModel.Resources;
 using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -12,16 +13,22 @@ using Windows.UI.Xaml.Navigation;
 
 namespace Hangon.Views {
     public sealed partial class SettingsPage : Page {
-        CoreDispatcher UIDispatcher { get; set; }
+        CoreDispatcher _UIDispatcher { get; set; }
+
+        ResourceLoader _ResourcesLoader { get; set; }
 
         public SettingsPage() {
             InitializeComponent();
+            InitializeVariables();
             SetUpPageAnimation();
             LoadData();
 
-            UIDispatcher = CoreWindow.GetForCurrentThread().Dispatcher;
-
             AnimatePersonalizationPivot();
+        }
+
+        private void InitializeVariables() {
+            _ResourcesLoader = new ResourceLoader();
+            _UIDispatcher = CoreWindow.GetForCurrentThread().Dispatcher;
         }
 
         #region animations
@@ -44,12 +51,13 @@ namespace Hangon.Views {
         #endregion animations
 
         private void LoadData() {
-            WallSwitch.IsOn = BackgroundTasks.IsWallTaskActive();
-            LockscreenSwitch.IsOn = BackgroundTasks.IsLockscreenTaskActive();
-            TileSwitch.IsOn = BackgroundTasks.IsTileTaskActive();
+            WallSwitch.IsOn = BackgroundTasks.IsWallTaskActivated();
+            LockscreenSwitch.IsOn = BackgroundTasks.IsLockscreenTaskActivated();
+            TileSwitch.IsOn = BackgroundTasks.IsTileTaskActivated();
 
             UpdateWallTaskActivityText();
             UpdateLockscreenTaskActivityText();
+            UpdateTileTaskActivityText();
         }
 
         #region navigation
@@ -61,7 +69,6 @@ namespace Hangon.Views {
 
         protected override void OnNavigatedTo(NavigationEventArgs e) {
             CoreWindow.GetForCurrentThread().KeyDown += Page_KeyDown;
-
             base.OnNavigatedTo(e);
         }
 
@@ -99,20 +106,22 @@ namespace Hangon.Views {
         private void UpdateWallTaskActivityText() {
             var activity = BackgroundTasks.GetWallTaskActivity();
             if (activity == null) return;
-            LastUpdatedTask.Text = "Wallpaper task last run on: " + activity["DateTime"];
+
+            var lastRun = _ResourcesLoader.GetString("TaskWallpaperLastRun");
+            LastUpdatedTask.Text = string.Format("{0}: {1}", lastRun, activity["DateTime"]);
 
             if (activity["Exception"] != null) {
                 LastWallTaskError.Text = activity["Exception"].ToString();
             }
         }
 
-
         private void WallSwitch_Toggled(object sender, RoutedEventArgs e) {
             var toggle = (ToggleSwitch)sender;
+
             if (toggle.IsOn) {
                 ShowWallTaskActivity();
 
-                if (BackgroundTasks.IsWallTaskActive()) {
+                if (BackgroundTasks.IsWallTaskActivated()) {
                     return;
                 }
 
@@ -123,7 +132,7 @@ namespace Hangon.Views {
                 BackgroundTasks.UnregisterWallTask();
             }
         }
-
+        
         private void ShowWallTaskActivity() {
             WallIntervalUpdates.Visibility = Visibility.Visible;
             WallTaskActivity.Visibility = Visibility.Visible;
@@ -132,6 +141,22 @@ namespace Hangon.Views {
         private void HideWallTaskActivity() {
             WallIntervalUpdates.Visibility = Visibility.Collapsed;
             WallTaskActivity.Visibility = Visibility.Collapsed;
+        }
+
+        private void WallIntervalUpdates_Loaded(object sender, RoutedEventArgs e) {
+            var savedInterval = BackgroundTasks.GetWallTaskInterval();
+
+            foreach (ComboBoxItem item in WallIntervalUpdates.Items) {
+                var intervalItemValue = uint.Parse((string)item.Tag);
+
+                if (savedInterval == intervalItemValue) {
+                    WallIntervalUpdates.SelectedItem = item;
+                    break;
+                }
+            }
+
+            WallIntervalUpdates.SelectionChanged -= WallIntervalUpdates_SelectionChanged;
+            WallIntervalUpdates.SelectionChanged += WallIntervalUpdates_SelectionChanged;
         }
 
         private void WallIntervalUpdates_SelectionChanged(object sender, SelectionChangedEventArgs e) {
@@ -163,7 +188,9 @@ namespace Hangon.Views {
         private void UpdateLockscreenTaskActivityText() {
             var activity = BackgroundTasks.GetLockscreenTaskActivity();
             if (activity == null) return;
-            LastUpdatedLockscreenTask.Text = "Wallpaper task last run on: " + activity["DateTime"];
+
+            var lastRun = _ResourcesLoader.GetString("TaskLockscreenLastRun");
+            LastUpdatedLockscreenTask.Text = string.Format("{0}: {1}", lastRun, activity["DateTime"]);
 
             if (activity["Exception"] != null) {
                 LastLockscreenTaskError.Text = activity["Exception"].ToString();
@@ -176,7 +203,7 @@ namespace Hangon.Views {
             if (toggle.IsOn) {
                 ShowLockscreenTaskActivity();
 
-                if (BackgroundTasks.IsLockscreenTaskActive()) {
+                if (BackgroundTasks.IsLockscreenTaskActivated()) {
                     return;
                 }
 
@@ -198,19 +225,21 @@ namespace Hangon.Views {
             LockscreenTaskActivity.Visibility = Visibility.Collapsed;
         }
 
+        // TODO: test
         private void LockscreenIntervalUpdates_Loaded(object sender, RoutedEventArgs e) {
-            var currentInterval = BackgroundTasks.GetLockscreenTaskInterval();
+            var savedInterval = BackgroundTasks.GetLockscreenTaskInterval();
 
+            foreach (ComboBoxItem item in LockscreenIntervalUpdates.Items) {
+                var intervalItemValue = uint.Parse((string)item.Tag);
 
-            for (int i = 0; i < LockscreenIntervalUpdates.Items.Count; i++) {
-                var item = (ComboBoxItem)LockscreenIntervalUpdates.Items[i];
-                var itemInterval = uint.Parse((string)item.Tag);
-
-                if (itemInterval == currentInterval) {
-                    LockscreenIntervalUpdates.SelectedIndex = i;
+                if (savedInterval == intervalItemValue) {
+                    LockscreenIntervalUpdates.SelectedItem = item;
                     break;
                 }
             }
+
+            LockscreenIntervalUpdates.SelectionChanged -= LockscreenIntervalUpdate_SelectionChanged;
+            LockscreenIntervalUpdates.SelectionChanged += LockscreenIntervalUpdate_SelectionChanged;
         }
 
         private void LockscreenIntervalUpdate_SelectionChanged(object sender, SelectionChangedEventArgs e) {
@@ -246,7 +275,7 @@ namespace Hangon.Views {
             if (toggle.IsOn) {
                 ShowTileTaskActivity();
 
-                if (BackgroundTasks.IsTileTaskActive()) {
+                if (BackgroundTasks.IsTileTaskActivated()) {
                     return;
                 }
 
@@ -255,6 +284,18 @@ namespace Hangon.Views {
             } else {
                 HideTileTaskActivity();
                 BackgroundTasks.UnregisterTileTask();
+            }
+        }
+
+        private void UpdateTileTaskActivityText() {
+            var activity = BackgroundTasks.GetTileTaskActivity();
+            if (activity == null) return;
+
+            var lastRun = _ResourcesLoader.GetString("TaskTileLastRun");
+            LastUpdatedTileTask.Text = string.Format("{0}: {1}", lastRun, activity["DateTime"]);
+
+            if (activity["Exception"] != null) {
+                TileTaskError.Text = activity["Exception"].ToString();
             }
         }
 
@@ -275,17 +316,19 @@ namespace Hangon.Views {
         }
 
         private void TileIntervalUpdates_Loaded(object sender, RoutedEventArgs e) {
-            var currentInterval = BackgroundTasks.GetTileTaskInterval();
+            var savedInterval = BackgroundTasks.GetTileTaskInterval();
 
-            for (int i = 0; i < TileIntervalUpdates.Items.Count; i++) {
-                var item = (ComboBoxItem)TileIntervalUpdates.Items[i];
-                var itemInterval = uint.Parse((string)item.Tag);
+            foreach (ComboBoxItem item in TileIntervalUpdates.Items) {
+                var intervalItemValue = uint.Parse((string)item.Tag);
 
-                if (itemInterval == currentInterval) {
-                    TileIntervalUpdates.SelectedIndex = i;
+                if (savedInterval == intervalItemValue) {
+                    TileIntervalUpdates.SelectedItem = item;
                     break;
                 }
             }
+
+            TileIntervalUpdates.SelectionChanged -= TileIntervalUpdate_SelectionChanged;
+            TileIntervalUpdates.SelectionChanged += TileIntervalUpdate_SelectionChanged;
         }
 
         private void TileIntervalUpdate_SelectionChanged(object sender, SelectionChangedEventArgs e) {
@@ -463,7 +506,7 @@ namespace Hangon.Views {
 
             var autoEvent = new AutoResetEvent(false);
             var timer = new Timer(async (object state) => {
-                UIDispatcher.RunAsync(CoreDispatcherPriority.Normal, () => {
+                _UIDispatcher.RunAsync(CoreDispatcherPriority.Normal, () => {
                     HideNotification();
                 });
             }, autoEvent, TimeSpan.FromSeconds(5), new TimeSpan());
@@ -479,5 +522,6 @@ namespace Hangon.Views {
         }
         #endregion notifications
 
+        
     }
 }

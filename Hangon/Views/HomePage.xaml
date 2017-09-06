@@ -146,7 +146,7 @@
                 <TextBlock Text="1.7.0" Opacity=".5"/>
 
                 <RichTextBlock TextWrapping="Wrap" 
-                               Margin="-0,20,0,0"
+                               Margin="0,20,0,0"
                                ScrollViewer.VerticalScrollMode="Disabled">
                     
                     <Paragraph Margin="0,12">

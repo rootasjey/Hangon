@@ -274,10 +274,10 @@
     <value>every 3 hours</value>
   </data>
   <data name="LastUpdatedTask.Text" xml:space="preserve">
-    <value>never run</value>
+    <value>Never run</value>
   </data>
   <data name="LastWallTaskError.Text" xml:space="preserve">
-    <value>no error</value>
+    <value>No error</value>
   </data>
   <data name="LockscreenIntervalUpdates.Header" xml:space="preserve">
     <value>period</value>
@@ -349,7 +349,7 @@
     <value>Link copied!</value>
   </data>
   <data name="NoError" xml:space="preserve">
-    <value>no error</value>
+    <value>No error</value>
   </data>
   <data name="PeriodicTile.Text" xml:space="preserve">
     <value>Periodically update primary live tile</value>
@@ -383,5 +383,14 @@
   </data>
   <data name="PullBack.ReleaseToRefreshText" xml:space="preserve">
     <value>Release to go back</value>
+  </data>
+  <data name="TaskLockscreenLastRun" xml:space="preserve">
+    <value>Lockscreen task last run on</value>
+  </data>
+  <data name="TaskTileLastRun" xml:space="preserve">
+    <value>Tile task last run on</value>
+  </data>
+  <data name="TaskWallpaperLastRun" xml:space="preserve">
+    <value>Wallpaper task last run on</value>
   </data>
 </root>
