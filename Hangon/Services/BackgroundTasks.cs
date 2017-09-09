@@ -3,7 +3,7 @@ using Windows.ApplicationModel.Background;
 using Windows.Storage;
 
 namespace Hangon.Services {
-    public class BackgroundTask {
+    public class BackgroundTasks {
         #region variables
         private static string WallTaskName {
             get {
@@ -40,10 +40,70 @@ namespace Hangon.Services {
                 return "LockscreenTaskInterval";
             }
         }
+
+        private static string TileTaskName {
+            get {
+                return "TileUpdaterTask";
+            }
+        }
+
+        private static string TileTaskEntryPoint {
+            get {
+                return "Tasks.TileUpdater";
+            }
+        }
+
+        private static string TileTaskInterval {
+            get {
+                return "TileTaskInterval";
+            }
+        }
         #endregion variables
 
+        #region tile task
+        public static bool IsTileTaskActivated() {
+            foreach (var task in BackgroundTaskRegistration.AllTasks) {
+                if (task.Value.Name == TileTaskName) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public static void RegisterTileTask(uint interval) {
+            RegisterBackgroundTask(
+                TileTaskName,
+                TileTaskEntryPoint,
+                interval
+            );
+
+            SaveTileTaskInterval(interval);
+        }
+
+        public static void UnregisterTileTask() {
+            UnregisterBackgroundTask(TileTaskName);
+        }
+
+        public static void SaveTileTaskInterval(uint interval) {
+            var settingsValues = ApplicationData.Current.LocalSettings.Values;
+            settingsValues[TileTaskInterval] = interval;
+        }
+
+        public static uint GetTileTaskInterval() {
+            var settingsValues = ApplicationData.Current.LocalSettings.Values;
+            return settingsValues.ContainsKey(TileTaskInterval) ? 
+                (uint)settingsValues[TileTaskInterval] : 60;
+        }
+
+        public static ApplicationDataCompositeValue GetTileTaskActivity() {
+            var key = "TileUpdaterTask" + "Activity";
+            var settingsValues = ApplicationData.Current.LocalSettings.Values;
+            return settingsValues.ContainsKey(key) ? (ApplicationDataCompositeValue)settingsValues[key] : null;
+        }
+        #endregion tile task
+
         #region wall task
-        public static bool IsWallTaskActive() {
+        public static bool IsWallTaskActivated() {
             foreach (var task in BackgroundTaskRegistration.AllTasks) {
                 if (task.Value.Name == WallTaskName) {
                     return true;
@@ -58,6 +118,8 @@ namespace Hangon.Services {
                 WallTaskEntryPoint,
                 interval
             );
+
+            SaveWallTaskInterval(interval);
         }
 
         public static void UnregisterWallTask() {
@@ -71,7 +133,8 @@ namespace Hangon.Services {
 
         public static uint GetWallTaskInterval() {
             var settingsValues = ApplicationData.Current.LocalSettings.Values;
-            return settingsValues.ContainsKey(WallTaskInterval) ? (uint)settingsValues[WallTaskInterval] : 60;
+            return settingsValues.ContainsKey(WallTaskInterval) ? 
+                (uint)settingsValues[WallTaskInterval] : 60;
         }
 
         public static ApplicationDataCompositeValue GetWallTaskActivity() {
@@ -82,7 +145,7 @@ namespace Hangon.Services {
         #endregion wall task
 
         #region lockscreen task
-        public static bool IsLockscreenTaskActive() {
+        public static bool IsLockscreenTaskActivated() {
             foreach (var task in BackgroundTaskRegistration.AllTasks) {
                 if (task.Value.Name == LockscreenTaskName) {
                     return true;
@@ -98,7 +161,8 @@ namespace Hangon.Services {
 
         public static uint GetLockscreenTaskInterval() {
             var settingsValues = ApplicationData.Current.LocalSettings.Values;
-            return settingsValues.ContainsKey(LockscreenTaskInterval) ? (uint)settingsValues[LockscreenTaskInterval] : 60;
+            return settingsValues.ContainsKey(LockscreenTaskInterval) ? 
+                (uint)settingsValues[LockscreenTaskInterval] : 60;
         }
 
         public static void RegisterLockscreenTask(uint interval) {
@@ -107,6 +171,8 @@ namespace Hangon.Services {
                 LockscreenTaskEntryPoint,
                 interval
             );
+
+            SaveLockscreenTaskInterval(interval);
         }
 
         public static void UnregisterLockscreenTask() {

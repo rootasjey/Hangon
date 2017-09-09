@@ -2,17 +2,17 @@
 using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Tasks.Models;
 using Windows.ApplicationModel.Background;
 using Windows.Storage;
-using Newtonsoft.Json.Linq;
 using Windows.System.UserProfile;
-using System.Net.Http.Headers;
+using Unsplasharp.Models;
+using Tasks.Data;
+using Unsplasharp;
 
 namespace Tasks {
     public sealed class WallUpdater : IBackgroundTask {
-        BackgroundTaskDeferral _deferral;
-        volatile bool _cancelRequested = false;
+        #region variables
+        BackgroundTaskDeferral _Deferral;
 
         private static string WallTaskName {
             get {
@@ -26,29 +26,38 @@ namespace Tasks {
             }
         }
 
+        private static string BestPhotoResolutionKey {
+            get {
+                return "BestPhotoResolution";
+            }
+        }
+        #endregion variables
+
         /// <summary>
         /// Task's Entry Point
         /// </summary>
         /// <param name="taskInstance">Task starting the method</param>
         async void IBackgroundTask.Run(IBackgroundTaskInstance taskInstance) {
             taskInstance.Canceled += OnCanceled;
-            var deferral = taskInstance.GetDeferral();
+            _Deferral = taskInstance.GetDeferral();
 
             SaveTime(taskInstance);
 
             Photo photo = await GetRandom();
 
-            StorageFile file = await DownloadImagefromServer(photo.URLRegular, photo.Id);
+            var urlFormat = ChooseBestPhotoFormat(photo);
+
+            StorageFile file = await DownloadImagefromServer(urlFormat, photo.Id);
 
             if (taskInstance.Task.Name == WallTaskName) {
                 await SetWallpaperAsync(file);
             } else {
                 await SetLockscreenAsync(file);
             }
-            
+
             //SaveLockscreenBackgroundName(lockImage.Name);
             //SaveAppBackground(lockImage);
-            deferral.Complete();
+            _Deferral.Complete();
         }
 
         string GetActivityKey(IBackgroundTaskInstance instance) {
@@ -59,8 +68,6 @@ namespace Tasks {
 
         private void OnCanceled(IBackgroundTaskInstance sender, BackgroundTaskCancellationReason reason) {
             // Indicate that the background task is canceled.
-            _cancelRequested = true;
-
             string key = GetActivityKey(sender);
 
             ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
@@ -85,29 +92,8 @@ namespace Tasks {
         }
 
         private async Task<Photo> GetRandom() {
-            Photo paper = new Photo();
-
-            HttpClient http = new HttpClient();
-            http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Client-ID", "16246a4d58baa698a0a720106aab4ecedfe241c72205586da6ab9393424894a8");
-            HttpResponseMessage response = null;
-
-            try {
-                response = await http.GetAsync("https://api.unsplash.com/photos/random");
-                response.EnsureSuccessStatusCode();
-                string responseBodyAsText = await response.Content.ReadAsStringAsync();
-
-                JObject json = JObject.Parse(responseBodyAsText);
-
-                paper.Id = (string)json.GetValue("id");
-                paper.Likes = (int)json.GetValue("likes");
-                paper.URLRaw = (string)json["urls"]["raw"];
-                paper.URLRegular = (string)json["urls"]["regular"];
-                paper.Thumbnail = (string)json["urls"]["thumb"];
-
-                return paper;
-            } catch/* (HttpRequestException hre)*/ {
-                return paper;
-            }
+            var client = new UnsplasharpClient(Credentials.ApplicationId);
+            return await client.GetRandomPhoto();
         }
 
         private async Task<StorageFile> DownloadImagefromServer(string URI, string filename) {
@@ -146,6 +132,34 @@ namespace Tasks {
                 success = await profileSettings.TrySetWallpaperImageAsync(file);
             }
             return success;
+        }
+
+        private string ChooseBestPhotoFormat(Photo photo) {
+            var url = photo.Urls.Raw;
+
+            ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
+
+            if (!localSettings.Values.ContainsKey(BestPhotoResolutionKey)) { return url; }
+
+            localSettings.Values.TryGetValue(BestPhotoResolutionKey, out var resolution);
+
+            var format = (string)resolution;
+
+            switch (format) {
+                case "small":
+                    url = photo.Urls.Small;
+                    break;
+                case "regular":
+                    url = photo.Urls.Regular;
+                    break;
+                case "full":
+                    url = photo.Urls.Full;
+                    break;
+                default:
+                    break;
+            }
+
+            return url;
         }
     }
 }

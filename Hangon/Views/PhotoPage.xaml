@@ -4,6 +4,8 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:models="using:Unsplasharp.Models"
+    xmlns:pr="using:PullToRefresh.UWP"
     mc:Ignorable="d">
 
     <Page.Resources>
@@ -21,10 +23,10 @@
                          Visibility="Collapsed"
                          Canvas.ZIndex="2"
                          Background="{ThemeResource SystemControlHighlightAccentBrush}" 
-                         Height="20" VerticalAlignment="Top"
+                         MinHeight="20" VerticalAlignment="Top"
                          Tapped="FlyoutNotification_Dismiss">
-            <StackPanel>
-                <TextBlock x:Name="FlyoutText" Text="downloading photo..."/>
+            <StackPanel MaxWidth="200">
+                <TextBlock x:Name="FlyoutText" Text="downloading photo..." TextWrapping="Wrap"/>
                 <Grid x:Name="ProgressGrid">
                     <ProgressBar x:Name="ProgressIndeterminate"
                                  FlowDirection="RightToLeft" IsIndeterminate="True" Canvas.ZIndex="1"/>
@@ -33,157 +35,207 @@
             </StackPanel>
         </FlyoutPresenter>
 
-        <Grid x:Name="PhotoViewContainer" 
-              Loaded="PhotoViewContainer_Loaded">
-            <Image x:Name="PhotoView" Stretch="UniformToFill"
-                   VerticalAlignment="Center" HorizontalAlignment="Center">
-            </Image>
-
-            <Grid x:Name="PhotoDimmer"/>
-        </Grid>
-        
-        <ScrollViewer x:Name="PhotoCaption"
-                      Opacity="0"
-                      RequestedTheme="Dark"
-                      Margin="0,0,0,0"
-                      Canvas.ZIndex="1"
-                      Padding="0,40">
-
-            <Grid x:Name="PhotoCaptionContent" 
-                  Loaded="PhotoCaptionContent_Loaded"
-                  Unloaded="PhotoCaptionContent_Unloaded">
-                <Grid.RowDefinitions>
-                    <RowDefinition x:Name="RowSpacing" Height="500"/>
-                    <RowDefinition x:Name="RowUser" Height="180"/>
-                    <RowDefinition x:Name="RowUnsplashAttribution" Height="30"/>
-                    <RowDefinition x:Name="RowStats" Height="150"/>
-                    <RowDefinition x:Name="RowExif" Height="Auto"/>
-                    <RowDefinition x:Name="RowDate" Height="70"/>
-                    <RowDefinition Height="60"/>
-                </Grid.RowDefinitions>
-
-                <StackPanel x:Name="UserView"
-                            Grid.Row="1"
-                            HorizontalAlignment="Center"
-                            Margin="0,0"
-                            Padding="12"
-                            Tapped="UserView_Tapped">
-                    
-                    <Ellipse x:Name="UserProfileImage" 
-                            Grid.Column="0" 
-                            Height="60" Width="60"
-                            PointerEntered="UserView_PointerEntered"
-                            PointerExited="UserView_PointerExited"
-                            HorizontalAlignment="Center"
-                            VerticalAlignment="Center">
-                        <Ellipse.Fill>
-                            <ImageBrush Stretch="UniformToFill">
-                                <ImageBrush.ImageSource>
-                                    <BitmapImage x:Name="UserImageSource" />
-                                </ImageBrush.ImageSource>
-                            </ImageBrush>
-                        </Ellipse.Fill>
-                    </Ellipse>
-
-                    <Grid Background="{ThemeResource SystemControlHighlightAccentBrush}"
-                          Margin="0,20,0,0" 
-                          Padding="10"
-                          Height="40">
-                        <TextBlock x:Name="UserName" 
-                                   FontSize="20"
-                                   
-                                   HorizontalAlignment="Center"
-                                   VerticalAlignment="Center"/>
-                    </Grid>
-
-                    <StackPanel x:Name="PanelUserLocation" 
-                                Margin="12,6,0,0"
-                                HorizontalAlignment="Center"
-                                Orientation="Horizontal"
-                                Opacity=".6">
-                        <FontIcon Glyph="&#xE128;"
-                                    FontSize="20"
-                                    Margin="0,0,12,0"/>
-                        <TextBlock x:Name="UserLocation"
-                                    FontSize="20"
-                                    FontWeight="Light"/>
-                    </StackPanel>
-                </StackPanel>
-
-                <StackPanel x:Name="PanelUnsplashAttribution"
-                            Opacity=".6"
-                            Grid.Row="2"
-                            HorizontalAlignment="Center"
-                            Orientation="Horizontal"
-                            Tapped="OpenPhotoInBrowser_Tapped">
-                    
-                    <FontIcon Glyph="&#xE12B;" FontSize="20" Margin="-0,0,12,0"/>
-                    <TextBlock x:Name="UnsplashAttribution" 
-                           Text="unsplash"
-                           FontSize="20"
-                           FontWeight="Bold" 
-                           Typography.Capitals="SmallCaps"/>
-                </StackPanel>
-                
-                <Grid x:Name="StatsPanel" Margin="0,40,0,0" Width="200" Grid.Row="3"
-                      HorizontalAlignment="Center">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="3*"/>
-                        <ColumnDefinition Width="3*"/>
-                        <ColumnDefinition Width="3*"/>
-                    </Grid.ColumnDefinitions>
-
-                    <StackPanel>
-                        <FontIcon Glyph="&#xE118;" FontSize="20" Margin="0,10" 
-                                    HorizontalAlignment="Center"/>
-                        <TextBlock x:Name="DownloadsCount" FontSize="24" FontWeight="Light" 
-                                    HorizontalAlignment="Center"/>
-                    </StackPanel>
-
-                    <StackPanel Grid.Column="1" >
-                        <FontIcon Glyph="&#xE0A5;" FontSize="20" Margin="0,10"
-                                    HorizontalAlignment="Center"/>
-                        <TextBlock x:Name="LikesCount" FontSize="24" FontWeight="Light" 
-                                    HorizontalAlignment="Center"/>
-                    </StackPanel>
-
-                    <StackPanel Grid.Column="2" >
-                        <FontIcon Glyph="&#xE18B;" FontSize="20" Margin="0,10" HorizontalAlignment="Center"/>
-                        <TextBlock x:Name="ViewCount" FontSize="24" FontWeight="Light" 
-                                    HorizontalAlignment="Center" Text="-"/>
-                    </StackPanel>
-                </Grid>
-
-                <StackPanel x:Name="ExifPanel" Grid.Row="4" HorizontalAlignment="Center">
+        <FlipView x:Name="PhotosFlipView"
+                  Loaded="PhotosFlipView_Loaded">
+            <FlipView.ItemTemplate>
+                <DataTemplate x:DataType="models:Photo">
                     <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="70"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
+                        <Grid x:Name="PhotoViewContainer" 
+                              Loaded="PhotoViewContainer_Loaded">
+                            <Image x:Name="PhotoImage"
+                                   Loaded="PhotoImage_Loaded"
+                                   Source="{x:Bind Urls.Regular}"
+                                   Stretch="UniformToFill"
+                                   VerticalAlignment="Center"
+                                   HorizontalAlignment="Center"/>
+                            <Grid x:Name="PhotoDimmer"/>
+                        </Grid>
 
-                        <FontIcon x:Name="IconCamera" Glyph="&#xE114;" FontSize="54" />
-                        <StackPanel Grid.Column="1">
-                            <TextBlock x:Name="ExifMake" FontSize="24" FontWeight="Bold"/>
-                            <TextBlock x:Name="ExifModel" />
-                        </StackPanel>
+
+                        <pr:PullToRefreshBox x:Name="PhotoPullBox" 
+                                             RefreshInvoked="PhotoPullBox_RefreshInvoked">
+                            <pr:PullToRefreshBox.TopIndicatorTemplate>
+                                <DataTemplate>
+                                    <pr:PullRefreshProgressControl Progress="{Binding}"
+                                                                   x:Uid="PullBack"
+                                                                   PullToRefreshText="Pull to go back"
+                                                                   ReleaseToRefreshText="Release to go back"/>
+                                </DataTemplate>
+                            </pr:PullToRefreshBox.TopIndicatorTemplate>
+                            
+                            <ScrollViewer x:Name="PhotoCaption"
+                                      Background="Transparent"
+                                      Opacity="1"
+                                      RequestedTheme="Dark"
+                                      Margin="0,0,0,0"
+                                      Canvas.ZIndex="1"
+                                      Padding="0,0"
+                                      Loaded="PhotoCaption_Loaded">
+
+                            <Grid x:Name="PhotoCaptionContent" 
+                                  Loaded="PhotoCaptionContent_Loaded"
+                                  Unloaded="PhotoCaptionContent_Unloaded">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition x:Name="RowSpacing" Height="500"/>
+                                    <RowDefinition x:Name="RowUser" Height="140"/>
+                                    <RowDefinition x:Name="RowPhotoLocation"/>
+                                    <RowDefinition x:Name="RowUnsplashAttribution" Height="30"/>
+                                    <RowDefinition x:Name="RowStats" Height="150"/>
+                                    <RowDefinition x:Name="RowExif" Height="Auto"/>
+                                    <RowDefinition x:Name="RowDate" Height="70"/>
+                                    <RowDefinition Height="60"/>
+                                </Grid.RowDefinitions>
+
+                                <StackPanel x:Name="UserView"
+                                            Grid.Row="1"
+                                            HorizontalAlignment="Center"
+                                            Margin="0,0"
+                                            Padding="12"
+                                            Tapped="UserView_Tapped">
+
+                                    <Ellipse x:Name="UserProfileImage" 
+                                            Grid.Column="0" 
+                                            Height="60" Width="60"
+                                            PointerEntered="UserView_PointerEntered"
+                                            PointerExited="UserView_PointerExited"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center">
+                                        <Ellipse.Fill>
+                                            <ImageBrush Stretch="UniformToFill">
+                                                <ImageBrush.ImageSource>
+                                                    <BitmapImage x:Name="UserImageSource" UriSource="{x:Bind User.ProfileImage, Converter={StaticResource UserProfileImage}}" />
+                                                </ImageBrush.ImageSource>
+                                            </ImageBrush>
+                                        </Ellipse.Fill>
+                                    </Ellipse>
+
+                                    <Grid Background="{ThemeResource SystemControlHighlightAccentBrush}"
+                                          Margin="0,20,0,0" 
+                                          Padding="10"
+                                          Height="40">
+                                        <TextBlock x:Name="UserName" 
+                                                   Text="{x:Bind User, Converter={StaticResource Username}}"
+                                                   FontSize="20"
+                                                   HorizontalAlignment="Center"
+                                                   VerticalAlignment="Center"/>
+                                    </Grid>
+                                </StackPanel>
+
+                                <StackPanel x:Name="PanelPhotoLocation"
+                                            Grid.Row="2"
+                                            Margin="12,24"
+                                            HorizontalAlignment="Center"
+                                            Orientation="Horizontal"
+                                            Visibility="{x:Bind Location, Converter={StaticResource LocationVisibility}, Mode=OneWay}"
+                                            Opacity=".6">
+
+                                    <BitmapIcon Height="28" 
+                                                Width="28" 
+                                                Margin="0,0,12,0"
+                                                UriSource="ms-appx:///Assets/Icons/location.png"/>
+                                    <TextBlock x:Name="PhotoLocation"
+                                               Text="{x:Bind Location, Converter={StaticResource LocationName}, Mode=OneWay}"
+                                               VerticalAlignment="Center"
+                                               MaxWidth="150"
+                                               TextWrapping="Wrap"
+                                               FontSize="20"
+                                               FontWeight="Light"/>
+                                </StackPanel>
+
+                                <StackPanel x:Name="PanelUnsplashAttribution"
+                                            Opacity=".6"
+                                            Grid.Row="3"
+                                            HorizontalAlignment="Center"
+                                            Orientation="Horizontal"
+                                            Tapped="OpenPhotoInBrowser_Tapped">
+
+                                    <FontIcon Glyph="&#xE12B;" FontSize="20" Margin="-0,0,12,0"/>
+                                    <TextBlock x:Name="UnsplashAttribution" 
+                                               Text="unsplash"
+                                               FontSize="20"
+                                               FontWeight="Bold" 
+                                               Typography.Capitals="SmallCaps"/>
+                                </StackPanel>
+
+                                <Grid x:Name="StatsPanel" Margin="0,40,0,0" Width="200" Grid.Row="4"
+                                        HorizontalAlignment="Center">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="3*"/>
+                                        <ColumnDefinition Width="3*"/>
+                                        <ColumnDefinition Width="3*"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <StackPanel>
+                                        <FontIcon Glyph="&#xE118;" FontSize="20" Margin="0,10" 
+                                                    HorizontalAlignment="Center"/>
+                                        <TextBlock x:Name="DownloadsCount"
+                                                   Text="{x:Bind Downloads, Mode=OneWay}"
+                                                   FontSize="24" 
+                                                   FontWeight="Light" 
+                                                   HorizontalAlignment="Center"/>
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Column="1" >
+                                        <FontIcon Glyph="&#xE0A5;" FontSize="20" Margin="0,10"
+                                                HorizontalAlignment="Center"/>
+                                        <TextBlock x:Name="LikesCount" 
+                                                   Text="{x:Bind Likes}"
+                                                   FontSize="24" 
+                                                   FontWeight="Light" 
+                                                   HorizontalAlignment="Center"/>
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Column="2" >
+                                        <FontIcon Glyph="&#xE18B;" FontSize="20" Margin="0,10" HorizontalAlignment="Center"/>
+                                        <TextBlock x:Name="ViewCount" FontSize="24" FontWeight="Light" 
+                                                   HorizontalAlignment="Center" Text="-"/>
+                                    </StackPanel>
+                                </Grid>
+
+                                <StackPanel x:Name="ExifPanel" 
+                                            Grid.Row="5" 
+                                            HorizontalAlignment="Center">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="70"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <FontIcon x:Name="IconCamera" 
+                                                  Glyph="&#xE114;" 
+                                                  FontSize="54"
+                                                  Visibility="{x:Bind Exif, Converter={StaticResource ExifIcon}, Mode=OneWay}"/>
+                                        <StackPanel Grid.Column="1">
+                                            <TextBlock x:Name="ExifMake" 
+                                                       Text="{x:Bind Exif, Converter={StaticResource ExifMake}, Mode=OneWay}" 
+                                                       FontSize="24" 
+                                                       FontWeight="Bold"/>
+                                            <TextBlock x:Name="ExifModel" 
+                                                       Text="{x:Bind Exif, Converter={StaticResource ExifModel}, Mode=OneWay}" />
+                                        </StackPanel>
+                                    </Grid>
+                                </StackPanel>
+
+                                <StackPanel x:Name="CreatedAtPanel"
+                                            Opacity=".6"
+                                            Grid.Row="6" 
+                                            Margin="0,10"
+                                            HorizontalAlignment="Center"
+                                            Orientation="Horizontal">
+                                    <FontIcon Glyph="&#xE121;" FontSize="20" Margin="0,0,10,0"/>
+                                    <TextBlock x:Name="CreatedAt"
+                                               Text="{x:Bind CreatedAt, Converter={StaticResource CreatedAt}}"
+                                               VerticalAlignment="Center"
+                                               FontSize="18"/>
+                                </StackPanel>
+
+                            </Grid>
+                        </ScrollViewer>
+                        </pr:PullToRefreshBox>
                     </Grid>
-                </StackPanel>
-
-                <StackPanel x:Name="PublishedPanel"
-                            Opacity=".6"
-                            Grid.Row="5" 
-                            Margin="0,10"
-                            HorizontalAlignment="Center"
-                            Orientation="Horizontal">
-                    <FontIcon Glyph="&#xE81C;" FontSize="20" Margin="0,0,10,0"/>
-                    <TextBlock x:Name="PublishedOn"
-                                VerticalAlignment="Center"
-                                FontSize="18"/>
-                </StackPanel>
-                
-            </Grid>
-
-        </ScrollViewer>
+                </DataTemplate>
+            </FlipView.ItemTemplate>
+        </FlipView>
 
         <CommandBar x:Name="AppBar"
                     Canvas.ZIndex="3"
@@ -192,6 +244,12 @@
 
             <AppBarButton x:Name="CmdCrop" x:Uid="CmdCrop" 
                           Visibility="Collapsed" Label="crop" Icon="Crop" Tapped="CmdCrop_Tapped"/>
+            <AppBarButton x:Name="CmdStretch" Label="Uniform" Tapped="CmdStretch_Tapped">
+                <AppBarButton.Icon>
+                    <FontIcon x:Name="CmdStretchIcon" FontFamily="Segoe MDL2 Assets" Glyph="&#xE1D8;"/>
+                </AppBarButton.Icon>
+            </AppBarButton>
+            
             <AppBarButton x:Name="CmdToggleCaption" x:Uid="CmdToggleCaption" 
                           Label="hide caption" Tapped="CmdToggleCaption_Tapped">
                 <AppBarButton.Icon>
@@ -205,13 +263,13 @@
                         <MenuFlyoutItem x:Uid="FlyoutWallpaper" 
                                         Text="wallpaper" 
                                         Tapped="CmdSetAsWallpaper"/>
+                        
                         <MenuFlyoutItem x:Uid="FlyoutLockscreen"
                                         Text="lockscreen" 
                                         Tapped="CmdSetAsLockscreen"/>
                     </MenuFlyout>
                 </AppBarButton.Flyout>
             </AppBarButton>
-            
         </CommandBar>
 
         <Grid x:Name="AppBarFrozenHost" Canvas.ZIndex="2" Height="75" VerticalAlignment="Bottom"/>

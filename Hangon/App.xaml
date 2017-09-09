@@ -7,7 +7,15 @@
 
     <Application.Resources>
         <converters:UriParser x:Key="UriParser"/>
-        
+        <converters:UserProfileImage x:Key="UserProfileImage"/>
+        <converters:Username x:Key="Username"/>
+        <converters:ExifIcon x:Key="ExifIcon"/>
+        <converters:ExifMake x:Key="ExifMake"/>
+        <converters:ExifModel x:Key="ExifModel"/>
+        <converters:LocationName x:Key="LocationName"/>
+        <converters:LocationVisibility x:Key="LocationVisibility"/>
+        <converters:CreatedAt x:Key="CreatedAt"/>
+
         <Style x:Key="GridViewItemFill" TargetType="GridViewItem">
             <Setter Property="HorizontalAlignment" Value="Stretch"/>
             <Setter Property="VerticalContentAlignment" Value="Stretch" />
