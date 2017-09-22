@@ -19,10 +19,53 @@ namespace Hangon.Services {
             tileUpdater.Clear();
             tileUpdater.EnableNotificationQueue(true);
 
-            for (int i = start; i < (start + 5); i++) {
+            // 1st notification is transparent to see background image
+            // through it at the begining
+            tileUpdater.Update(CreateTransparentNotifications());
+
+            for (int i = start; i < (start + 4); i++) {
                 tileUpdater.Update(CreateNotification(data.RecentPhotos[i]));
             }
         }
+
+        public static void ClearPrimary() {
+            var tileUpdater = TileUpdateManager.CreateTileUpdaterForApplication();
+            tileUpdater.Clear();
+        }
+
+        #region transparent notification
+
+        private static TileNotification CreateTransparentNotifications() {
+            var content = new TileContent() {
+                Visual = new TileVisual() {
+                    TileMedium = CreateTransparentBinding(),
+                    TileWide = CreateTransparentBinding(),
+                    TileLarge = CreateTransparentBinding()
+                }
+            };
+
+            return new TileNotification(content.GetXml());
+        }
+
+        private static TileBinding CreateTransparentBinding() {
+            return new TileBinding() {
+                Content = new TileBindingContentAdaptive() {
+                    TextStacking = TileTextStacking.Center,
+                    PeekImage = new TilePeekImage() {
+                        Source = "Assets/Square150x150Logo.scale-200.png"
+                    },
+                    Children = {
+                        new AdaptiveText() {
+                            Text = "Hangon",
+                            HintAlign = AdaptiveTextAlign.Center,
+                            HintStyle = AdaptiveTextStyle.Subheader
+                        }
+                    }
+                }
+            };
+        }
+
+        #endregion transparent notification
 
         private static TileNotification CreateNotification(Photo photo) {
             var content = new TileContent() {

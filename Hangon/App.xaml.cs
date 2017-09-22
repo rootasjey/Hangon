@@ -2,9 +2,9 @@
 using Hangon.Services;
 using Hangon.Views;
 using System;
-using System.Globalization;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
+using Windows.ApplicationModel.Resources;
 using Windows.Foundation.Metadata;
 using Windows.Globalization;
 using Windows.Phone.UI.Input;
@@ -23,6 +23,8 @@ namespace Hangon {
     {
         public static DataSource AppDataSource { get; set; }
 
+        public static ResourceLoader ResourceLoader { get; set; }
+
         /// <summary>
         /// Initializes the singleton application object.  This is the first line of authored code
         /// executed, and as such is the logical equivalent of main() or WinMain().
@@ -31,6 +33,11 @@ namespace Hangon {
         {
             this.InitializeComponent();
             this.Suspending += OnSuspending;
+            InitializeVariables();
+        }
+
+        private void InitializeVariables() {
+            ResourceLoader = new ResourceLoader();
         }
 
         /// <summary>
@@ -147,6 +154,11 @@ namespace Hangon {
         }
 
         public static void UpdateAppTheme() {
+          // test
+          // if (Settings.IsApplicationThemeLight()) {
+          //       frame.RequestedTheme = ElementTheme.Light;
+          //       return;
+          //   }
             ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
             var theme = localSettings.Values.ContainsKey("Theme") ?
                 (string)localSettings.Values["Theme"] : "Dark";

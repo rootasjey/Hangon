@@ -47,8 +47,6 @@ namespace Hangon.Views {
 
         private RowDefinition _RowSpacing { get; set; }
 
-        private ResourceLoader _ResourcesLoader { get; set; }
-
         private bool _ConnectedAnimationHandled { get; set; }
 
         private bool _IsStretched { get; set; }
@@ -65,7 +63,6 @@ namespace Hangon.Views {
 
             _PageDataSource = App.AppDataSource;
             _UIDispatcher = CoreWindow.GetForCurrentThread().Dispatcher;
-            _ResourcesLoader = new ResourceLoader();
             _IsPhotoCaptionVisible = true;
             _ConnectedAnimationHandled = false;
             _IsStretched = Settings.GetDefaultPhotoStretching() == Windows.UI.Xaml.Media.Stretch.UniformToFill;
@@ -165,8 +162,8 @@ namespace Hangon.Views {
 
             HideProgress();
 
-            var successMessage = _ResourcesLoader.GetString("SavePhotoSuccess");
-            var failedMessage = _ResourcesLoader.GetString("SavePhotoFailed");
+            var successMessage = App.ResourceLoader.GetString("SavePhotoSuccess");
+            var failedMessage = App.ResourceLoader.GetString("SavePhotoFailed");
 
             if (result) Notify(successMessage);
             else Notify(failedMessage);
@@ -242,9 +239,9 @@ namespace Hangon.Views {
         }
 
         private async void CmdSetAsWallpaper(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e) {
-            var progressMessage = _ResourcesLoader.GetString("SettingWallpaper");
-            var successMessage = _ResourcesLoader.GetString("WallpaperSetSuccess");
-            var failedMessage = _ResourcesLoader.GetString("WallpaperSetFailed");
+            var progressMessage = App.ResourceLoader.GetString("SettingWallpaper");
+            var successMessage = App.ResourceLoader.GetString("WallpaperSetSuccess");
+            var failedMessage = App.ResourceLoader.GetString("WallpaperSetFailed");
 
             ShowProgress(progressMessage);
             var success = await Wallpaper.SetAsWallpaper(_CurrentPhoto, HttpProgressCallback);
@@ -255,9 +252,9 @@ namespace Hangon.Views {
         }
 
         private async void CmdSetAsLockscreen(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e) {
-            var progressMessage = _ResourcesLoader.GetString("SettingLockscreen");
-            var successMessage = _ResourcesLoader.GetString("LockscreenSetSuccess");
-            var failedMessage = _ResourcesLoader.GetString("LockscreenSetFailed");
+            var progressMessage = App.ResourceLoader.GetString("SettingLockscreen");
+            var successMessage = App.ResourceLoader.GetString("LockscreenSetSuccess");
+            var failedMessage = App.ResourceLoader.GetString("LockscreenSetFailed");
 
             ShowProgress(progressMessage);
             var success = await Wallpaper.SetAsLockscreen(_CurrentPhoto, HttpProgressCallback);
@@ -543,7 +540,7 @@ namespace Hangon.Views {
 
             CmdToggleCaptionIcon.UriSource = new Uri("ms-appx:///Assets/Icons/hide.png");
 
-            var label = _ResourcesLoader.GetString("HideCaption");
+            var label = App.ResourceLoader.GetString("HideCaption");
             CmdToggleCaption.Label = label;
         }
 
@@ -562,7 +559,7 @@ namespace Hangon.Views {
 
             CmdToggleCaptionIcon.UriSource = new Uri("ms-appx:///Assets/Icons/show.png");
 
-            var label = _ResourcesLoader.GetString("ShowCaption");
+            var label = App.ResourceLoader.GetString("ShowCaption");
             CmdToggleCaption.Label = label;
 
             // Completly hide caption

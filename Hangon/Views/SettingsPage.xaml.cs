@@ -15,8 +15,6 @@ namespace Hangon.Views {
     public sealed partial class SettingsPage : Page {
         CoreDispatcher _UIDispatcher { get; set; }
 
-        ResourceLoader _ResourcesLoader { get; set; }
-
         public SettingsPage() {
             InitializeComponent();
             InitializeVariables();
@@ -27,7 +25,6 @@ namespace Hangon.Views {
         }
 
         private void InitializeVariables() {
-            _ResourcesLoader = new ResourceLoader();
             _UIDispatcher = CoreWindow.GetForCurrentThread().Dispatcher;
         }
 
@@ -107,7 +104,7 @@ namespace Hangon.Views {
             var activity = BackgroundTasks.GetWallTaskActivity();
             if (activity == null) return;
 
-            var lastRun = _ResourcesLoader.GetString("TaskWallpaperLastRun");
+            var lastRun = App.ResourceLoader.GetString("TaskWallpaperLastRun");
             LastUpdatedTask.Text = string.Format("{0}: {1}", lastRun, activity["DateTime"]);
 
             if (activity["Exception"] != null) {
@@ -189,7 +186,7 @@ namespace Hangon.Views {
             var activity = BackgroundTasks.GetLockscreenTaskActivity();
             if (activity == null) return;
 
-            var lastRun = _ResourcesLoader.GetString("TaskLockscreenLastRun");
+            var lastRun = App.ResourceLoader.GetString("TaskLockscreenLastRun");
             LastUpdatedLockscreenTask.Text = string.Format("{0}: {1}", lastRun, activity["DateTime"]);
 
             if (activity["Exception"] != null) {
@@ -284,6 +281,7 @@ namespace Hangon.Views {
             } else {
                 HideTileTaskActivity();
                 BackgroundTasks.UnregisterTileTask();
+                TileDesigner.ClearPrimary();
             }
         }
 
@@ -291,7 +289,7 @@ namespace Hangon.Views {
             var activity = BackgroundTasks.GetTileTaskActivity();
             if (activity == null) return;
 
-            var lastRun = _ResourcesLoader.GetString("TaskTileLastRun");
+            var lastRun = App.ResourceLoader.GetString("TaskTileLastRun");
             LastUpdatedTileTask.Text = string.Format("{0}: {1}", lastRun, activity["DateTime"]);
 
             if (activity["Exception"] != null) {

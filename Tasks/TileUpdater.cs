@@ -24,7 +24,7 @@ namespace Tasks {
             SaveTime(taskInstance);
 
             var client = new UnsplasharpClient(Credentials.ApplicationId);
-            var photos = await client.ListPhotos(page: 1, perPage: 6);
+            var photos = await client.ListPhotos(page: 1, perPage: 5);
 
             TileDesigner.UpdatePrimary(photos);
 

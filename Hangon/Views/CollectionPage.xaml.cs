@@ -34,8 +34,6 @@ namespace Hangon.Views {
 
         private static int _LastSelectedPivotIndex { get; set; }
 
-        ResourceLoader _ResourcesLoader { get; set; }
-
         private CoreDispatcher _UIDispatcher { get; set; }
         #endregion variables
 
@@ -70,7 +68,6 @@ namespace Hangon.Views {
         #region data
         private void InitializeVariables() {
             _PageDataSource = App.AppDataSource;
-            _ResourcesLoader = new ResourceLoader();
             _UIDispatcher = CoreWindow.GetForCurrentThread().Dispatcher;
         }
 
@@ -439,16 +436,16 @@ namespace Hangon.Views {
         }
 
         private void CmdCopyPhotoLink_Tapped(object sender, TappedRoutedEventArgs e) {
-            var successMessage = _ResourcesLoader.GetString("CopyLinkSuccess");
+            var successMessage = App.ResourceLoader.GetString("CopyLinkSuccess");
 
             DataTransfer.Copy(_LastSelectedPhoto.Links.Html);
             Notify(successMessage);
         }
 
         private async void CmdSetAsWallpaper_Tapped(object sender, TappedRoutedEventArgs e) {
-            var progressMessage = _ResourcesLoader.GetString("SettingWallpaper");
-            var successMessage = _ResourcesLoader.GetString("WallpaperSetSuccess");
-            var failedMessage = _ResourcesLoader.GetString("WallpaperSetFailed");
+            var progressMessage = App.ResourceLoader.GetString("SettingWallpaper");
+            var successMessage = App.ResourceLoader.GetString("WallpaperSetSuccess");
+            var failedMessage = App.ResourceLoader.GetString("WallpaperSetFailed");
 
             ShowProgress(progressMessage);
             var success = await Wallpaper.SetAsWallpaper(_LastSelectedPhoto, HttpProgressCallback);
@@ -459,9 +456,9 @@ namespace Hangon.Views {
         }
 
         private async void CmdSetAsLockscreen_Tapped(object sender, TappedRoutedEventArgs e) {
-            var progressMessage = _ResourcesLoader.GetString("SettingLockscreen");
-            var successMessage = _ResourcesLoader.GetString("LockscreenSetSuccess");
-            var failedMessage = _ResourcesLoader.GetString("LockscreenSetFailed");
+            var progressMessage = App.ResourceLoader.GetString("SettingLockscreen");
+            var successMessage = App.ResourceLoader.GetString("LockscreenSetSuccess");
+            var failedMessage = App.ResourceLoader.GetString("LockscreenSetFailed");
 
             ShowProgress(progressMessage);
             var success = await Wallpaper.SetAsLockscreen(_LastSelectedPhoto, HttpProgressCallback);
@@ -499,8 +496,8 @@ namespace Hangon.Views {
 
             HideProgress();
 
-            var successMessage = _ResourcesLoader.GetString("SavePhotoSuccess");
-            var failedMessage = _ResourcesLoader.GetString("SavePhotoFailed");
+            var successMessage = App.ResourceLoader.GetString("SavePhotoSuccess");
+            var failedMessage = App.ResourceLoader.GetString("SavePhotoFailed");
 
             if (result) Notify(successMessage);
             else Notify(failedMessage);
