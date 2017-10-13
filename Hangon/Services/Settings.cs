@@ -1,11 +1,18 @@
-﻿using Windows.ApplicationModel;
+﻿using System;
+using Newtonsoft.Json;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Unsplasharp.Models;
+using Windows.ApplicationModel;
 using Windows.Storage;
 using Windows.System.UserProfile;
 using Windows.UI.Xaml;
+using Hangon.Models;
 
 namespace Hangon.Services {
     public class Settings {
         #region keys
+
         private static string UseDefaultDownloadPathKey {
             get {
                 return "UseDefaultDownloadPath";
@@ -59,6 +66,13 @@ namespace Hangon.Services {
                 return "BestPhotoResolution";
             }
         }
+
+        private static string FavoritesListKey {
+            get {
+                return "FavoritesList";
+            }
+        }
+
         #endregion keys
 
         #region path
@@ -143,6 +157,8 @@ namespace Hangon.Services {
         }
         #endregion theme
 
+        #region photo settings
+
         public static Windows.UI.Xaml.Media.Stretch GetDefaultPhotoStretching() {
             ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
             localSettings.Values.TryGetValue(PhotoStretchingKey, out var stretch);
@@ -163,6 +179,31 @@ namespace Hangon.Services {
             var localSettings = ApplicationData.Current.LocalSettings;
             localSettings.Values[BestPhotoResolutionKey] = resolution;
         }
+
+        #endregion photo settings
+
+        #region favorites
+
+        public static async Task SaveFavorites(PhotosKeyedCollection photosList) {
+            var json = JsonConvert.SerializeObject(photosList);
+
+            var file = await ApplicationData
+                .Current
+                .LocalFolder
+                .CreateFileAsync(FavoritesListKey, CreationCollisionOption.ReplaceExisting);
+
+            await FileIO.WriteTextAsync(file, json);
+        }
+
+        public static async Task<PhotosKeyedCollection> GetFavorites() {
+            var file = (StorageFile)await ApplicationData.Current.LocalFolder.TryGetItemAsync(FavoritesListKey);
+            if (file == null) return null;
+
+            string json = await FileIO.ReadTextAsync(file);
+            return JsonConvert.DeserializeObject<PhotosKeyedCollection>(json);
+        }
+
+        #endregion favorites
 
         #region appversion
         public static bool IsNewUpdatedLaunch() {

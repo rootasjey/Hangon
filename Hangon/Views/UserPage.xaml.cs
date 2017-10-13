@@ -86,7 +86,7 @@ namespace Hangon.Views {
 
         #region data
         private void InitializeVariables() {
-            _PageDataSource = App.AppDataSource;
+            _PageDataSource = App.DataSource;
             _ResourcesLoader = new ResourceLoader();
             _UIDispatcher = CoreWindow.GetForCurrentThread().Dispatcher;
         }
@@ -95,7 +95,7 @@ namespace Hangon.Views {
             _PageDataSource.UserPhotos.Clear();
         }
 
-        private void LoadData() {
+        private void InitializeData() {
             LoadUserData();
             LoadUserPhotos();
             LoadUserCollections();
@@ -391,7 +391,7 @@ namespace Hangon.Views {
 
         private void CmdRefresh_Tapped(object sender, TappedRoutedEventArgs e) {
             ClearData();
-            LoadData();
+            InitializeData();
         }
 
         #endregion CommandBar
@@ -462,7 +462,7 @@ namespace Hangon.Views {
                 ConnectedAnimationService.GetForCurrentView().PrepareToAnimate("PhotoImage", image);
             }
 
-            Frame.Navigate(typeof(PhotoPage), new object[] { photo, _PageDataSource.UserPhotos });
+            Frame.Navigate(typeof(PhotoPage), new object[] { photo, _PageDataSource.UserPhotos, this.GetType() });
         }
 
         private void CollectionItem_Tapped(object sender, TappedRoutedEventArgs e) {
@@ -503,9 +503,11 @@ namespace Hangon.Views {
         private void PivotUserData_SelectionChanged(object sender, SelectionChangedEventArgs e) {
             _LastPivotIndexSelected = PivotUserData.SelectedIndex;
 
+            App.DataSource.LoadLocalFavorites();
+
             switch (PivotUserData.SelectedIndex) {
                 case 0:
-                    LoadData();
+                    InitializeData();
                     break;
                 case 1:
                     LoadUserPhotos();
@@ -587,8 +589,29 @@ namespace Hangon.Views {
             var photo = (Photo)panel.DataContext;
 
             _LastSelectedPhoto = photo;
+
+            CheckIfPhotoInFavorites(photo);
+
             PhotoRightTappedFlyout.ShowAt(panel);
         }
+
+        private void CheckIfPhotoInFavorites(Photo photo) {
+            if (App.DataSource.LocalFavorites == null) {
+                RightCmdRemoveFavorites.Visibility = Visibility.Collapsed;
+                RightCmdAddToFavorites.Visibility = Visibility.Collapsed;
+                return;
+            }
+
+            if (App.DataSource.LocalFavorites.Contains(photo.Id)) {
+                RightCmdRemoveFavorites.Visibility = Visibility.Visible;
+                RightCmdAddToFavorites.Visibility = Visibility.Collapsed;
+                return;
+            }
+
+            RightCmdRemoveFavorites.Visibility = Visibility.Collapsed;
+            RightCmdAddToFavorites.Visibility = Visibility.Visible;
+        }
+
 
         private void CmdCopyPhotoLink_Tapped(object sender, TappedRoutedEventArgs e) {
             var successMessage = _ResourcesLoader.GetString("CopyLinkSuccess");
@@ -674,6 +697,50 @@ namespace Hangon.Views {
             }
         }
 
+        private void RightCmdAddToFavorites_Tapped(object sender, TappedRoutedEventArgs e) {
+            var localFavorites = App.DataSource.LocalFavorites;
+            if (localFavorites == null) return;
+
+            var cmd = (MenuFlyoutItem)sender;
+            var photo = (Photo)cmd.DataContext;
+
+            if (photo == null || string.IsNullOrEmpty(photo.Id)) {
+                DataTransfer.ShowLocalToast(App.ResourceLoader.GetString("PhotoNotFound"));
+                return;
+            }
+
+            if (localFavorites.Contains(photo.Id)) {
+                DataTransfer.ShowLocalToast(App.ResourceLoader.GetString("PhotoAlreadyInFavorites"));
+                return;
+            }
+
+            App.DataSource.AddToFavorites(photo);
+
+            // TODO: Notify add
+            var message = App.ResourceLoader.GetString("PhotoSuccessfulAddedToFavorites");
+            Notify(message);
+        }
+
+        private void RightCmdRemoveFavorites_Tapped(object sender, TappedRoutedEventArgs e) {
+            var localFavorites = App.DataSource.LocalFavorites;
+            if (localFavorites == null) return;
+
+            var cmd = (MenuFlyoutItem)sender;
+            var photo = (Photo)cmd.DataContext;
+
+            if (photo == null || string.IsNullOrEmpty(photo.Id)) {
+                DataTransfer.ShowLocalToast(App.ResourceLoader.GetString("PhotoNotFound"));
+                return;
+            }
+
+            App.DataSource.RemoveFromFavorites(photo);
+
+            // TODO: Notify removed
+            var message = App.ResourceLoader.GetString("PhotoSuccessfulRemovedFromFavorites");
+            Notify(message);
+        }
+
         #endregion rightTapped flyout
+        
     }
 }

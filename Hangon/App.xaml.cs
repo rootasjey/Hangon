@@ -21,7 +21,7 @@ namespace Hangon {
     /// </summary>
     sealed partial class App : Application
     {
-        public static DataSource AppDataSource { get; set; }
+        public static DataSource DataSource { get; set; }
 
         public static ResourceLoader ResourceLoader { get; set; }
 

@@ -99,6 +99,7 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Converters\AddonImage.cs" />
     <Compile Include="Converters\ExifIcon.cs" />
     <Compile Include="Converters\ExifMake.cs" />
     <Compile Include="Converters\ExifModel.cs" />
@@ -112,17 +113,25 @@
     <Compile Include="Data\Credentials.cs" />
     <Compile Include="Data\DataSource.cs" />
     <Compile Include="Data\PhotosList.cs" />
+    <Compile Include="Models\PhotosKeyedCollection.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\BackgroundTasks.cs" />
     <Compile Include="Services\DataTransfert.cs" />
     <Compile Include="Services\Events.cs" />
+    <Compile Include="Services\InAppPurchases.cs" />
     <Compile Include="Services\Settings.cs" />
     <Compile Include="Services\Storage.cs" />
     <Compile Include="Services\TileDesigner.cs" />
     <Compile Include="Services\UI.cs" />
     <Compile Include="Services\Wallpaper.cs" />
+    <Compile Include="Views\AchievementsPage.xaml.cs">
+      <DependentUpon>AchievementsPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\CollectionPage.xaml.cs">
       <DependentUpon>CollectionPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\FavoritesPage.xaml.cs">
+      <DependentUpon>FavoritesPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\HomePage.xaml.cs">
       <DependentUpon>HomePage.xaml</DependentUpon>
@@ -210,7 +219,15 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Page Include="Views\AchievementsPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\CollectionPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\FavoritesPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

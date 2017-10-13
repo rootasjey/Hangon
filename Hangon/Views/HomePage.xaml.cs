@@ -15,9 +15,7 @@ using Windows.UI.Composition;
 using Windows.UI.Xaml.Input;
 using System.Threading;
 using Windows.UI.Xaml.Media.Imaging;
-using Windows.ApplicationModel.Resources;
 using Unsplasharp.Models;
-using Windows.UI.Xaml.Controls.Primitives;
 
 namespace Hangon.Views {
     public sealed partial class HomePage : Page {
@@ -25,11 +23,11 @@ namespace Hangon.Views {
         #region variables
         private DataSource _PageDataSource { get; set; }
 
-        private float _RecentAnimationDelay { get; set; }
+        private double _RecentAnimationDelay { get; set; }
 
-        private float _CuratedAnimationDelay { get; set; }
+        private double _CuratedAnimationDelay { get; set; }
 
-        private float _SearchAnimationDelay { get; set; }
+        private double _SearchAnimationDelay { get; set; }
 
         public static Photo _LastSelectedPhoto { get; set; }
 
@@ -80,13 +78,16 @@ namespace Hangon.Views {
             }
         }
 
-        #endregion navigation
-
-        void RestorePivotPosition() {
-            PagePivot.SelectedIndex = _LastSelectedPivotIndex;
+        private void GoToFavorites_Tapped(object sender, TappedRoutedEventArgs e) {
+            Frame.Navigate(typeof(FavoritesPage));
         }
 
-        void StartNavigationToAnimation() {
+        private void GoToAchievements_Tapped(object sender, TappedRoutedEventArgs e) {
+            Frame.Navigate(typeof(AchievementsPage));
+        }
+
+
+        private void NavigateBackToGridItem() {
             var animation = ConnectedAnimationService.GetForCurrentView().GetAnimation("PhotoImageBack");
 
             if (animation == null || _LastSelectedPhoto == null) {
@@ -103,29 +104,33 @@ namespace Hangon.Views {
                 animateSearchResults();
             }
 
-            void animateRecent()
-            {
+            void animateRecent() {
                 RecentView.Loaded += (s, e) => {
                     UI.AnimateBackItemToList(RecentView, _LastSelectedPhoto, animation);
                 };
             }
 
-            void animateCurated()
-            {
+            void animateCurated() {
                 CuratedView.Loaded += (s, e) => {
                     UI.AnimateBackItemToList(CuratedView, _LastSelectedPhoto, animation);
                 };
             }
 
-            void animateSearchResults()
-            {
+            void animateSearchResults() {
                 SearchPhotosView.Loaded += (s, e) => {
                     UI.AnimateBackItemToList(SearchPhotosView, _LastSelectedPhoto, animation);
                 };
             }
         }
 
+        #endregion navigation
+
+        private void RestorePivotPosition() {
+            PagePivot.SelectedIndex = _LastSelectedPivotIndex;
+        }
+
         #region data
+
         private void InitializeVariables() {
             _CmdBarOpenedOffset = 15;
             _UIDispatcher = CoreWindow.GetForCurrentThread().Dispatcher;
@@ -137,11 +142,11 @@ namespace Hangon.Views {
         }
 
         private void BindAppDataSource() {
-            if (App.AppDataSource == null) {
-                App.AppDataSource = new DataSource();
+            if (App.DataSource == null) {
+                App.DataSource = new DataSource();
             }
 
-            _PageDataSource = App.AppDataSource;
+            _PageDataSource = App.DataSource;
         }
 
         private async void LoadRecentData() {
@@ -218,15 +223,18 @@ namespace Hangon.Views {
         #endregion data 
 
         #region events
+
         private void PagePivot_SelectionChanged(object sender, SelectionChangedEventArgs e) {
             UseCmdBarMinimalMode();
             _LastSelectedPivotIndex = PagePivot.SelectedIndex;
+
+            App.DataSource.LoadLocalFavorites();
 
             switch (PagePivot.SelectedIndex) {
                 case 0:
                     FindName("RecentPhotosPivotItemContent");
                     LoadRecentData();
-                    StartNavigationToAnimation();
+                    NavigateBackToGridItem();
 
                     ShowResfreshCmd();
                     HideShowSearchCmd();
@@ -237,7 +245,7 @@ namespace Hangon.Views {
                 case 1:
                     FindName("CuratedPhotosPivotItemContent");
                     LoadCuratedData();
-                    StartNavigationToAnimation();
+                    NavigateBackToGridItem();
 
                     ShowResfreshCmd();
                     HideShowSearchCmd();
@@ -247,7 +255,7 @@ namespace Hangon.Views {
 
                 case 2:
                     FindName("SearchPivotItemContent");
-                    StartNavigationToAnimation();
+                    NavigateBackToGridItem();
                     HideResfreshCmd();
 
                     if (_AreSearchResultsActivated) {
@@ -295,7 +303,7 @@ namespace Hangon.Views {
             }
 
             var photosListParameter = GetCurrentPhotosListSelected();
-            Frame.Navigate(typeof(PhotoPage), new object[] { photo, photosListParameter });
+            Frame.Navigate(typeof(PhotoPage), new object[] { photo, photosListParameter, this.GetType() });
 
             PhotosList GetCurrentPhotosListSelected() {
                 switch (_LastSelectedPivotIndex) {
@@ -321,7 +329,7 @@ namespace Hangon.Views {
                 return;
             }
 
-            float delay = GetAnimationDelayPivotIndex();
+            var delay = GetAnimationDelayPivotIndex();
 
             photoItem.Offset(0, 100, 0)
                     .Then()
@@ -329,7 +337,7 @@ namespace Hangon.Views {
                     .Offset(0,0, 500, delay)
                     .Start();
 
-            float GetAnimationDelayPivotIndex() {
+            double GetAnimationDelayPivotIndex() {
                 var step = 100;
 
                 switch (PagePivot.SelectedIndex) {
@@ -366,9 +374,11 @@ namespace Hangon.Views {
                 offset = scrollViewer.VerticalOffset;
             };
         }
+        
         #endregion events
 
         #region micro-interactions
+
         private void Image_PointerEntered(object sender, Windows.UI.Xaml.Input.PointerRoutedEventArgs e) {
             var image = (Image)sender;
             image.Scale(1.1f, 1.1f).Start();
@@ -737,7 +747,7 @@ namespace Hangon.Views {
 
             var autoEvent = new AutoResetEvent(false);
             var timer = new Timer(async (object state) => {
-                _UIDispatcher.RunAsync(CoreDispatcherPriority.Normal, () => {
+                await _UIDispatcher.RunAsync(CoreDispatcherPriority.Normal, () => {
                     HideNotification();
                 });
             }, autoEvent, TimeSpan.FromSeconds(5), new TimeSpan());
@@ -755,6 +765,7 @@ namespace Hangon.Views {
         #endregion notifications
 
         #region rightTapped flyout
+
         void ShowProgress(string message = "") {
             ProgressDeterminate.Value = 0;
             FlyoutNotification.Visibility = Visibility.Visible;
@@ -780,7 +791,27 @@ namespace Hangon.Views {
             var photo = (Photo)panel.DataContext;
 
             _LastSelectedPhoto = photo;
+
+            CheckIfPhotoInFavorites(photo);
+
             PhotoRightTappedFlyout.ShowAt(panel);
+        }
+
+        private void CheckIfPhotoInFavorites(Photo photo) {
+            if (App.DataSource.LocalFavorites == null) {
+                RightCmdRemoveFavorites.Visibility = Visibility.Collapsed;
+                RightCmdAddToFavorites.Visibility = Visibility.Collapsed;
+                return;
+            }
+
+            if (App.DataSource.LocalFavorites.Contains(photo.Id)) {
+                RightCmdRemoveFavorites.Visibility = Visibility.Visible;
+                RightCmdAddToFavorites.Visibility = Visibility.Collapsed;
+                return;
+            }
+
+            RightCmdRemoveFavorites.Visibility = Visibility.Collapsed;
+            RightCmdAddToFavorites.Visibility = Visibility.Visible;
         }
 
         private void CmdCopyLink_Tapped(object sender, TappedRoutedEventArgs e) {
@@ -830,7 +861,7 @@ namespace Hangon.Views {
             Download(resolution);
         }
 
-        async void Download(string size = "") {
+        private async void Download(string size = "") {
             ShowProgress();
             var result = false;
 
@@ -865,6 +896,49 @@ namespace Hangon.Views {
                         return _LastSelectedPhoto.Urls.Regular;
                 }
             }
+        }
+
+        private void RightCmdAddToFavorites_Tapped(object sender, TappedRoutedEventArgs e) {
+            var localFavorites = App.DataSource.LocalFavorites;
+            if (localFavorites == null) return;
+
+            var cmd = (MenuFlyoutItem)sender;
+            var photo = (Photo)cmd.DataContext;
+
+            if (photo == null || string.IsNullOrEmpty(photo.Id)) {
+                DataTransfer.ShowLocalToast(App.ResourceLoader.GetString("PhotoNotFound"));
+                return;
+            }
+
+            if (localFavorites.Contains(photo.Id)) {
+                DataTransfer.ShowLocalToast(App.ResourceLoader.GetString("PhotoAlreadyInFavorites"));
+                return;
+            }
+
+            App.DataSource.AddToFavorites(photo);
+
+            // TODO: Notify add
+            var message = App.ResourceLoader.GetString("PhotoSuccessfulAddedToFavorites");
+            Notify(message);
+        }
+
+        private void RightCmdRemoveFavorites_Tapped(object sender, TappedRoutedEventArgs e) {
+            var localFavorites = App.DataSource.LocalFavorites;
+            if (localFavorites == null) return;
+
+            var cmd = (MenuFlyoutItem)sender;
+            var photo = (Photo)cmd.DataContext;
+
+            if (photo == null || string.IsNullOrEmpty(photo.Id)) {
+                DataTransfer.ShowLocalToast(App.ResourceLoader.GetString("PhotoNotFound"));
+                return;
+            }
+
+            App.DataSource.RemoveFromFavorites(photo);
+
+            // TODO: Notify removed
+            var message = App.ResourceLoader.GetString("PhotoSuccessfulRemovedFromFavorites");
+            Notify(message);
         }
 
         #endregion rightTapped flyout

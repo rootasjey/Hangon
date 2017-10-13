@@ -10,13 +10,6 @@
     mc:Ignorable="d">
     
     <Page.Resources>
-        <Style x:Key="GridViewItemZeroMarginStyle" TargetType="GridViewItem">
-            <Setter Property="HorizontalAlignment" Value="Stretch"/>
-            <Setter Property="VerticalContentAlignment" Value="Stretch" />
-            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
-            <Setter Property="Margin" Value="0"/>
-        </Style>
-
         <DataTemplate x:Key="PhotoTemplate" x:DataType="models:Photo">
             <UserControl>
                 <StackPanel x:Name="PhotoItem"
@@ -85,6 +78,17 @@
                             Text="Open in browser"
                             x:Uid="CmdOpenInBrowserText"
                             Tapped="CmdOpenInBrowser_Tapped"/>
+
+            <MenuFlyoutItem x:Name="RightCmdAddToFavorites"
+                            x:Uid="RightCmdAddToFavorites"
+                            Text="Add to favorites"
+                            Tapped="RightCmdAddToFavorites_Tapped"/>
+
+            <MenuFlyoutItem x:Name="RightCmdRemoveFavorites"
+                            x:Uid="RightCmdRemoveFavorites"
+                            Text="Remove from favorites"
+                            Visibility="Collapsed"
+                            Tapped="RightCmdRemoveFavorites_Tapped"/>
 
             <MenuFlyoutSubItem x:Name="CmdSetAs" x:Uid="CmdSetAsText" Text="Set as...">
                 <MenuFlyoutItem x:Name="CmdSetAsWallpaper" 
@@ -506,6 +510,8 @@
             <AppBarButton x:Name="CmdShowSearch" x:Uid="CmdShowSearch" Label="show search" Icon="Find" Tapped="CmdShowSearch_Tapped"/>
             <AppBarButton x:Name="CmdRefresh" x:Uid="CmdRefresh" Label="refresh" Icon="Refresh" Tapped="CmdRefresh_Tapped"/>
             <CommandBar.SecondaryCommands>
+                <AppBarButton Label="donations" x:Uid="CmdDonations" Tapped="GoToAchievements_Tapped"/>
+                <AppBarButton x:Name="CmdFavorites" x:Uid="CmdFavorites" Label="favorites" Tapped="GoToFavorites_Tapped"/>
                 <AppBarButton x:Name="CmdSettings" x:Uid="CmdSettings" Label="settings" Tapped="CmdSettings_Tapped"/>
             </CommandBar.SecondaryCommands>
         </CommandBar>

@@ -1,0 +1,98 @@
+﻿<Page
+    x:Class="Hangon.Views.AchievementsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:store="using:Windows.Services.Store"
+    mc:Ignorable="d">
+
+    <Page.Resources>
+        <DataTemplate x:Key="AddonTemplate" x:DataType="store:StoreProduct">
+            <Grid Tapped="Addon_Tapped" Padding="0,20">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="90"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="70"/>
+                </Grid.ColumnDefinitions>
+
+                <BitmapIcon UriSource="{x:Bind Images, Converter={StaticResource AddonImage}}"
+                            Height="50" Width="50"/>
+
+                <StackPanel x:Name="AddOnDescription" Grid.Column="1">
+                    <TextBlock Text="{x:Bind Title}" FontSize="22" FontWeight="SemiBold" TextWrapping="Wrap"/>
+                    <TextBlock Text="{x:Bind Description}" FontSize="16" FontWeight="SemiLight" TextWrapping="Wrap"
+                               Opacity=".6"/>
+                </StackPanel>
+
+                <TextBlock Text="{x:Bind Price.FormattedPrice}" Grid.Column="2" 
+                           FontSize="18"
+                           FontWeight="Bold"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"/>
+            </Grid>
+        </DataTemplate>
+
+        <Style x:Key="TextStyle1" TargetType="TextBlock">
+            <Setter Property="TextWrapping" Value="Wrap"/>
+            <Setter Property="FontSize" Value="18"/>
+            <Setter Property="Opacity" Value=".6"/>
+            <Setter Property="FontWeight" Value="Normal"/>
+        </Style>
+    </Page.Resources>
+
+    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <Pivot x:Name="PagePivot">
+            <PivotItem x:Name="DonationsPivot"
+                       Header="addons">
+                <Grid>
+                    <ListView x:Name="UnlocksListView"
+                              ItemTemplate="{StaticResource AddonTemplate}">
+                        <ListView.ItemContainerStyle>
+                            <Style TargetType="ListViewItem">
+                                <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                                <Setter Property="Margin" Value="0,1"/>
+                            </Style>
+                        </ListView.ItemContainerStyle>
+                    </ListView>
+
+                    <StackPanel x:Name="DonationsLoadingView"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center">
+                        <TextBlock x:Uid="Loadinginapppurchases" 
+                                   Text="loading in-app purchases"
+                                    FontSize="24"
+                                    TextWrapping="Wrap"/>
+                        <ProgressBar x:Name="ProgressLoadingInAppPurchases"
+                                         IsIndeterminate="True"/>
+                    </StackPanel>
+                </Grid>
+            </PivotItem>
+
+            <PivotItem x:Name="AboutPivot"
+                       Header="why?">
+                <Grid>
+                    <StackPanel>
+                        <TextBlock x:Uid="WhyDonateTitle" 
+                                    Text="why donate ?"
+                                    FontWeight="Light"
+                                    FontSize="44"
+                                    Margin="0,0,0,12"
+                                    Typography.Capitals="SmallCaps"
+                                    TextWrapping="Wrap"/>
+                        <TextBlock x:Uid="WhyDonateLine1" 
+                                       Text="By donating, you're contributing to the development of Hangon."
+                                       Style="{StaticResource TextStyle1}"/>
+                        <TextBlock x:Uid="WhyDonateLine2" 
+                                       Text="It takes time for developing such an app, so it always appreciated when I receive some donations to encourage me go further."
+                                       Margin="0,10"
+                                       Style="{StaticResource TextStyle1}"/>
+                        <TextBlock x:Uid="WhyDonateLine3" 
+                                       Text="So in order for me to continue developing the app and make it growing, I'll need your help."
+                                       Style="{StaticResource TextStyle1}"/>
+                    </StackPanel>
+                </Grid>
+            </PivotItem>
+        </Pivot>
+    </Grid>
+</Page>

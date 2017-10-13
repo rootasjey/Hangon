@@ -10,11 +10,18 @@ using Windows.UI.Xaml.Data;
 namespace Hangon.Data {
     public class PhotosList : ObservableCollection<Photo>, ISupportIncrementalLoading {
         public string Url { get; set; }
+
         public int Page { get; set; }
+
         public bool HasMoreItems { get; set; }
+
         public string Query { get; set; }
+
         public int TotalPhotoCount { get; set; }
-        private UnsplasharpClient _Client {get;set;}
+
+        private UnsplasharpClient _Client { get; set; }
+
+        public IList<Photo> Photos { get => Items; }
 
         public async Task<int> Fetch() {
             HasMoreItems = true;

@@ -270,6 +270,15 @@
                     </MenuFlyout>
                 </AppBarButton.Flyout>
             </AppBarButton>
+
+            <CommandBar.SecondaryCommands>
+                <AppBarButton x:Name="CmdAddToFavorites" x:Uid="CmdAddToFavorites" 
+                              Label="add to favorites" Tapped="CmdAddToFavorites_Tapped"/>
+                
+                <AppBarButton x:Name="CmdRemoveFromFavorites" x:Uid="CmdRemoveFromFavorites" 
+                              Visibility="Collapsed"
+                              Label="remove from favorites" Tapped="CmdRemoveFromFavorites_Tapped"/>
+            </CommandBar.SecondaryCommands>
         </CommandBar>
 
         <Grid x:Name="AppBarFrozenHost" Canvas.ZIndex="2" Height="75" VerticalAlignment="Bottom"/>

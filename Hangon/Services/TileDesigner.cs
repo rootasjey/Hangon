@@ -7,7 +7,7 @@ using Windows.UI.Notifications;
 namespace Hangon.Services {
     public class TileDesigner {
         public static void UpdatePrimary() {
-            var data = App.AppDataSource;
+            var data = App.DataSource;
             if (data == null) return;
 
             var rand = new Random();

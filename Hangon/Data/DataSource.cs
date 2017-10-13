@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using Hangon.Models;
+using Hangon.Services;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using Unsplasharp;
 using Unsplasharp.Models;
@@ -19,6 +22,8 @@ namespace Hangon.Data {
         public CollectionsList UserCollections { get; set; }
 
         public PhotosList CollectionPhotos { get; set; }
+
+        public PhotosKeyedCollection LocalFavorites { get; set; }
 
         #endregion variables
 
@@ -106,7 +111,7 @@ namespace Hangon.Data {
 
             var url = string.Format("{0}/{1}/collections", GetUrl("users"), username);
             if (UserCollections.Url == url) return 0;
-
+            
             UserCollections.Clear();
             UserCollections.Page = 0;
             UserCollections.Url = url;
@@ -181,6 +186,33 @@ namespace Hangon.Data {
         public string GetUsername(User user) {
             return user.Username ??
                    string.Format("{0}{1}", user.FirstName, user.LastName).ToLower();
+        }
+
+        public async Task LoadLocalFavorites() {
+            if (LocalFavorites == null) {
+                var savedFavorites = await Settings.GetFavorites();
+
+                if (savedFavorites == null) {
+                    LocalFavorites = new PhotosKeyedCollection();
+                    return;
+                }
+
+                LocalFavorites = savedFavorites;
+            }
+        }
+
+        public async Task AddToFavorites(Photo photo) {
+            if (LocalFavorites.Contains(photo.Id)) { return; }
+
+            LocalFavorites.Add(photo);
+            await Settings.SaveFavorites(LocalFavorites);
+        }
+
+        public async Task RemoveFromFavorites(Photo photo) {
+            if (!LocalFavorites.Contains(photo.Id)) { return; }
+
+            LocalFavorites.Remove(photo.Id);
+            await Settings.SaveFavorites(LocalFavorites);
         }
 
         #endregion methods

@@ -393,4 +393,58 @@
   <data name="TaskWallpaperLastRun" xml:space="preserve">
     <value>Wallpaper task last run on</value>
   </data>
+  <data name="RightCmdAddToFavorites.Text" xml:space="preserve">
+    <value>Add to favorites</value>
+  </data>
+  <data name="RightCmdRemoveFavorites.Text" xml:space="preserve">
+    <value>Remove from favorites</value>
+  </data>
+  <data name="LoadingFavoritesLabel.Text" xml:space="preserve">
+    <value>Loading your favorites...</value>
+  </data>
+  <data name="Loadinginapppurchases.Text" xml:space="preserve">
+    <value>loading in-app purchases</value>
+  </data>
+  <data name="NoFavoritesLabel.Text" xml:space="preserve">
+    <value>You've no favorites at the moment.</value>
+  </data>
+  <data name="WhyDonateLine1.Text" xml:space="preserve">
+    <value>By donating, you're contributing to the development of Hangon.</value>
+  </data>
+  <data name="WhyDonateLine2.Text" xml:space="preserve">
+    <value>It takes time for developing an app, so it always appreciated when I receive some donations to encourage me to go further.</value>
+  </data>
+  <data name="WhyDonateLine3.Text" xml:space="preserve">
+    <value>Your contributions will make me to continue developing the app and make it better.</value>
+  </data>
+  <data name="WhyDonateTitle.Text" xml:space="preserve">
+    <value>why donate ?</value>
+  </data>
+  <data name="CmdDonations.Label" xml:space="preserve">
+    <value>donations</value>
+  </data>
+  <data name="CmdFavorites.Label" xml:space="preserve">
+    <value>favorites</value>
+  </data>
+  <data name="CmdAddToFavorites.Label" xml:space="preserve">
+    <value>add to favorites</value>
+  </data>
+  <data name="CmdRemoveFromFavorites/Label" xml:space="preserve">
+    <value>remove from favorites</value>
+  </data>
+  <data name="PhotoSuccessfulAddedToFavorites" xml:space="preserve">
+    <value>The photo has been successful added to your favorites</value>
+  </data>
+  <data name="PhotoSuccessfulRemovedFromFavorites" xml:space="preserve">
+    <value>The photo has been successful removed from your favorites</value>
+  </data>
+  <data name="PhotoAlreadyInFavorites" xml:space="preserve">
+    <value>This photo is already in your favorites ;)</value>
+  </data>
+  <data name="PhotoNotFound" xml:space="preserve">
+    <value>Couldn't retrieve the photo :(</value>
+  </data>
+  <data name="FavoritesHeader.Header" xml:space="preserve">
+    <value>favorites</value>
+  </data>
 </root>

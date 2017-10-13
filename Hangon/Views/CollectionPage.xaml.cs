@@ -14,7 +14,6 @@ using Windows.UI.Xaml.Hosting;
 using Windows.UI.Composition;
 using Microsoft.Graphics.Canvas.Effects;
 using Windows.UI;
-using Windows.ApplicationModel.Resources;
 using System.Threading;
 using Windows.UI.Xaml.Input;
 using Unsplasharp.Models;
@@ -67,7 +66,7 @@ namespace Hangon.Views {
 
         #region data
         private void InitializeVariables() {
-            _PageDataSource = App.AppDataSource;
+            _PageDataSource = App.DataSource;
             _UIDispatcher = CoreWindow.GetForCurrentThread().Dispatcher;
         }
 
@@ -272,7 +271,7 @@ namespace Hangon.Views {
                 ConnectedAnimationService.GetForCurrentView().PrepareToAnimate("PhotoImage", image);
             }
 
-            Frame.Navigate(typeof(PhotoPage), new object[] { photo, _PageDataSource.CollectionPhotos });
+            Frame.Navigate(typeof(PhotoPage), new object[] { photo, _PageDataSource.CollectionPhotos, this.GetType() });
         }
 
         private void PhotosListViewHeader_Tapped(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e) {
@@ -407,6 +406,7 @@ namespace Hangon.Views {
         #endregion notifications
 
         #region rightTapped flyout
+
         void ShowProgress(string message = "") {
             ProgressDeterminate.Value = 0;
             FlyoutNotification.Visibility = Visibility.Visible;
@@ -432,7 +432,27 @@ namespace Hangon.Views {
             var photo = (Photo)panel.DataContext;
 
             _LastSelectedPhoto = photo;
+
+            CheckIfPhotoInFavorites(photo);
+
             PhotoRightTappedFlyout.ShowAt(panel);
+        }
+
+        private void CheckIfPhotoInFavorites(Photo photo) {
+            if (App.DataSource.LocalFavorites == null) {
+                RightCmdRemoveFavorites.Visibility = Visibility.Collapsed;
+                RightCmdAddToFavorites.Visibility = Visibility.Collapsed;
+                return;
+            }
+
+            if (App.DataSource.LocalFavorites.Contains(photo.Id)) {
+                RightCmdRemoveFavorites.Visibility = Visibility.Visible;
+                RightCmdAddToFavorites.Visibility = Visibility.Collapsed;
+                return;
+            }
+
+            RightCmdRemoveFavorites.Visibility = Visibility.Collapsed;
+            RightCmdAddToFavorites.Visibility = Visibility.Visible;
         }
 
         private void CmdCopyPhotoLink_Tapped(object sender, TappedRoutedEventArgs e) {
@@ -482,7 +502,7 @@ namespace Hangon.Views {
             Download(resolution);
         }
 
-        async void Download(string size = "") {
+        private async void Download(string size = "") {
             ShowProgress();
             var result = false;
 
@@ -517,6 +537,49 @@ namespace Hangon.Views {
                         return _LastSelectedPhoto.Urls.Regular;
                 }
             }
+        }
+
+        private void RightCmdAddToFavorites_Tapped(object sender, TappedRoutedEventArgs e) {
+            var localFavorites = App.DataSource.LocalFavorites;
+            if (localFavorites == null) return;
+
+            var cmd = (MenuFlyoutItem)sender;
+            var photo = (Photo)cmd.DataContext;
+
+            if (photo == null || string.IsNullOrEmpty(photo.Id)) {
+                DataTransfer.ShowLocalToast(App.ResourceLoader.GetString("PhotoNotFound"));
+                return;
+            }
+
+            if (localFavorites.Contains(photo.Id)) {
+                DataTransfer.ShowLocalToast(App.ResourceLoader.GetString("PhotoAlreadyInFavorites"));
+                return;
+            }
+
+            App.DataSource.AddToFavorites(photo);
+
+            // TODO: Notify add
+            var message = App.ResourceLoader.GetString("PhotoSuccessfulAddedToFavorites");
+            Notify(message);
+        }
+
+        private void RightCmdRemoveFavorites_Tapped(object sender, TappedRoutedEventArgs e) {
+            var localFavorites = App.DataSource.LocalFavorites;
+            if (localFavorites == null) return;
+
+            var cmd = (MenuFlyoutItem)sender;
+            var photo = (Photo)cmd.DataContext;
+
+            if (photo == null || string.IsNullOrEmpty(photo.Id)) {
+                DataTransfer.ShowLocalToast(App.ResourceLoader.GetString("PhotoNotFound"));
+                return;
+            }
+
+            App.DataSource.RemoveFromFavorites(photo);
+
+            // TODO: Notify removed
+            var message = App.ResourceLoader.GetString("PhotoSuccessfulRemovedFromFavorites");
+            Notify(message);
         }
 
         #endregion rightTapped flyout

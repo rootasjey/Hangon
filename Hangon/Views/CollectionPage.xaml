@@ -54,6 +54,17 @@
                             x:Uid="CmdOpenInBrowserText"
                             Tapped="CmdOpenPhotoInBrowser_Tapped"/>
 
+            <MenuFlyoutItem x:Name="RightCmdAddToFavorites"
+                            x:Uid="RightCmdAddToFavorites"
+                            Text="Add to favorites"
+                            Tapped="RightCmdAddToFavorites_Tapped"/>
+
+            <MenuFlyoutItem x:Name="RightCmdRemoveFavorites"
+                            x:Uid="RightCmdRemoveFavorites"
+                            Text="Remove from favorites"
+                            Visibility="Collapsed"
+                            Tapped="RightCmdRemoveFavorites_Tapped"/>
+
             <MenuFlyoutSubItem x:Name="CmdSetAs" x:Uid="CmdSetAsText" Text="Set as...">
                 <MenuFlyoutItem x:Name="CmdSetAsWallpaper" 
                                 x:Uid="FlyoutWallpaper" 

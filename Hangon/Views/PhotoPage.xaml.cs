@@ -19,6 +19,8 @@ using System.Threading;
 using Windows.UI;
 using Windows.ApplicationModel.Resources;
 using Unsplasharp.Models;
+using Hangon.Models;
+using System.Collections.Generic;
 
 namespace Hangon.Views {
     public sealed partial class PhotoPage : Page {
@@ -29,7 +31,7 @@ namespace Hangon.Views {
 
         private DataSource _PageDataSource { get; set; }
 
-        private static PhotosList _PageItemsSource { get; set; }
+        private static IList<Photo> _PageItemsSource { get; set; }
 
         private Visual _BackgroundVisual { get; set; }
 
@@ -50,6 +52,9 @@ namespace Hangon.Views {
         private bool _ConnectedAnimationHandled { get; set; }
 
         private bool _IsStretched { get; set; }
+
+        private Type _SourcePageType { get; set; }
+
         #endregion variables
 
         public PhotoPage() {
@@ -61,7 +66,7 @@ namespace Hangon.Views {
         private void InitializeVariables() {
             GetDeviceType();
 
-            _PageDataSource = App.AppDataSource;
+            _PageDataSource = App.DataSource;
             _UIDispatcher = CoreWindow.GetForCurrentThread().Dispatcher;
             _IsPhotoCaptionVisible = true;
             _ConnectedAnimationHandled = false;
@@ -98,6 +103,9 @@ namespace Hangon.Views {
 
                 } else if (e.SourcePageType == typeof(CollectionPage)) {
                     CollectionPage._LastSelectedPhoto = _CurrentPhoto;
+
+                } else if (e.SourcePageType == typeof(FavoritesPage)) {
+                    FavoritesPage._LastSelectedPhoto = _CurrentPhoto;
                 }
             }            
 
@@ -113,7 +121,9 @@ namespace Hangon.Views {
                 _CurrentPhoto = (Photo)parameters[0];
             }
 
-            _PageItemsSource = (PhotosList)parameters[1];
+            _PageItemsSource  = (IList<Photo>)parameters[1];
+
+            _SourcePageType = (Type)parameters[2];
 
             base.OnNavigatedTo(e);
         }
@@ -467,6 +477,7 @@ namespace Hangon.Views {
 
         private void PhotosFlipView_Loaded(object sender, RoutedEventArgs e) {
             PhotosFlipView.ItemsSource = _PageItemsSource;
+
             var index = _PageItemsSource.IndexOf(_CurrentPhoto);
 
             PhotosFlipView.SelectionChanged -= PhotosFlipView_SelectionChanged;
@@ -475,6 +486,8 @@ namespace Hangon.Views {
             PhotosFlipView.SelectedIndex = index;
 
             ForceFetchOnFirstItemIfSelected();
+
+            RefreshFavoritesCommands();
 
             void ForceFetchOnFirstItemIfSelected() {
                 if (index == 0) {
@@ -513,12 +526,33 @@ namespace Hangon.Views {
 
             RefreshCaptionVisibility(root);
             RefreshPhotoStretching(image);
+            RefreshFavoritesCommands();
         }
 
         private void PhotoPullBox_RefreshInvoked(DependencyObject sender, object args) {
             if (Frame.CanGoBack) {
                 Frame.GoBack();
             }
+        }
+
+        private void CmdAddToFavorites_Tapped(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e) {
+            App.DataSource.AddToFavorites(_CurrentPhoto);
+            RefreshFavoritesCommands();
+
+            var message = App.ResourceLoader.GetString("PhotoSuccessfulAddedToFavorites");
+            Notify(message);
+        }
+
+        private void CmdRemoveFromFavorites_Tapped(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e) {
+            App.DataSource.RemoveFromFavorites(_CurrentPhoto);
+            RefreshFavoritesCommands();
+
+            if (_SourcePageType == typeof(FavoritesPage)) {
+                Frame.GoBack();
+            }
+
+            var message = App.ResourceLoader.GetString("PhotoSuccessfulRemovedFromFavorites");
+            Notify(message);
         }
 
         #endregion events
@@ -589,6 +623,17 @@ namespace Hangon.Views {
             image.Stretch = Windows.UI.Xaml.Media.Stretch.Uniform;
         }
 
+        private void RefreshFavoritesCommands() {
+            if (App.DataSource.LocalFavorites.Contains(_CurrentPhoto.Id)) {
+                CmdAddToFavorites.Visibility = Visibility.Collapsed;
+                CmdRemoveFromFavorites.Visibility = Visibility.Visible;
+                return;
+            }
+
+            CmdAddToFavorites.Visibility = Visibility.Visible;
+            CmdRemoveFromFavorites.Visibility = Visibility.Collapsed;
+        }
+
         private void UpdatePhotoCaptionPosition() {
             var height = Window.Current.Bounds.Height - _PhotoCaptionTopMargin;
             _RowSpacing.Height = new GridLength(height);
@@ -649,6 +694,5 @@ namespace Hangon.Views {
         }
 
         #endregion others
-
     }
 }
