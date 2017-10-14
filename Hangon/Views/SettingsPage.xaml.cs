@@ -18,7 +18,7 @@ namespace Hangon.Views {
         public SettingsPage() {
             InitializeComponent();
             InitializeVariables();
-            SetUpPageAnimation();
+            InitializePageAnimation();
             LoadData();
 
             AnimatePersonalizationPivot();
@@ -26,10 +26,11 @@ namespace Hangon.Views {
 
         private void InitializeVariables() {
             _UIDispatcher = CoreWindow.GetForCurrentThread().Dispatcher;
+            CurrentAppVersionLabel.Text = string.Format("version {0}", Settings.GetAppVersion());
         }
 
         #region animations
-        private void SetUpPageAnimation() {
+        private void InitializePageAnimation() {
             TransitionCollection collection = new TransitionCollection();
             NavigationThemeTransition theme = new NavigationThemeTransition();
 

@@ -447,4 +447,10 @@
   <data name="FavoritesHeader.Header" xml:space="preserve">
     <value>favorites</value>
   </data>
+  <data name="FeedbackPivotItem.Header" xml:space="preserve">
+    <value>feedback</value>
+  </data>
+  <data name="UpdatePivotItem.Header" xml:space="preserve">
+    <value>update</value>
+  </data>
 </root>

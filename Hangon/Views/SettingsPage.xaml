@@ -6,6 +6,23 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
+    <Page.Resources>
+        <Style x:Key="SettingsTitleColored" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="24"/>
+            <Setter Property="FontWeight" Value="Medium"/>
+            <Setter Property="TextWrapping" Value="Wrap"/>
+            <Setter Property="Typography.Capitals" Value="SmallCaps"/>
+            <Setter Property="Foreground" Value="{ThemeResource SystemControlHighlightAccentBrush}"/>
+        </Style>
+
+        <Style x:Key="SettingsTitle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="26"/>
+            <Setter Property="FontWeight" Value="Medium"/>
+            <Setter Property="TextWrapping" Value="Wrap"/>
+            <Setter Property="Typography.Capitals" Value="SmallCaps"/>
+        </Style>
+    </Page.Resources>
+
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <FlyoutPresenter x:Name="FlyoutNotification"
                          RequestedTheme="Dark"
@@ -23,13 +40,17 @@
             <PivotItem x:Name="PersonalizationPivotItem"
                        x:Uid="PivotPersonalization"
                        Header="personalization">
+                
                 <ScrollViewer Margin="0,20,0,0">
                     <StackPanel x:Name="PersonalizationContentPanel">
                         <StackPanel x:Name="LanguagePanel">
-                            <TextBlock Text="language" x:Uid="LanguageLabel" FontSize="24"/>
+                            <TextBlock Text="language" x:Uid="LanguageLabel"
+                                       Style="{StaticResource SettingsTitle}"/>
+                            
                             <TextBlock Text="Choose your language"
                                        x:Uid="ChooseLanguage"
                                        Opacity=".6"/>
+                            
                             <ComboBox x:Name="LanguageSelection"
                                       Loaded="LanguageSelection_Loaded"
                                       SelectionChanged="LanguageSelection_SelectionChanged">
@@ -39,7 +60,8 @@
                         </StackPanel>
 
                         <StackPanel x:Name="ThemePanel" Margin="0,20,0,0">
-                            <TextBlock x:Uid="ThemeText" Text="thème" FontSize="24"/>
+                            <TextBlock x:Uid="ThemeText" Text="thème" 
+                                       Style="{StaticResource SettingsTitle}"/>
                             <ToggleSwitch x:Name="ThemeSwitch"
                                           x:Uid="ThemeSwitch"
                                           Loaded="ThemeSwitch_Loaded"
@@ -49,7 +71,9 @@
                         </StackPanel>
 
                         <StackPanel x:Name="DownloadsLocationPanel" Margin="0,20,0,0">
-                            <TextBlock Text="downloads" x:Uid="DownloadText" FontSize="24"/>
+                            <TextBlock Text="downloads" x:Uid="DownloadText" 
+                                       Style="{StaticResource SettingsTitle}"/>
+                            
                             <TextBlock Text="Save downloads automatically to Pictures library"
                                        x:Uid="AutoSaveDownloadText"
                                        Opacity=".6"/>
@@ -87,7 +111,9 @@
                 <ScrollViewer>
                     <StackPanel Margin="0,20,0,40">
                         <StackPanel>
-                            <TextBlock FontSize="24" x:Uid="WallpaperText" Text="wallpaper"/>
+                            <TextBlock x:Uid="WallpaperText" Text="wallpaper"
+                                       Style="{StaticResource SettingsTitle}"/>
+                            
                             <TextBlock Text="Periodically update wallpaper" 
                                        x:Uid="PeriodicWallpaperText"
                                        TextWrapping="Wrap" Opacity=".6"/>
@@ -131,7 +157,9 @@
                         </StackPanel>
 
                         <StackPanel Margin="0,20">
-                            <TextBlock FontSize="24" x:Uid="LockscreenText" Text="lockscreen"/>
+                            <TextBlock x:Uid="LockscreenText" Text="lockscreen"
+                                       Style="{StaticResource SettingsTitle}"/>
+                            
                             <TextBlock Text="Periodically update lockscreen background"
                                        x:Uid="PeriodicLockscreenText"
                                        TextWrapping="Wrap" Opacity=".6"/>
@@ -176,7 +204,9 @@
                         </StackPanel>
 
                         <StackPanel>
-                            <TextBlock FontSize="24" x:Uid="Tile" Text="tile"/>
+                            <TextBlock x:Uid="Tile" Text="tile"
+                                       Style="{StaticResource SettingsTitle}"/>
+                            
                             <TextBlock Text="Periodically update primary tile"
                                        x:Uid="PeriodicTile"
                                        TextWrapping="Wrap" Opacity=".6"/>
@@ -222,10 +252,10 @@
                 </ScrollViewer>
             </PivotItem>
 
-            <PivotItem Header="about" x:Uid="AboutPivotItem">
+            <PivotItem Header="feedback" x:Uid="FeedbackPivotItem">
                 <ScrollViewer Margin="0,20,0,0">
                     <StackPanel>
-                        <TextBlock Text="feedback" x:Uid="FeedbackText" FontSize="24"/>
+                        <TextBlock Text="feedback" x:Uid="FeedbackText" Style="{StaticResource SettingsTitle}"/>
                         <TextBlock Text="Send an email if you encounter issues or if you've suggestions"
                                    x:Uid="FeedbackEmailText"
                                    Opacity=".6" TextWrapping="Wrap"/>
@@ -236,7 +266,8 @@
                                 Margin="0,12,0,20" 
                                 Click="FeedbackButton_Click"/>
 
-                        <TextBlock Text="notation" FontSize="24"/>
+                        <TextBlock Text="notation" Style="{StaticResource SettingsTitle}"/>
+                        
                         <TextBlock Text="Don't forget to give the app a note on the store ;)"
                                    x:Uid="NotationSentenceText"
                                    TextWrapping="Wrap"
@@ -248,86 +279,61 @@
                                 Margin="0,12,0,20" 
                                 Visibility="Visible"
                                 Click="NoteButton_Click"/>
+                    </StackPanel>
+                </ScrollViewer>
+            </PivotItem>
 
-                        <TextBlock Text="images" FontSize="24" Margin="0,20,0,0"/>
+            <PivotItem Header="contributions" 
+                       x:Uid="ContributionPivotItem">
+                <Grid Margin="0,20,0,0">
+                    <StackPanel>
+                        <TextBlock Text="images" Style="{StaticResource SettingsTitle}"/>
                         <RichTextBlock x:Name="ImagesBox" Margin="0,0,0,20" Opacity=".6">
                             <Paragraph>
                                 <Run x:Uid="PhotosProviderText" Text="All photos are from: "/>
                                 <Hyperlink NavigateUri="https://unsplash.com/">Unsplash</Hyperlink>
                             </Paragraph>
                         </RichTextBlock>
-
-                        <StackPanel x:Name="UpdateChangelogPanel"
-                                    Padding="0,20">
-                            <StackPanel Orientation="Horizontal">
-                                <FontIcon Glyph="&#xEB3C;" FontSize="30" Margin="0,0,12,0"/>
-                                <TextBlock Text="September Update" 
-                                           FontSize="26"
-                                           FontWeight="Normal"
-                                           Typography.Capitals="AllSmallCaps"/>
-                            </StackPanel>
-
-                            <TextBlock Text="1.7.0" Opacity=".5"/>
-
-                            <RichTextBlock TextWrapping="Wrap" 
-                                           Margin="0,20,0,0"
-                                           ScrollViewer.VerticalScrollMode="Disabled">
-
-                                <Paragraph Margin="0,12">
-                                    <Span FontSize="22" 
-                                          FontWeight="Medium" 
-                                          Foreground="{ThemeResource SystemControlForegroundAccentBrush}">
-                                        FLIPVIEW
-                                    </Span>
-                                    <LineBreak/>
-                                    <Span>Now you can flip to the next/previous photo</Span>
-                                    <LineBreak/>
-                                    <Span>without leaving photo page.</Span>
-                                    <LineBreak/>
-                                    <Span>Removing the need of going back each time</Span>
-                                    <LineBreak/>
-                                    <Span>to the home page will avoid finger cramp 👌</Span>
-                                </Paragraph>
-
-                                <Paragraph Margin="0,12">
-                                    <Span FontSize="22" FontWeight="Medium"
-                              Foreground="{ThemeResource SystemControlForegroundAccentBrush}">
-                                        LIVE TILE
-                                    </Span>
-                                    <LineBreak/>
-                                    <Span>The main app's tile is now live and strong! ✊</Span>
-                                    <LineBreak/>
-                                    <Span>It now shows the last recent photos.</Span>
-                                    <LineBreak/>
-                                    <Span>Granted, this should have been there</Span>
-                                    <LineBreak/>
-                                    <Span>since the very 1st time.</Span>
-                                </Paragraph>
-
-                                <Paragraph Margin="0,22">
-                                    <Span FontSize="22" FontWeight="Medium">OTHERS MINOR CHANGES</Span>
-                                    <LineBreak/>
-                                    <Span>• Hide headers when scrolling recent,</Span>
-                                    <LineBreak/>
-                                    <Span>curated and search lists.</Span>
-                                    <LineBreak/>
-                                    <LineBreak/>
-                                    <Span>• Pull to go back on photos FlipView</Span>
-                                    <LineBreak/>
-                                    <LineBreak/>
-                                    <Span>• Choose to see proportional dimensions</Span>
-                                    <LineBreak/>
-                                    <Span>on photo page</Span>
-                                    <LineBreak/>
-                                    <LineBreak/>
-                                    <Span>• The best resolution is now chosen</Span>
-                                    <LineBreak/>
-                                    <Span>when setting wallpaper/lockscreen</Span>
-                                </Paragraph>
-                            </RichTextBlock>
-                        </StackPanel>
                     </StackPanel>
-                </ScrollViewer>
+                </Grid>
+            </PivotItem>
+            
+            <PivotItem Header="update" x:Uid="UpdatePivotItem">
+                <Grid>
+                    <StackPanel Margin="0,20,0,0">
+                        <TextBlock Text="LAST UPDATE CHANGELOG"
+                                   FontSize="16"
+                                   FontWeight="Medium"/>
+
+                        <TextBlock x:Name="CurrentAppVersionLabel" Opacity=".5" FontWeight="SemiBold"
+                                   Margin="0,0,0,20"/>
+
+                        <TextBlock Text="FAVORITES"
+                                   Style="{StaticResource SettingsTitleColored}"/>
+
+                        <RichTextBlock Opacity=".5">
+                            <Paragraph>
+                                <Span>A new personal favorites section has been</Span>
+                                <LineBreak/>
+                                <Span>added where you can store your preferred photos.</Span>
+                                <LineBreak/>
+                            </Paragraph>
+                        </RichTextBlock>
+
+                        <TextBlock Text="IN-APP PURCHASES"
+                                   Style="{StaticResource SettingsTitleColored}"/>
+                        
+                        <RichTextBlock Opacity=".5">
+                            <Paragraph>
+                                <Span>You can now support the app development</Span>
+                                <LineBreak/>
+                                <Span>by purchasing addons.</Span>
+                                <LineBreak/>
+                                <Span>Thanks in advance.</Span>
+                            </Paragraph>
+                        </RichTextBlock>
+                    </StackPanel>
+                </Grid>
             </PivotItem>
         </Pivot>
 

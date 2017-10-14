@@ -27,6 +27,7 @@ namespace Hangon.Views {
             InitializeComponent();
             InitializeVariables();
             InitializeData();
+            InitializePageAnimation();
         }
 
         #region navigation
@@ -62,6 +63,21 @@ namespace Hangon.Views {
         }
 
         #endregion navigation
+
+        #region animations
+
+        private void InitializePageAnimation() {
+            TransitionCollection collection = new TransitionCollection();
+            NavigationThemeTransition theme = new NavigationThemeTransition();
+
+            var info = new ContinuumNavigationTransitionInfo();
+
+            theme.DefaultNavigationTransitionInfo = info;
+            collection.Add(theme);
+            Transitions = collection;
+        }
+
+        #endregion animation
 
         #region data
 
