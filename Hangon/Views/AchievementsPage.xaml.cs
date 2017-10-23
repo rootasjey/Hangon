@@ -98,51 +98,9 @@ namespace Hangon.Views {
 
         private async void Purchase(string id) {
             var result = await InAppPurchases.PurchaseAddon(id);
+            var messageResult = InAppPurchases.GetMessagePurchaseResult(result);
 
-            string extendedError = string.Empty;
-            string descriptionError = string.Empty;
-
-            if (result.ExtendedError != null) {
-                extendedError = "ExtendedError: " + result.ExtendedError.Message;
-            }
-
-            switch (result.Status) {
-                case StorePurchaseStatus.AlreadyPurchased:
-                    descriptionError = App.ResourceLoader.GetString("PurchaseStatusAlreadyPurchased");
-                    InAppPurchases.ConsumeAddon(id);
-                    break;
-
-                case StorePurchaseStatus.Succeeded:
-                    descriptionError = App.ResourceLoader.GetString("PurchaseStatusSucceeded");
-                    InAppPurchases.ConsumeAddon(id);
-                    break;
-
-                case StorePurchaseStatus.NotPurchased:
-                    descriptionError = string.Format("{0}. {1}",
-                        App.ResourceLoader.GetString("PurchaseStatusNotPurchased"),
-                        extendedError);
-                    break;
-
-                case StorePurchaseStatus.NetworkError:
-                    descriptionError = string.Format("{0}. {1}",
-                        App.ResourceLoader.GetString("PurchaseStatusNetworkError"),
-                        extendedError);
-                    break;
-
-                case StorePurchaseStatus.ServerError:
-                    descriptionError = string.Format("{0}. {1}",
-                        App.ResourceLoader.GetString("PurchaseStatusServerError"),
-                        extendedError);
-                    break;
-
-                default:
-                    descriptionError = string.Format("{0}. {1}",
-                        App.ResourceLoader.GetString("PurchaseStatusUknownError"),
-                        extendedError);
-                    break;
-            }
-
-            DataTransfer.ShowLocalToast(descriptionError);
+            DataTransfer.ShowLocalToast(messageResult);
         }
 
         #endregion others

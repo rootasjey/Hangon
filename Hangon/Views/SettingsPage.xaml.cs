@@ -43,7 +43,7 @@ namespace Hangon.Views {
         
 
         private void AnimatePersonalizationPivot() {
-            PersonalizationContentPanel.AnimateSlideIn();
+            var task = PersonalizationContentPanel.AnimateSlideIn();
         }
 
         #endregion animations
@@ -86,7 +86,7 @@ namespace Hangon.Views {
                 Body = "send this email to jeremiecorpinot@outlook.com"
             };
             // TODO : add app infos
-            EmailManager.ShowComposeNewEmailAsync(email);
+            var task = EmailManager.ShowComposeNewEmailAsync(email);
         }
 
         private async void NoteButton_Click(object sender, RoutedEventArgs e) {
@@ -505,7 +505,7 @@ namespace Hangon.Views {
 
             var autoEvent = new AutoResetEvent(false);
             var timer = new Timer(async (object state) => {
-                _UIDispatcher.RunAsync(CoreDispatcherPriority.Normal, () => {
+                await _UIDispatcher.RunAsync(CoreDispatcherPriority.Normal, () => {
                     HideNotification();
                 });
             }, autoEvent, TimeSpan.FromSeconds(5), new TimeSpan());

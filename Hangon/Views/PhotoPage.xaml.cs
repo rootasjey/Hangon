@@ -17,14 +17,13 @@ using Windows.Graphics.Display;
 using Windows.Foundation;
 using System.Threading;
 using Windows.UI;
-using Windows.ApplicationModel.Resources;
 using Unsplasharp.Models;
-using Hangon.Models;
 using System.Collections.Generic;
 
 namespace Hangon.Views {
     public sealed partial class PhotoPage : Page {
         #region variables
+
         public static Photo _CurrentPhoto { get; set; }
 
         private Image _CurrentPhotoImage { get; set; }
@@ -71,6 +70,7 @@ namespace Hangon.Views {
             _IsPhotoCaptionVisible = true;
             _ConnectedAnimationHandled = false;
             _IsStretched = Settings.GetDefaultPhotoStretching() == Windows.UI.Xaml.Media.Stretch.UniformToFill;
+
             UpdateCmdStretchIcon();
         }
 
@@ -197,7 +197,8 @@ namespace Hangon.Views {
         #endregion download
 
         #region commandbar
-        void ApplyCommandBarBarFrostedGlass() {
+
+        private void ApplyCommandBarBarFrostedGlass() {
             var glassHost = AppBarFrozenHost;
             var visual = ElementCompositionPreview.GetElementVisual(glassHost);
             var compositor = visual.Compositor;
@@ -329,6 +330,26 @@ namespace Hangon.Views {
         private void UpdateCmdStretchIcon() {
             if (_IsStretched) { CmdStretchIcon.Glyph = "\uE1D8"; } 
             else { CmdStretchIcon.Glyph = "\uE1D9"; }
+        }
+
+        private void CmdAddToFavorites_Tapped(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e) {
+            var task = App.DataSource.AddToFavorites(_CurrentPhoto);
+            RefreshFavoritesCommands();
+
+            var message = App.ResourceLoader.GetString("PhotoSuccessfulAddedToFavorites");
+            Notify(message);
+        }
+
+        private void CmdRemoveFromFavorites_Tapped(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e) {
+            var task = App.DataSource.RemoveFromFavorites(_CurrentPhoto);
+            RefreshFavoritesCommands();
+
+            if (_SourcePageType == typeof(FavoritesPage)) {
+                Frame.GoBack();
+            }
+
+            var message = App.ResourceLoader.GetString("PhotoSuccessfulRemovedFromFavorites");
+            Notify(message);
         }
 
         #endregion commandbar
@@ -535,26 +556,6 @@ namespace Hangon.Views {
             }
         }
 
-        private void CmdAddToFavorites_Tapped(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e) {
-            App.DataSource.AddToFavorites(_CurrentPhoto);
-            RefreshFavoritesCommands();
-
-            var message = App.ResourceLoader.GetString("PhotoSuccessfulAddedToFavorites");
-            Notify(message);
-        }
-
-        private void CmdRemoveFromFavorites_Tapped(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e) {
-            App.DataSource.RemoveFromFavorites(_CurrentPhoto);
-            RefreshFavoritesCommands();
-
-            if (_SourcePageType == typeof(FavoritesPage)) {
-                Frame.GoBack();
-            }
-
-            var message = App.ResourceLoader.GetString("PhotoSuccessfulRemovedFromFavorites");
-            Notify(message);
-        }
-
         #endregion events
 
         #region others methods
@@ -690,7 +691,8 @@ namespace Hangon.Views {
         void RefreshCaptionVisibility(Grid root) {
             var caption = (Grid)root.FindName("PhotoCaptionContent");
 
-            if (!_IsPhotoCaptionVisible) { HideCaption(caption); } else { ShowCaption(caption); }
+            if (!_IsPhotoCaptionVisible) HideCaption(caption);
+            else ShowCaption(caption);
         }
 
         #endregion others

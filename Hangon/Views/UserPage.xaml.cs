@@ -83,7 +83,6 @@ namespace Hangon.Views {
 
         #endregion navigation
 
-
         #region data
         private void InitializeVariables() {
             _PageDataSource = App.DataSource;
@@ -172,7 +171,6 @@ namespace Hangon.Views {
         }
 
         #endregion data
-
         
         #region micro-interactions
 
@@ -503,7 +501,7 @@ namespace Hangon.Views {
         private void PivotUserData_SelectionChanged(object sender, SelectionChangedEventArgs e) {
             _LastPivotIndexSelected = PivotUserData.SelectedIndex;
 
-            App.DataSource.LoadLocalFavorites();
+            var task = App.DataSource.LoadLocalFavorites();
 
             switch (PivotUserData.SelectedIndex) {
                 case 0:
@@ -714,7 +712,7 @@ namespace Hangon.Views {
                 return;
             }
 
-            App.DataSource.AddToFavorites(photo);
+            var task = App.DataSource.AddToFavorites(photo);
 
             // TODO: Notify add
             var message = App.ResourceLoader.GetString("PhotoSuccessfulAddedToFavorites");
@@ -733,7 +731,7 @@ namespace Hangon.Views {
                 return;
             }
 
-            App.DataSource.RemoveFromFavorites(photo);
+            var task = App.DataSource.RemoveFromFavorites(photo);
 
             // TODO: Notify removed
             var message = App.ResourceLoader.GetString("PhotoSuccessfulRemovedFromFavorites");

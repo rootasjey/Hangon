@@ -86,7 +86,6 @@ namespace Hangon.Views {
             Frame.Navigate(typeof(AchievementsPage));
         }
 
-
         private void NavigateBackToGridItem() {
             var animation = ConnectedAnimationService.GetForCurrentView().GetAnimation("PhotoImageBack");
 
@@ -120,6 +119,34 @@ namespace Hangon.Views {
                 SearchPhotosView.Loaded += (s, e) => {
                     UI.AnimateBackItemToList(SearchPhotosView, _LastSelectedPhoto, animation);
                 };
+            }
+        }
+
+        private void PhotoItem_Tapped(object sender, TappedRoutedEventArgs e) {
+            var item = (StackPanel)sender;
+            var photo = (Photo)item.DataContext;
+            _LastSelectedPhoto = photo;
+
+            var image = (Image)item.FindName("PhotoImage");
+
+            if (image != null) {
+                ConnectedAnimationService.GetForCurrentView().PrepareToAnimate("PhotoImage", image);
+            }
+
+            var photosListParameter = GetCurrentPhotosListSelected();
+            Frame.Navigate(typeof(PhotoPage), new object[] { photo, photosListParameter, this.GetType() });
+
+            PhotosList GetCurrentPhotosListSelected() {
+                switch (_LastSelectedPivotIndex) {
+                    case 0:
+                        return _PageDataSource.RecentPhotos;
+                    case 1:
+                        return _PageDataSource.CuratedPhotos;
+                    case 2:
+                        return _PageDataSource.PhotosSearchResults;
+                    default:
+                        return _PageDataSource.RecentPhotos;
+                }
             }
         }
 
@@ -228,7 +255,8 @@ namespace Hangon.Views {
             UseCmdBarMinimalMode();
             _LastSelectedPivotIndex = PagePivot.SelectedIndex;
 
-            App.DataSource.LoadLocalFavorites();
+            // possible slow down in connected animation ?
+            var task = App.DataSource.LoadLocalFavorites();
 
             switch (PagePivot.SelectedIndex) {
                 case 0:
@@ -278,7 +306,6 @@ namespace Hangon.Views {
                 default:
                     break;
             }
-            
 
             void HideResfreshCmd()
             {
@@ -290,34 +317,6 @@ namespace Hangon.Views {
                 CmdRefresh.Visibility = Visibility.Visible;
             }
         }
-
-        private void PhotoItem_Tapped(object sender, TappedRoutedEventArgs e) {
-            var item = (StackPanel)sender;
-            var photo = (Photo)item.DataContext;
-            _LastSelectedPhoto = photo;
-
-            var image = (Image)item.FindName("PhotoImage");
-
-            if (image != null) {
-                ConnectedAnimationService.GetForCurrentView().PrepareToAnimate("PhotoImage", image);
-            }
-
-            var photosListParameter = GetCurrentPhotosListSelected();
-            Frame.Navigate(typeof(PhotoPage), new object[] { photo, photosListParameter, this.GetType() });
-
-            PhotosList GetCurrentPhotosListSelected() {
-                switch (_LastSelectedPivotIndex) {
-                    case 0:
-                        return _PageDataSource.RecentPhotos;
-                    case 1:
-                        return _PageDataSource.CuratedPhotos;
-                    case 2:
-                        return _PageDataSource.PhotosSearchResults;
-                    default:
-                        return _PageDataSource.RecentPhotos;
-                }
-            }
-        }        
 
         private void PhotoItem_Loaded(object sender, RoutedEventArgs e) {
             var photoItem = (StackPanel)sender;
@@ -402,6 +401,7 @@ namespace Hangon.Views {
         #endregion micro-interactions
 
         #region commandbar
+
         void ApplyCommandBarBarFrostedGlass() {
             var glassHost = AppBarFrozenHost;
             var visual = ElementCompositionPreview.GetElementVisual(glassHost);
@@ -553,6 +553,11 @@ namespace Hangon.Views {
                     break;
             }
         }
+
+        private void GoToSlideshow_Tapped(object sender, TappedRoutedEventArgs e) {
+            Frame.Navigate(typeof(SlideshowPage));
+        }
+
         #endregion commandbar
 
         #region search
@@ -792,12 +797,12 @@ namespace Hangon.Views {
 
             _LastSelectedPhoto = photo;
 
-            CheckIfPhotoInFavorites(photo);
+            IsPhotoInFavorites(photo);
 
             PhotoRightTappedFlyout.ShowAt(panel);
         }
 
-        private void CheckIfPhotoInFavorites(Photo photo) {
+        private void IsPhotoInFavorites(Photo photo) {
             if (App.DataSource.LocalFavorites == null) {
                 RightCmdRemoveFavorites.Visibility = Visibility.Collapsed;
                 RightCmdAddToFavorites.Visibility = Visibility.Collapsed;
@@ -915,7 +920,7 @@ namespace Hangon.Views {
                 return;
             }
 
-            App.DataSource.AddToFavorites(photo);
+            var task = App.DataSource.AddToFavorites(photo);
 
             // TODO: Notify add
             var message = App.ResourceLoader.GetString("PhotoSuccessfulAddedToFavorites");
@@ -934,7 +939,7 @@ namespace Hangon.Views {
                 return;
             }
 
-            App.DataSource.RemoveFromFavorites(photo);
+            var task = App.DataSource.RemoveFromFavorites(photo);
 
             // TODO: Notify removed
             var message = App.ResourceLoader.GetString("PhotoSuccessfulRemovedFromFavorites");

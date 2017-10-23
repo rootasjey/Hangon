@@ -388,7 +388,7 @@ namespace Hangon.Views {
 
             var autoEvent = new AutoResetEvent(false);
             var timer = new Timer(async (object state) => {
-                _UIDispatcher.RunAsync(CoreDispatcherPriority.Normal, () => {
+                await _UIDispatcher.RunAsync(CoreDispatcherPriority.Normal, () => {
                     HideNotification();
                 });
             }, autoEvent, TimeSpan.FromSeconds(5), new TimeSpan());
@@ -556,7 +556,7 @@ namespace Hangon.Views {
                 return;
             }
 
-            App.DataSource.AddToFavorites(photo);
+            var task = App.DataSource.AddToFavorites(photo);
 
             // TODO: Notify add
             var message = App.ResourceLoader.GetString("PhotoSuccessfulAddedToFavorites");
@@ -575,7 +575,7 @@ namespace Hangon.Views {
                 return;
             }
 
-            App.DataSource.RemoveFromFavorites(photo);
+            var task = App.DataSource.RemoveFromFavorites(photo);
 
             // TODO: Notify removed
             var message = App.ResourceLoader.GetString("PhotoSuccessfulRemovedFromFavorites");

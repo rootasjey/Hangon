@@ -453,4 +453,28 @@
   <data name="UpdatePivotItem.Header" xml:space="preserve">
     <value>update</value>
   </data>
+  <data name="SlideshowButtonBuyAddon.Text" xml:space="preserve">
+    <value>Okay. Take my money!</value>
+  </data>
+  <data name="SlideshowLoadingViewLabel.Text" xml:space="preserve">
+    <value>loading slideshow...</value>
+  </data>
+  <data name="SlideshowNoAccessLabel.Text" xml:space="preserve">
+    <value>It seems that you don't have the necessary addon to play the slideshow.</value>
+  </data>
+  <data name="CmdSlideshow.Label" xml:space="preserve">
+    <value>slideshow</value>
+  </data>
+  <data name="ButtonTryAgainLabel.Text" xml:space="preserve">
+    <value>try again</value>
+  </data>
+  <data name="SlideshowErrorViewLabel.Text" xml:space="preserve">
+    <value>Sorry, photos coudn't be retrieved. Try again and if the problem persists, contact me.</value>
+  </data>
+  <data name="ButtonContactMeLabel.Text" xml:space="preserve">
+    <value>contact me</value>
+  </data>
+  <data name="CmdHome.Label" xml:space="preserve">
+    <value>home</value>
+  </data>
 </root>

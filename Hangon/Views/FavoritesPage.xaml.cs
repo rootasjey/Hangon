@@ -251,7 +251,7 @@ namespace Hangon.Views {
                 return;
             }
 
-            App.DataSource.RemoveFromFavorites(photo);
+            var task = App.DataSource.RemoveFromFavorites(photo);
 
             // TODO: Notify removed
             var message = App.ResourceLoader.GetString("PhotoSuccessfulRemovedFromFavorites");

@@ -1,0 +1,264 @@
+﻿<Page
+    x:Class="Hangon.Views.SlideshowPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Page.Resources>
+        <Style x:Key="ButtonCenteredStyle" TargetType="Button">
+            <Setter Property="Margin" Value="0,10"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="MinWidth" Value="130"/>
+        </Style>
+
+        <Style x:Key="ButtonSquarredStyle" TargetType="Button">
+            <Setter Property="Height" Value="140"/>
+            <Setter Property="Width" Value="120"/>
+        </Style>
+
+        <Style x:Key="FontIconCountStyle" TargetType="FontIcon">
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="Margin" Value="0,0,6,0"/>
+        </Style>
+
+        <Style x:Key="FontIconLabelStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+        </Style>
+    </Page.Resources>
+
+    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <Grid x:Name="SlideshowContainer">
+            <Image x:Name="PhotoImage"
+                   Visibility="Collapsed"
+                   Stretch="UniformToFill"
+                   Tapped="GoToPhotoPage_Tapped">
+                <Image.Source>
+                    <BitmapImage DecodePixelWidth="300"/>
+                </Image.Source>
+            </Image>
+
+            <Grid x:Name="PhotoCaption"
+                    Margin="12"
+                    Background="Transparent"
+                    Canvas.ZIndex="2"
+                    Visibility="Collapsed"
+                    VerticalAlignment="Bottom">
+
+                <StackPanel x:Name="PhotoCaptionContent">
+                    <StackPanel x:Name="UserPanel" 
+                                Orientation="Horizontal" 
+                                Margin="0,-10,0,6"
+                                Tapped="GoToUser_Tapped">
+                        
+                        <Ellipse x:Name="UserProfileImage"
+                                Height="40" Width="40"
+                                PointerEntered="UserProfileImage_PointerEntered"
+                                PointerExited="UserProfileImage_PointerExited"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center">
+                            <Ellipse.Fill>
+                                <ImageBrush Stretch="UniformToFill">
+                                    <ImageBrush.ImageSource>
+                                        <BitmapImage x:Name="UserImageSource" />
+                                    </ImageBrush.ImageSource>
+                                </ImageBrush>
+                            </Ellipse.Fill>
+                        </Ellipse>
+
+                        <Grid x:Name="UsernamePanel">
+                            <Grid x:Name="UsernameFrozenHost" Margin="12,0,0,0"/>
+                            <TextBlock x:Name="UserName" 
+                               Margin="12,0,0,0"
+                               FontSize="20"
+                               FontWeight="Medium"
+                               Typography.Capitals="AllSmallCaps"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center"/>
+                        </Grid>
+                    </StackPanel>
+
+                    <StackPanel x:Name="StatsCountPanel"
+                                Orientation="Horizontal"
+                                Visibility="Visible"
+                                Margin="56,0,0,0">
+
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,0">
+                            <Grid x:Name="LikesIconPanel" Height="30">
+                                <Grid x:Name="LikesIconFrozenHost" Margin="-6,0,0,0"/>
+                                <FontIcon x:Name="LikesIcon" 
+                                          Glyph="&#xE006;" 
+                                          Style="{StaticResource FontIconCountStyle}" />
+                            </Grid>
+
+                            <Grid x:Name="LikesCountPanel" Height="30" Margin="-2,0,0,0">
+                                <Grid x:Name="LikesCountFrozenHost"/>
+                                <TextBlock x:Name="LikesCount"
+                                           VerticalAlignment="Center"
+                                           HorizontalAlignment="Left"
+                                           Style="{StaticResource FontIconLabelStyle}" />
+                            </Grid>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal" Margin="-6,0,0,0">
+                            <Grid x:Name="DownloadIconPanel" Height="30" Width="22" Margin="6,0,0,0">
+                                <Grid x:Name="DownloadIconFrozenHost"/>
+                                <FontIcon x:Name="DownloadIcon" 
+                                          Glyph="&#xE118;" 
+                                          Style="{StaticResource FontIconCountStyle}"/>
+                            </Grid>
+
+                            <Grid x:Name="DownloadTextPanel" Height="30" Margin="-2,0,0,0">
+                                <Grid x:Name="DownloadTextFrozenHost"/>
+                                <TextBlock x:Name="DownloadsCount"
+                                           VerticalAlignment="Center"
+                                           HorizontalAlignment="Left"
+                                           Style="{StaticResource FontIconLabelStyle}"/>
+                            </Grid>
+                        </StackPanel>
+                    </StackPanel>
+
+                    <StackPanel x:Name="LocationPanel" Orientation="Horizontal"
+                                Margin="56,6,0,0">
+
+                        <Grid x:Name="LocationIconPanel" Height="30">
+                            <Grid x:Name="LocationIconFrozenHost" Margin="-6,0,0,0"/>
+                            <BitmapIcon x:Name="LocationIcon" 
+                                Height="20" 
+                                Width="20" 
+                                UriSource="ms-appx:///Assets/Icons/location.png"/>
+                        </Grid>
+
+                        <Grid x:Name="LocationTextPanel" Height="30" Margin="-2,0,0,0">
+                            <Grid x:Name="LocationTextFrozenHost"/>
+                            <TextBlock x:Name="LocationText" 
+                                       VerticalAlignment="Center"
+                                       HorizontalAlignment="Center"
+                                       FontSize="18" 
+                                       FontWeight="SemiLight"/>
+                        </Grid>
+                    </StackPanel>
+                </StackPanel>
+            </Grid>
+
+            <Grid x:Name="FloatingToggleFavoritesPanel"
+                  Height="40"
+                  Width="40"
+                  Margin="0,0,3,24"
+                  Canvas.ZIndex="2"
+                  Visibility="Collapsed"
+                  HorizontalAlignment="Right"
+                  VerticalAlignment="Bottom">
+
+                <FontIcon x:Name="ToggleFavoritesIcon"
+                          Glyph="&#xE006;"
+                          FontSize="30"
+                          Foreground="Tomato"
+                          Canvas.ZIndex="3"
+                          PointerEntered="AddFavoritesIcon_PointerEntered"
+                          PointerExited="AddFavoritesIcon_PointerExited"
+                          Tapped="ToggleFavorite_Tapped"/>
+            </Grid>
+
+            <StackPanel x:Name="SlideshowNoAccessView"
+                        Visibility="Collapsed"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Center">
+        
+                <FontIcon Glyph="&#xE007;" FontSize="50" Margin="12"/>
+                
+                <TextBlock x:Uid="SlideshowNoAccessLabel" 
+                           Text="It seems that you don't have the necessary addon to play the slideshow."
+                           Margin="12"
+                           FontSize="22"
+                           FontWeight="SemiLight"
+                           TextWrapping="Wrap"/>
+
+                <Button Margin="0,10,0,0"
+                        Style="{StaticResource ButtonSquarredStyle}"
+                        HorizontalAlignment="Center"
+                        Tapped="BuySlideshowAddon_Tapped">
+                    <Button.Content>
+                        <StackPanel>
+                            <BitmapIcon UriSource="/Assets/Icons/credit_card.png" 
+                                        Height="60" />
+                            <TextBlock x:Uid="SlideshowButtonBuyAddon" 
+                                       Text="Okey. Take my money!"
+                                       TextWrapping="Wrap"/>
+                        </StackPanel>
+                    </Button.Content>
+                </Button>
+
+            </StackPanel>
+
+            <StackPanel x:Name="SlideshowErrorView"
+                        Visibility="Collapsed"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center">
+
+                <FontIcon Glyph="&#xE19E;" FontSize="40" />
+
+                <TextBlock x:Uid="SlideshowErrorViewLabel" 
+                           Text="Sorry, photos coudn't be retrieved. Try again and if the problem persists, contact me."
+                           FontWeight="SemiLight"
+                           FontSize="22"
+                           Margin="12"
+                           TextWrapping="Wrap"/>
+
+                <StackPanel Orientation="Horizontal"
+                            HorizontalAlignment="Center">
+                    
+                    <Button  
+                        Style="{StaticResource ButtonSquarredStyle}"
+                        Background="{ThemeResource SystemControlHighlightAccentBrush}"
+                        Foreground="White"
+                        Tapped="TryAgainStartingSlideshow_Tapped">
+                        <Button.Content>
+                            <StackPanel>
+                                <FontIcon Glyph="&#xE149;" FontSize="30" />
+                                <TextBlock x:Uid="ButtonTryAgainLabel" 
+                                           Margin="0,12,0,0"
+                                           Text="try again"
+                                           TextWrapping="Wrap"/>
+                            </StackPanel>
+                        </Button.Content>
+                    </Button>
+
+                    <Button Margin="6,0"
+                            Style="{StaticResource ButtonSquarredStyle}"
+                            Tapped="ContactMe_Tapped">
+                        <Button.Content>
+                            <StackPanel>
+                                <FontIcon Glyph="&#xE715;" FontSize="30"/>
+                                <TextBlock x:Uid="ButtonContactMeLabel"
+                                           Margin="0,12,0,0"
+                                           Text="contact me"
+                                           TextWrapping="Wrap"/>
+                            </StackPanel>
+                        </Button.Content>
+                    </Button>
+                </StackPanel>
+                
+            </StackPanel>
+
+            <StackPanel x:Name="SlideshowLoadingView"
+                        Visibility="Visible"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Center">
+                <TextBlock x:Uid="SlideshowLoadingViewLabel" Text="loading slideshow..." FontSize="24"/>
+                <ProgressBar IsIndeterminate="True"/>
+            </StackPanel>
+        </Grid>
+
+        <CommandBar x:Name="PageCommandBar"
+                    Background="Transparent"
+                    ClosedDisplayMode="Minimal"
+                    VerticalAlignment="Bottom">
+            <CommandBar.SecondaryCommands>
+                <AppBarButton x:Uid="CmdHome" Label="home" Tapped="CmdGoHome_Tapped"/>
+            </CommandBar.SecondaryCommands>
+        </CommandBar>
+    </Grid>
+</Page>

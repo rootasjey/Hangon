@@ -1,7 +1,6 @@
 ﻿using Hangon.Models;
 using Hangon.Services;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using Unsplasharp;
 using Unsplasharp.Models;
@@ -9,6 +8,7 @@ using Unsplasharp.Models;
 namespace Hangon.Data {
     public class DataSource {
         #region variables
+
         private UnsplasharpClient _Client { get; set; }
 
         public PhotosList RecentPhotos { get; set; }
@@ -24,6 +24,21 @@ namespace Hangon.Data {
         public PhotosList CollectionPhotos { get; set; }
 
         public PhotosKeyedCollection LocalFavorites { get; set; }
+
+        private static string BaseURI {
+            get {
+                return "https://api.unsplash.com/";
+            }
+        }
+
+        private static IDictionary<string, string> Endpoints = new Dictionary<string, string>() {
+            {"photos", "photos" },
+            {"curated_photos", "photos/curated" },
+            {"search", "search" },
+            {"search_photos", "search/photos" },
+            {"users", "users" },
+            {"collections", "collections" }
+        };
 
         #endregion variables
 
@@ -134,20 +149,9 @@ namespace Hangon.Data {
             return await CollectionPhotos.Fetch();
         }
 
-        private static string BaseURI {
-            get {
-                return "https://api.unsplash.com/";
-            }
+        public async Task<List<Photo>> GetRandomPhotos() {
+            return await _Client.GetRandomPhoto(count: 30);
         }
-
-        private static IDictionary<string, string> Endpoints = new Dictionary<string, string>() {
-            {"photos", "photos" },
-            {"curated_photos", "photos/curated" },
-            {"search", "search" },
-            {"search_photos", "search/photos" },
-            {"users", "users" },
-            {"collections", "collections" }
-        };
 
         public static string GetUrl(string type) {
             switch (type) {

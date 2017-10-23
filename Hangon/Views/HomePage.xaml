@@ -487,6 +487,7 @@
             <AppBarButton x:Name="CmdRefresh" x:Uid="CmdRefresh" Label="refresh" Icon="Refresh" Tapped="CmdRefresh_Tapped"/>
             <CommandBar.SecondaryCommands>
                 <AppBarButton Label="donations" x:Uid="CmdDonations" Tapped="GoToAchievements_Tapped"/>
+                <AppBarButton Label="slideshow" x:Uid="CmdSlideshow" Tapped="GoToSlideshow_Tapped"/>
                 <AppBarButton x:Name="CmdFavorites" x:Uid="CmdFavorites" Label="favorites" Tapped="GoToFavorites_Tapped"/>
                 <AppBarButton x:Name="CmdSettings" x:Uid="CmdSettings" Label="settings" Tapped="CmdSettings_Tapped"/>
             </CommandBar.SecondaryCommands>

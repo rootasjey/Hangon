@@ -127,44 +127,77 @@
         <Pivot x:Name="PagePivot"
                Style="{StaticResource PivotCenteredHeadersStyle}">
             <PivotItem x:Uid="FavoritesHeader" Header="favorites">
-                <Grid>
-                    <controls:AdaptiveGridView x:Name="LocalFavoritesView"
-                                                   DesiredWidth="300"
-                                                   ItemHeight="300"
-                                                   ItemTemplate="{StaticResource PhotoTemplate}"
-                                                   animations:ReorderGridAnimation.Duration="300"
-                                                   ItemContainerStyle="{StaticResource GridViewItemZeroMarginStyle}">
-                    </controls:AdaptiveGridView>
+                <UserControl>
+                    <Grid>
+                        <!--LOAD VIEW-->
+                        <StackPanel x:Name="LocalFavoritesLoadingView"
+                                    Visibility="Visible"
+                                    VerticalAlignment="Center">
 
-                    <StackPanel x:Name="LocalFavoritesLoadingView"
-                                Visibility="Visible"
-                                VerticalAlignment="Center">
-                        
-                        <FontIcon Glyph="&#xE10C;"
-                                  FontSize="40"
-                                  Margin="0,10"/>
-                        
-                        <TextBlock x:Uid="LoadingFavoritesLabel" 
-                                   Text="Loading your favorites..."
-                                   FontSize="20"
-                                   HorizontalAlignment="Center"
-                                   TextWrapping="Wrap"/>
-                        <ProgressBar IsIndeterminate="True" Margin="0,20"/>
-                    </StackPanel>
+                            <FontIcon Glyph="&#xE10C;"
+                                      FontSize="40"
+                                      Margin="0,10"/>
 
-                    <StackPanel x:Name="LocalFavoritesEmptyView"
-                                Visibility="Collapsed"
-                                VerticalAlignment="Center">
-                        <FontIcon Glyph="&#xE007;"
-                                  FontSize="40"
-                                  Margin="0,10"/>
-                        <TextBlock x:Uid="NoFavoritesLabel" 
-                                   Text="You've no favorites at the moment."
-                                   FontSize="24"
-                                   HorizontalAlignment="Center"
-                                   TextWrapping="Wrap"/>
-                    </StackPanel>
-                </Grid>
+                            <TextBlock x:Uid="LoadingFavoritesLabel" 
+                                       Text="Loading your favorites..."
+                                       FontSize="20"
+                                       HorizontalAlignment="Center"
+                                       TextWrapping="Wrap"/>
+                            <ProgressBar IsIndeterminate="True" Margin="0,20"/>
+                        </StackPanel>
+
+                        <!--EMPTY VIEW-->
+                        <StackPanel x:Name="LocalFavoritesEmptyView"
+                                    Visibility="Collapsed"
+                                    VerticalAlignment="Center">
+                            <FontIcon Glyph="&#xE007;"
+                                      FontSize="40"
+                                      Margin="0,10"/>
+                            <TextBlock x:Uid="NoFavoritesLabel" 
+                                       Text="You've no favorites at the moment."
+                                       FontSize="24"
+                                       HorizontalAlignment="Center"
+                                       TextWrapping="Wrap"/>
+                        </StackPanel>
+
+                        <!--DATA-->
+                        <controls:AdaptiveGridView x:Name="LocalFavoritesView"
+                                                       DesiredWidth="300"
+                                                       ItemHeight="300"
+                                                       ItemTemplate="{StaticResource PhotoTemplate}"
+                                                       animations:ReorderGridAnimation.Duration="300"
+                                                       ItemContainerStyle="{StaticResource GridViewItemZeroMarginStyle}">
+                        </controls:AdaptiveGridView>
+
+                        <!-- VISUAL STATES -->
+                        <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroup x:Name="LocalFavoritesViewStates">
+                                <VisualState x:Name="LocalFavoritesViewSmall">
+                                    <VisualState.StateTriggers>
+                                        <AdaptiveTrigger MinWindowWidth="0"/>
+                                    </VisualState.StateTriggers>
+
+                                    <VisualState.Setters>
+                                        <Setter Target="LocalFavoritesView.ItemHeight" Value="90"/>
+                                        <Setter Target="LocalFavoritesView.DesiredWidth" Value="90"/>
+                                        <Setter Target="LocalFavoritesView.Margin" Value="0,0,-20,0"/>
+                                    </VisualState.Setters>
+                                </VisualState>
+
+                                <VisualState x:Name="LocalFavoritesViewLarge">
+                                    <VisualState.StateTriggers>
+                                        <AdaptiveTrigger MinWindowWidth="600"/>
+                                    </VisualState.StateTriggers>
+
+                                    <VisualState.Setters>
+                                        <Setter Target="LocalFavoritesView.ItemHeight" Value="300"/>
+                                        <Setter Target="LocalFavoritesView.DesiredWidth" Value="300"/>
+                                    </VisualState.Setters>
+                                </VisualState>
+                            </VisualStateGroup>
+                        </VisualStateManager.VisualStateGroups>
+                    </Grid>
+                </UserControl>
             </PivotItem>
         </Pivot>
     </Grid>
