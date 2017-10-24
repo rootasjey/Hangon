@@ -308,28 +308,19 @@
                         <TextBlock x:Name="CurrentAppVersionLabel" Opacity=".5" FontWeight="SemiBold"
                                    Margin="0,0,0,20"/>
 
-                        <TextBlock Text="FAVORITES"
+                        <TextBlock Text="SLIDESHOW"
                                    Style="{StaticResource SettingsTitleColored}"/>
 
                         <RichTextBlock Opacity=".5">
                             <Paragraph>
-                                <Span>A new personal favorites section has been</Span>
+                                <Span>A new slideshow section has been added,</Span>
                                 <LineBreak/>
-                                <Span>added where you can store your preferred photos.</Span>
+                                <Span>and ti's a great way to discover new photos.</Span>
                                 <LineBreak/>
-                            </Paragraph>
-                        </RichTextBlock>
-
-                        <TextBlock Text="IN-APP PURCHASES"
-                                   Style="{StaticResource SettingsTitleColored}"/>
-                        
-                        <RichTextBlock Opacity=".5">
-                            <Paragraph>
-                                <Span>You can now support the app development</Span>
+                                <Span>This new feature is a thank you gift</Span>
                                 <LineBreak/>
-                                <Span>by purchasing addons.</Span>
+                                <Span>for those who support the app financially.</Span>
                                 <LineBreak/>
-                                <Span>Thanks in advance.</Span>
                             </Paragraph>
                         </RichTextBlock>
                     </StackPanel>

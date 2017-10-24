@@ -139,11 +139,11 @@
                         ScrollViewer.VerticalScrollMode="Disabled"
                         Padding="0,20">
                 <StackPanel Orientation="Horizontal">
-                    <FontIcon Glyph="&#xE00B;" 
+                    <FontIcon Glyph="&#xE116;" 
                               Foreground="{ThemeResource SystemControlHighlightAccentBrush}" 
                               FontSize="30" Margin="0,0,12,-6"/>
-                    <TextBlock Text="October Update" 
-                               FontSize="38"
+                    <TextBlock Text="Slideshow Update" 
+                               FontSize="36"
                                FontWeight="Normal"
                                Typography.Capitals="AllSmallCaps"/>
                     
@@ -154,31 +154,21 @@
                 <RichTextBlock TextWrapping="Wrap" 
                                Margin="0,20,0,0"
                                ScrollViewer.VerticalScrollMode="Disabled">
-                    
+
                     <Paragraph Margin="0,12">
                         <Span FontSize="22" 
                               FontWeight="Medium" 
                               Foreground="{ThemeResource SystemControlForegroundAccentBrush}">
-                            FAVORITES
+                            SLIDESHOW
                         </Span>
                         <LineBreak/>
-                        <Span>A new personal favorites section has been</Span>
+                        <Span>A new slideshow section has been added,</Span>
                         <LineBreak/>
-                        <Span>added where you can store your preferred photos.</Span>
+                        <Span>and ti's a great way to discover new photos.</Span>
                         <LineBreak/>
-                    </Paragraph>
-
-                    <Paragraph Margin="0,12">
-                        <Span FontSize="22" FontWeight="Medium"
-                              Foreground="{ThemeResource SystemControlForegroundAccentBrush}">
-                            IN-APP PURCHASES
-                        </Span>
+                        <Span>This new feature is a thank you gift</Span>
                         <LineBreak/>
-                        <Span>You can now support the app development</Span>
-                        <LineBreak/>
-                        <Span>by purchasing addons.</Span>
-                        <LineBreak/>
-                        <Span>Thanks in advance.</Span>
+                        <Span>for those who support the app financially.</Span>
                     </Paragraph>
                 </RichTextBlock>
                 
