@@ -84,190 +84,232 @@
             </MenuFlyoutSubItem>
         </MenuFlyout>
     </Page.Resources>
-    
+
     <Grid Background="Black">
-        <FlyoutPresenter x:Name="FlyoutNotification"
+        <Grid.RowDefinitions>
+            <RowDefinition x:Name="TitleBarRow" Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Grid x:Name="TitleBar" 
+              Background="Transparent" 
+              Grid.Row="0" 
+              Canvas.ZIndex="2"
+              Margin="0,0,0,-37">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Grid x:Name="BackButtonGrid" VerticalAlignment="Top"
+                  Visibility="Collapsed">
+                <Button x:Name="BackButton" Background="Transparent">
+                    <FontIcon Glyph="&#xE096;" Foreground="White"/>
+                </Button>
+            </Grid>
+            <Grid Grid.Column="1" x:Name="TitleBarMainContent" Background="Transparent">
+                <TextBlock Text="Hangon" 
+                           Visibility="Collapsed"
+                           Foreground="White"
+                           FontSize="12" 
+                           FontFamily="Segoe UI" 
+                           FontWeight="Normal" 
+                           Margin="60,6,0,0"/>
+            </Grid>
+            <Grid Grid.Column="3" x:Name="RightMask" Background="Transparent"/>
+        </Grid>
+
+        <Grid x:Name="PageContent"
+              Grid.Row="1">
+            <FlyoutPresenter x:Name="FlyoutNotification"
                          RequestedTheme="Dark"
                          Visibility="Collapsed"
                          Canvas.ZIndex="2"
                          Background="{ThemeResource SystemControlHighlightAccentBrush}" 
                          MinHeight="20" VerticalAlignment="Top"
                          Tapped="FlyoutNotification_Dismiss">
-            <StackPanel MaxWidth="200">
-                <TextBlock x:Name="FlyoutText" Text="" TextWrapping="Wrap"/>
-                <Grid x:Name="ProgressGrid" Visibility="Collapsed">
-                    <ProgressBar x:Name="ProgressIndeterminate"
+                <StackPanel MaxWidth="200">
+                    <TextBlock x:Name="FlyoutText" Text="" TextWrapping="Wrap"/>
+                    <Grid x:Name="ProgressGrid" Visibility="Collapsed">
+                        <ProgressBar x:Name="ProgressIndeterminate"
                                  FlowDirection="RightToLeft" IsIndeterminate="True" Canvas.ZIndex="1"/>
-                    <ProgressBar x:Name="ProgressDeterminate" IsIndeterminate="False" />
-                </Grid>
-            </StackPanel>
-        </FlyoutPresenter>
-        
-        <Grid x:Name="BackgroundView">
-            <Image x:Name="CollectionCoverImage" Stretch="UniformToFill"/>
-            <Grid x:Name="BackgroundBlurEffect"/>
-        </Grid>
+                        <ProgressBar x:Name="ProgressDeterminate" IsIndeterminate="False" />
+                    </Grid>
+                </StackPanel>
+            </FlyoutPresenter>
 
-        <Pivot x:Name="PivotCollection"
-               RequestedTheme="Dark"
-               Style="{StaticResource PivotCenteredHeadersStyle}"
-               SelectionChanged="PivotCollection_SelectionChanged">
-            
-            <PivotItem x:Name="CollectionInfosView"
-                       Header="infos">
-                <ScrollViewer>
-                    <StackPanel Margin="0,60,0,0"
-                                Padding="0,0,0,100">
+            <Grid x:Name="BackgroundView">
+                <Image x:Name="CollectionCoverImage" Stretch="UniformToFill"/>
+                <Grid x:Name="BackgroundBlurEffect"/>
+            </Grid>
 
-                        <StackPanel x:Name="PanelInfos"
-                                    HorizontalAlignment="Center">
-                            <StackPanel x:Name="CollectionInfosPanel"
-                                    HorizontalAlignment="Left">
-                                
-                                <TextBlock x:Name="TextTitle"
-                                           FontSize="28"
-                                           Typography.Capitals="SmallCaps"
-                                           FontWeight="Bold"/>
+            <Pivot x:Name="PivotCollection"
+                   RequestedTheme="Dark"
+                   Margin="0,37,0,0"
+                   Style="{StaticResource PivotCenteredHeadersStyle}"
+                   SelectionChanged="PivotCollection_SelectionChanged">
 
-                                <TextBlock x:Name="TextDescription"
-                                           FontSize="20"
-                                           FontWeight="Light"/>
+                <PivotItem x:Name="CollectionInfosView"
+                           Header="infos">
+                    <ScrollViewer>
+                        <StackPanel Margin="0,60,0,0"
+                                    Padding="0,0,0,100">
 
-                                <TextBlock x:Name="TextPubDate"
-                                           FontSize="18"
-                                       Opacity=".6"/>
-                            </StackPanel>
+                            <StackPanel x:Name="PanelInfos"
+                                        HorizontalAlignment="Center">
+                                <StackPanel x:Name="CollectionInfosPanel"
+                                        HorizontalAlignment="Left">
 
-                            <Grid x:Name="UserInfosPanel"
-                                  Margin="0,20,0,0">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="50"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
-                            
-                                <Ellipse x:Name="UserProfileImage"
-                                        Height="40" Width="40"
-                                         VerticalAlignment="Top"
-                                         Margin="-6,0,0,0"
-                                        PointerEntered="UserView_PointerEntered"
-                                        PointerExited="UserView_PointerExited">
-                                    <Ellipse.Fill>
-                                        <ImageBrush Stretch="UniformToFill">
-                                            <ImageBrush.ImageSource>
-                                                <BitmapImage x:Name="UserImageSource" />
-                                            </ImageBrush.ImageSource>
-                                        </ImageBrush>
-                                    </Ellipse.Fill>
-                                </Ellipse>
+                                    <TextBlock x:Name="TextTitle"
+                                               FontSize="28"
+                                               Typography.Capitals="SmallCaps"
+                                               FontWeight="Bold"/>
 
-                                <StackPanel x:Name="UserTextPanel"
-                                            VerticalAlignment="Top"
-                                            Grid.Column="1">
-                                    <Grid x:Name="UserNameContainer" 
-                                          Background="Black"
-                                          Opacity=".7"
-                                          Padding="10"
-                                          MinWidth="0"
-                                          HorizontalAlignment="Left"
-                                          Height="40">
+                                    <TextBlock x:Name="TextDescription"
+                                               FontSize="20"
+                                               FontWeight="Light"/>
 
-                                        <TextBlock x:Name="UserName" 
-                                            FontSize="20"
-                                            HorizontalAlignment="Center"
-                                            VerticalAlignment="Center"/>
-                                    </Grid>
+                                    <TextBlock x:Name="TextPubDate"
+                                               FontSize="18"
+                                           Opacity=".6"/>
                                 </StackPanel>
-                            </Grid>
 
-                            <StackPanel x:Name="PanelUserLocation" 
-                                        Margin="12,6,0,0"
+                                <Grid x:Name="UserInfosPanel"
+                                      Margin="0,20,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="50"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <Ellipse x:Name="UserProfileImage"
+                                            Height="40" Width="40"
+                                             VerticalAlignment="Top"
+                                             Margin="-6,0,0,0"
+                                            PointerEntered="UserView_PointerEntered"
+                                            PointerExited="UserView_PointerExited">
+                                        <Ellipse.Fill>
+                                            <ImageBrush Stretch="UniformToFill">
+                                                <ImageBrush.ImageSource>
+                                                    <BitmapImage x:Name="UserImageSource" />
+                                                </ImageBrush.ImageSource>
+                                            </ImageBrush>
+                                        </Ellipse.Fill>
+                                    </Ellipse>
+
+                                    <StackPanel x:Name="UserTextPanel"
+                                                VerticalAlignment="Top"
+                                                Grid.Column="1">
+                                        <Grid x:Name="UserNameContainer" 
+                                              Background="Black"
+                                              Opacity=".7"
+                                              Padding="10"
+                                              MinWidth="0"
+                                              HorizontalAlignment="Left"
+                                              Height="40">
+
+                                            <TextBlock x:Name="UserName" 
+                                                FontSize="20"
+                                                HorizontalAlignment="Center"
+                                                VerticalAlignment="Center"/>
+                                        </Grid>
+                                    </StackPanel>
+                                </Grid>
+
+                                <StackPanel x:Name="PanelUserLocation" 
+                                            Margin="12,6,0,0"
+                                            Orientation="Horizontal"
+                                            Opacity=".6">
+                                    <FontIcon Glyph="&#xE128;"
+                                                      FontSize="20"
+                                                      Margin="0,0,12,0"/>
+                                    <TextBlock x:Name="UserLocation"
+                                                        FontSize="20"
+                                                        FontWeight="Light"/>
+                                </StackPanel>
+                            </StackPanel>
+
+                            <StackPanel x:Name="PhotosListViewHeader" 
                                         Orientation="Horizontal"
-                                        Opacity=".6">
-                                <FontIcon Glyph="&#xE128;"
-                                                  FontSize="20"
-                                                  Margin="0,0,12,0"/>
-                                <TextBlock x:Name="UserLocation"
-                                                    FontSize="20"
-                                                    FontWeight="Light"/>
+                                        HorizontalAlignment="Center"
+                                        Margin="0,60,0,10"
+                                        Opacity=".6"
+                                        Tapped="PhotosListViewHeader_Tapped">
+
+                                <TextBlock Text="photos" FontSize="30"
+                                           Typography.Capitals="AllSmallCaps"/>
+
+                                <TextBlock x:Name="TextPhotosCount"
+                                           VerticalAlignment="Center"
+                                           Foreground="{ThemeResource SystemControlHighlightAccentBrush}"/>
+
+                                <FontIcon Glyph="&#xF0E2;" FontSize="18" Margin="20,10,0,0" VerticalAlignment="Center"/>
+                            </StackPanel>
+
+                            <ListView x:Name="PhotosListView"
+                                        ScrollViewer.HorizontalScrollMode="Enabled"
+                                        ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                                        ScrollViewer.IsHorizontalRailEnabled="True"
+                                        ItemTemplate="{StaticResource PhotoTemplate}">
+                                <ListView.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <VirtualizingStackPanel Orientation="Horizontal" />
+                                    </ItemsPanelTemplate>
+                                </ListView.ItemsPanel>
+                            </ListView>
+
+                            <StackPanel x:Name="EmptyViewPhotosListView" Margin="0,30" Visibility="Collapsed">
+                                <TextBlock x:Uid="NoPhotosYet" Text="No photos yet :(" TextAlignment="Center"/>
                             </StackPanel>
                         </StackPanel>
-                        
-                        <StackPanel x:Name="PhotosListViewHeader" 
-                                    Orientation="Horizontal"
-                                    HorizontalAlignment="Center"
-                                    Margin="0,60,0,10"
-                                    Opacity=".6"
-                                    Tapped="PhotosListViewHeader_Tapped">
-                            
-                            <TextBlock Text="photos" FontSize="30"
-                                       Typography.Capitals="AllSmallCaps"/>
-                            
-                            <TextBlock x:Name="TextPhotosCount"
-                                       VerticalAlignment="Center"
-                                       Foreground="{ThemeResource SystemControlHighlightAccentBrush}"/>
-                            
-                            <FontIcon Glyph="&#xF0E2;" FontSize="18" Margin="20,10,0,0" VerticalAlignment="Center"/>
+                    </ScrollViewer>
+                </PivotItem>
+
+                <PivotItem x:Name="PhotosView"
+                           Header="photos">
+                    <Grid>
+                        <controls:AdaptiveGridView x:Name="PhotosGridView"
+                                                    DesiredWidth="150"
+                                                    ItemHeight="150"
+                                                    ItemTemplate="{StaticResource PhotoTemplate}"
+                                                    animations:ReorderGridAnimation.Duration="300">
+                        </controls:AdaptiveGridView>
+
+                        <StackPanel x:Name="EmptyViewPhotos"
+                                    Visibility="Collapsed"
+                                    VerticalAlignment="Center"
+                                    HorizontalAlignment="Center">
+                            <TextBlock x:Uid="NoPhotosYet" 
+                                       Text="No photos yet :("
+                                       FontSize="22"
+                                       TextWrapping="Wrap"/>
                         </StackPanel>
+                    </Grid>
+                </PivotItem>
+            </Pivot>
 
-                        <ListView x:Name="PhotosListView"
-                                    ScrollViewer.HorizontalScrollMode="Enabled"
-                                    ScrollViewer.HorizontalScrollBarVisibility="Auto"
-                                    ScrollViewer.IsHorizontalRailEnabled="True"
-                                    ItemTemplate="{StaticResource PhotoTemplate}">
-                            <ListView.ItemsPanel>
-                                <ItemsPanelTemplate>
-                                    <VirtualizingStackPanel Orientation="Horizontal" />
-                                </ItemsPanelTemplate>
-                            </ListView.ItemsPanel>
-                        </ListView>
+            <CommandBar x:Name="PageCommandBar"
+                        Canvas.ZIndex="3"
+                        Background="Transparent"
+                        VerticalAlignment="Bottom">
+                <AppBarButton x:Name="CmdCopyLink" 
+                              x:Uid="CmdCopyLink" 
+                              Label="copy link" 
+                              Icon="Link" 
+                              Tapped="CmdCopyLink_Tapped"/>
 
-                        <StackPanel x:Name="EmptyViewPhotosListView" Margin="0,30" Visibility="Collapsed">
-                            <TextBlock x:Uid="NoPhotosYet" Text="No photos yet :(" TextAlignment="Center"/>
-                        </StackPanel>
-                    </StackPanel>
-                </ScrollViewer>
-            </PivotItem>
+                <AppBarButton x:Name="CmdOpenInBrowser" 
+                              x:Uid="CmdOpenInBrowser" 
+                              Label="open in browser" 
+                              Icon="Globe" 
+                              Tapped="CmdOpenInBrowser_Tapped"/>
 
-            <PivotItem x:Name="PhotosView"
-                       Header="photos">
-                <Grid>
-                    <controls:AdaptiveGridView x:Name="PhotosGridView"
-                                                DesiredWidth="150"
-                                                ItemHeight="150"
-                                                ItemTemplate="{StaticResource PhotoTemplate}"
-                                                animations:ReorderGridAnimation.Duration="300">
-                    </controls:AdaptiveGridView>
-                    
-                    <StackPanel x:Name="EmptyViewPhotos"
-                                Visibility="Collapsed"
-                                VerticalAlignment="Center"
-                                HorizontalAlignment="Center">
-                        <TextBlock x:Uid="NoPhotosYet" 
-                                   Text="No photos yet :("
-                                   FontSize="22"
-                                   TextWrapping="Wrap"/>
-                    </StackPanel>
-                </Grid>
-            </PivotItem>
-        </Pivot>
+                <CommandBar.SecondaryCommands>
+                    <AppBarButton x:Uid="CmdHome" Label="home" Tapped="CmdGoHome_Tapped"/>
+                </CommandBar.SecondaryCommands>
+            </CommandBar>
 
-        <CommandBar x:Name="AppBar"
-                    Canvas.ZIndex="3"
-                    Background="Transparent"
-                    VerticalAlignment="Bottom">
-            <AppBarButton x:Name="CmdCopyLink" 
-                          x:Uid="CmdCopyLink" 
-                          Label="copy link" 
-                          Icon="Link" 
-                          Tapped="CmdCopyLink_Tapped"/>
-            
-            <AppBarButton x:Name="CmdOpenInBrowser" 
-                          x:Uid="CmdOpenInBrowser" 
-                          Label="open in browser" 
-                          Icon="Globe" 
-                          Tapped="CmdOpenInBrowser_Tapped"/>
-        </CommandBar>
-
-        <Grid x:Name="AppBarFrozenHost" Canvas.ZIndex="2" Height="75" VerticalAlignment="Bottom"/>
+            <Grid x:Name="AppBarFrozenHost" Canvas.ZIndex="2" Height="75" VerticalAlignment="Bottom"/>
+            <Grid/>
+        </Grid>
     </Grid>
 </Page>

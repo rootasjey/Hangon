@@ -16,14 +16,13 @@ using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
 
 namespace Hangon {
-    /// <summary>
-    /// Provides application-specific behavior to supplement the default Application class.
-    /// </summary>
     sealed partial class App : Application
     {
         public static DataSource DataSource { get; set; }
 
         public static ResourceLoader ResourceLoader { get; set; }
+
+        public static string DeviceType { get; set; }
 
         /// <summary>
         /// Initializes the singleton application object.  This is the first line of authored code
@@ -91,6 +90,7 @@ namespace Hangon {
 
             //UpdateTitleBarThemeButton();
             UpdateAppTheme();
+            UpdateTitleBarTheme();
             HideSystemTray();
         }
 
@@ -154,11 +154,6 @@ namespace Hangon {
         }
 
         public static void UpdateAppTheme() {
-          // test
-          // if (Settings.IsApplicationThemeLight()) {
-          //       frame.RequestedTheme = ElementTheme.Light;
-          //       return;
-          //   }
             ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
             var theme = localSettings.Values.ContainsKey("Theme") ?
                 (string)localSettings.Values["Theme"] : "Dark";
@@ -172,12 +167,32 @@ namespace Hangon {
             frame.RequestedTheme = ElementTheme.Dark;
         }
 
-        void UpdateTitleBarThemeButton() {
+        public static void UpdateTitleBarTheme() {
             var titleBar = Windows.UI.ViewManagement.ApplicationView.GetForCurrentView().TitleBar;
             titleBar.ButtonBackgroundColor = Colors.Transparent;
             titleBar.ButtonInactiveBackgroundColor = Colors.Transparent;
+
+            if (Settings.IsApplicationThemeLight()) {
+                titleBar.ButtonInactiveForegroundColor = Colors.Black;
+                titleBar.ButtonForegroundColor = Colors.Black;
+                return;
+            }
+
             titleBar.ButtonInactiveForegroundColor = Colors.White;
             titleBar.ButtonForegroundColor = Colors.White;
+        }
+
+        public static void SetTitleBarTheme(ElementTheme theme) {
+            var titleBar = Windows.UI.ViewManagement.ApplicationView.GetForCurrentView().TitleBar;
+
+            if (theme == ElementTheme.Light) {
+                titleBar.ButtonInactiveForegroundColor = Colors.White;
+                titleBar.ButtonForegroundColor = Colors.White;
+                return;
+            }
+
+            titleBar.ButtonInactiveForegroundColor = Colors.Black;
+            titleBar.ButtonForegroundColor = Colors.Black;
         }
 
         async void HideSystemTray() {

@@ -62,6 +62,10 @@ namespace Hangon.Views {
             };
         }
 
+        private void CmdGoHome_Tapped(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e) {
+            Frame.Navigate(typeof(HomePage));
+        }
+
         #endregion navigation
 
         #region animations

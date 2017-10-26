@@ -6,10 +6,12 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Unsplasharp.Models;
+using Windows.ApplicationModel.Core;
 using Windows.ApplicationModel.Email;
 using Windows.UI;
 using Windows.UI.Composition;
 using Windows.UI.Core;
+using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Hosting;
@@ -51,6 +53,7 @@ namespace Hangon.Views {
         public SlideshowPage() {
             InitializeComponent();
             InitializeVariables();
+            InitializeTitleBar();
             InitializeData();
         }
 
@@ -59,6 +62,7 @@ namespace Hangon.Views {
         protected override void OnNavigatingFrom(NavigatingCancelEventArgs e) {
             CoreWindow.GetForCurrentThread().KeyDown -= Page_KeyDown;
             StopSlideShow();
+            App.UpdateTitleBarTheme();
             base.OnNavigatingFrom(e);
         }
 
@@ -88,10 +92,54 @@ namespace Hangon.Views {
 
         #endregion navigation
 
-
         private void InitializeVariables() {
             _UIDispatcher = CoreWindow.GetForCurrentThread().Dispatcher;
         }
+
+        #region titlebar
+
+        private void InitializeTitleBar() {
+            App.DeviceType = Windows.System.Profile.AnalyticsInfo.VersionInfo.DeviceFamily;
+
+            if (App.DeviceType == "Windows.Mobile") {
+                TitleBar.Visibility = Visibility.Collapsed;
+                var statusBar = StatusBar.GetForCurrentView();
+                statusBar.HideAsync();
+                return;
+            }
+
+            Window.Current.Activated += Current_Activated;
+            CoreApplicationViewTitleBar coreTitleBar = CoreApplication.GetCurrentView().TitleBar;
+            coreTitleBar.ExtendViewIntoTitleBar = true;
+
+            TitleBar.Height = coreTitleBar.Height;
+            Window.Current.SetTitleBar(TitleBarMainContent);
+
+            coreTitleBar.IsVisibleChanged += CoreTitleBar_IsVisibleChanged;
+            coreTitleBar.LayoutMetricsChanged += CoreTitleBar_LayoutMetricsChanged;
+
+            App.SetTitleBarTheme(ElementTheme.Light);
+        }
+
+        void CoreTitleBar_IsVisibleChanged(CoreApplicationViewTitleBar titleBar, object args) {
+            TitleBar.Visibility = titleBar.IsVisible ? Visibility.Visible : Visibility.Collapsed;
+        }
+
+        private void CoreTitleBar_LayoutMetricsChanged(CoreApplicationViewTitleBar sender, object args) {
+            TitleBar.Height = sender.Height;
+            RightMask.Width = sender.SystemOverlayRightInset;
+        }
+
+        private void Current_Activated(object sender, WindowActivatedEventArgs e) {
+            if (e.WindowActivationState != CoreWindowActivationState.Deactivated) {
+                TitleBarMainContent.Opacity = 1;
+                return;
+            }
+
+            TitleBarMainContent.Opacity = 0.5;
+        }
+
+        #endregion titlebar
 
         private async void InitializeData() {
             var isAllowed = await InAppPurchases.DoesUserHaveAddon(AddonSlideshowId);
@@ -267,6 +315,8 @@ namespace Hangon.Views {
 
             ToggleFavoritesIcon
                 .Fade(1)
+                .Scale(1.2f, 1.2f, centerX, centerY)
+                .Then()
                 .Scale(1f, 1f, centerX, centerY)
                 .Start();
         }

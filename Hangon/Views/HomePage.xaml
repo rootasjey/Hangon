@@ -111,378 +111,413 @@
     </Page.Resources>
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-        <FlyoutPresenter x:Name="FlyoutNotification"
+        <Grid.RowDefinitions>
+            <RowDefinition x:Name="TitleBarRow" Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Grid x:Name="TitleBar" 
+              Background="Transparent" 
+              Grid.Row="0" 
+              Canvas.ZIndex="2"
+              Margin="0,0,0,-37">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Grid x:Name="BackButtonGrid" VerticalAlignment="Top"
+                  Visibility="Collapsed">
+                <Button x:Name="BackButton" Background="Transparent">
+                    <FontIcon Glyph="&#xE096;" Foreground="White"/>
+                </Button>
+            </Grid>
+            <Grid Grid.Column="1" x:Name="TitleBarMainContent" Background="Transparent">
+                <TextBlock Text="Hangon" 
+                           VerticalAlignment="Top"
+                           Visibility="Collapsed"
+                           FontSize="12"
+                           FontFamily="Segoe UI" 
+                           FontWeight="Normal" 
+                           Margin="10,0"/>
+            </Grid>
+            <Grid Grid.Column="3" x:Name="RightMask" Background="Transparent"/>
+        </Grid>
+
+        <Grid x:Name="PageContent" Grid.Row="1">
+            <FlyoutPresenter x:Name="FlyoutNotification"
                          RequestedTheme="Dark"
                          Visibility="Collapsed"
                          Canvas.ZIndex="2"
                          Background="{ThemeResource SystemControlHighlightAccentBrush}" 
                          MinHeight="20" VerticalAlignment="Top"
                          Tapped="FlyoutNotification_Dismiss">
-            <StackPanel MaxWidth="200">
-                <TextBlock x:Name="FlyoutText" Text="" TextWrapping="Wrap"/>
-                <Grid x:Name="ProgressGrid" Visibility="Collapsed">
-                    <ProgressBar x:Name="ProgressIndeterminate"
+                <StackPanel MaxWidth="200">
+                    <TextBlock x:Name="FlyoutText" Text="" TextWrapping="Wrap"/>
+                    <Grid x:Name="ProgressGrid" Visibility="Collapsed">
+                        <ProgressBar x:Name="ProgressIndeterminate"
                                  FlowDirection="RightToLeft" IsIndeterminate="True" Canvas.ZIndex="1"/>
-                    <ProgressBar x:Name="ProgressDeterminate" IsIndeterminate="False" />
-                </Grid>
-            </StackPanel>
-        </FlyoutPresenter>
-
-        <FlyoutPresenter x:Name="UpdateChangeLogFlyout"
-                         Visibility="Collapsed"
-                         VerticalAlignment="Center"
-                         Canvas.ZIndex="2"
-                         ScrollViewer.VerticalScrollMode="Auto">
-            
-            <StackPanel 
-                        ScrollViewer.HorizontalScrollMode="Disabled"
-                        ScrollViewer.VerticalScrollMode="Disabled"
-                        Padding="0,20">
-                <StackPanel Orientation="Horizontal">
-                    <FontIcon Glyph="&#xE116;" 
-                              Foreground="{ThemeResource SystemControlHighlightAccentBrush}" 
-                              FontSize="30" Margin="0,0,12,-6"/>
-                    <TextBlock Text="Slideshow Update" 
-                               FontSize="36"
-                               FontWeight="Normal"
-                               Typography.Capitals="AllSmallCaps"/>
-                    
+                        <ProgressBar x:Name="ProgressDeterminate" IsIndeterminate="False" />
+                    </Grid>
                 </StackPanel>
-                
-                <TextBlock Text="1.7.0" Opacity=".5"/>
+            </FlyoutPresenter>
 
-                <RichTextBlock TextWrapping="Wrap" 
-                               Margin="0,20,0,0"
-                               ScrollViewer.VerticalScrollMode="Disabled">
-
-                    <Paragraph Margin="0,12">
-                        <Span FontSize="22" 
-                              FontWeight="Medium" 
-                              Foreground="{ThemeResource SystemControlForegroundAccentBrush}">
-                            SLIDESHOW
-                        </Span>
-                        <LineBreak/>
-                        <Span>A new slideshow section has been added,</Span>
-                        <LineBreak/>
-                        <Span>and ti's a great way to discover new photos.</Span>
-                        <LineBreak/>
-                        <Span>This new feature is a thank you gift</Span>
-                        <LineBreak/>
-                        <Span>for those who support the app financially.</Span>
-                    </Paragraph>
-                </RichTextBlock>
-                
-                <Button x:Name="ChangelogDismissButton"
-                        Margin="0,22"
-                        Width="100"
-                        Height="40"
-                        Content="OKAY" 
-                        Tapped="ChangelogDismissButton_Tapped"/>
-            </StackPanel>
-        </FlyoutPresenter>
-
-        <Grid x:Name="BackgroundContainer"
-              Visibility="Collapsed">
-            <Image x:Name="BackgroundImage" Stretch="UniformToFill"/>
-            <Grid x:Name="BackgroundDimmer" Opacity=".5" Background="Black"/>
-        </Grid>
-        
-        <Pivot x:Name="PagePivot"
-               Style="{StaticResource PivotCenteredHeadersStyle}"
-               SelectionChanged="PagePivot_SelectionChanged">
+            <FlyoutPresenter x:Name="UpdateChangeLogFlyout"
+                             Visibility="Collapsed"
+                             VerticalAlignment="Center"
+                             Canvas.ZIndex="2"
+                             ScrollViewer.VerticalScrollMode="Auto">
             
-            <PivotItem x:Name="RecentPhotoPivotItem"
-                       Margin="0"
-                       x:Uid="RecentHeader"
-                       Header="recent">
-
-                <UserControl x:Name="RecentPhotosPivotItemContent"
-                             x:DeferLoadStrategy="Lazy">
+                <StackPanel 
+                            ScrollViewer.HorizontalScrollMode="Disabled"
+                            ScrollViewer.VerticalScrollMode="Disabled"
+                            Padding="0,20">
+                    <StackPanel Orientation="Horizontal">
+                        <FontIcon Glyph="&#xE116;" 
+                                  Foreground="{ThemeResource SystemControlHighlightAccentBrush}" 
+                                  FontSize="30" Margin="0,0,12,-6"/>
+                        <TextBlock Text="Slideshow Update" 
+                                   FontSize="36"
+                                   FontWeight="Normal"
+                                   Typography.Capitals="AllSmallCaps"/>
                     
-                    <!--Visual States don't work if not in an UserControl/ContentControl-->
-                    
-                    <Grid>
-                        <!-- LOAD VIEW -->
-                        <Grid x:Name="RecentLoadingView" 
-                              VerticalAlignment="Center" 
-                              HorizontalAlignment="Center"
-                              Visibility="Collapsed">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="20"/>
-                                <RowDefinition Height="*"/>
-                            </Grid.RowDefinitions>
-                            <ProgressBar x:Name="ProgressPage" IsIndeterminate="True"/>
-                            <TextBlock  x:Uid="LoadingPhotos"
-                                        Text="Loading photos from Unsplash..."
-                                        Typography.Capitals="SmallCaps"
-                                        FontSize="20" Grid.Row="1"/>
-                        </Grid>
-
-                        <StackPanel x:Name="RecentEmptyView"
-                                    Visibility="Collapsed"
-                                    VerticalAlignment="Center"
-                                    HorizontalAlignment="Center">
-
-                            <TextBlock x:Uid="RecentPhotoFetchFailed" 
-                                       Text="Sorry, I couldn't get recent photos from Unsplash :("
-                                       Typography.Capitals="SmallCaps"
-                                       FontSize="20"
-                                       TextWrapping="Wrap"/>
-                            <Button Content="try again" 
-                                    Margin="0,20"
-                                    HorizontalAlignment="Center"/>
-                        </StackPanel>
-
-                        <!-- DATA -->
-                        <controls:AdaptiveGridView x:Name="RecentView"
-                                                   DesiredWidth="300"
-                                                   ItemHeight="300"
-                                                   ItemTemplate="{StaticResource PhotoTemplate}"
-                                                   animations:ReorderGridAnimation.Duration="300"
-                                                   ItemContainerStyle="{StaticResource GridViewItemZeroMarginStyle}"
-                                                   Loaded="GridView_Loaded">
-                        </controls:AdaptiveGridView>
-
-                        <!-- VISUAL STATES -->
-                        <VisualStateManager.VisualStateGroups>
-                            <VisualStateGroup x:Name="RecentViewStates">
-                                <VisualState x:Name="RecentViewSmall">
-                                    <VisualState.StateTriggers>
-                                        <AdaptiveTrigger MinWindowWidth="0"/>
-                                    </VisualState.StateTriggers>
-
-                                    <VisualState.Setters>
-                                        <Setter Target="RecentView.ItemHeight" Value="90"/>
-                                        <Setter Target="RecentView.DesiredWidth" Value="90"/>
-                                        <Setter Target="RecentView.Margin" Value="0,0,-20,0"/>
-                                    </VisualState.Setters>
-                                </VisualState>
-
-                                <VisualState x:Name="RecentViewLarge">
-                                    <VisualState.StateTriggers>
-                                        <AdaptiveTrigger MinWindowWidth="600"/>
-                                    </VisualState.StateTriggers>
-
-                                    <VisualState.Setters>
-                                        <Setter Target="RecentView.ItemHeight" Value="300"/>
-                                        <Setter Target="RecentView.DesiredWidth" Value="300"/>
-                                    </VisualState.Setters>
-                                </VisualState>
-                            </VisualStateGroup>
-                        </VisualStateManager.VisualStateGroups>
-                    </Grid>
-                </UserControl>
-            </PivotItem>
-
-            <PivotItem x:Name="CuratedPhotosPivotItem"
-                       Margin="0"
-                       x:Uid="CuratedHeader"
-                       Header="curated">
-
-                <UserControl x:Name="CuratedPhotosPivotItemContent"
-                             x:DeferLoadStrategy="Lazy">
-                    <!--Visual States don't work if not in an UserControl/ContentControl-->
-                    
-                    <Grid>
-                    
-                        <!-- LOAD VIEW -->
-                        <Grid x:Name="CuratedLoadingView" 
-                              VerticalAlignment="Center" 
-                              HorizontalAlignment="Center"
-                              Visibility="Collapsed">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="20"/>
-                                <RowDefinition Height="*"/>
-                            </Grid.RowDefinitions>
-                            
-                            <ProgressBar x:Name="CuratedProgressPage" IsIndeterminate="True"/>
-                            <TextBlock x:Uid="LoadingPhotos" 
-                                       Typography.Capitals="SmallCaps"
-                                       Text="Loading photos from Unsplash..." 
-                                       FontSize="20" Grid.Row="1"/>
-                        </Grid>
-
-                        <StackPanel x:Name="CuratedEmptyView"
-                                    Visibility="Collapsed"
-                                    VerticalAlignment="Center"
-                                    HorizontalAlignment="Center">
-
-                            <TextBlock x:Uid="CuratedPhotosFetchFailed" 
-                                       Text="Sorry, I couldn't get curated photos from Unsplash :("
-                                       FontSize="20"
-                                       Typography.Capitals="SmallCaps"
-                                       TextWrapping="Wrap"/>
-                            <Button Content="try again" 
-                                    Margin="0,20"
-                                    HorizontalAlignment="Center"/>
-                        </StackPanel>
-
-                        <!-- DATA -->
-                        <controls:AdaptiveGridView x:Name="CuratedView"
-                                                   Visibility="Visible"
-                                                   DesiredWidth="300"
-                                                   ItemHeight="300"
-                                                   ItemTemplate="{StaticResource PhotoTemplate}"
-                                                   animations:ReorderGridAnimation.Duration="300"
-                                                   ItemContainerStyle="{StaticResource GridViewItemZeroMarginStyle}"
-                                                   Loaded="GridView_Loaded">
-                        
-                        </controls:AdaptiveGridView>
-
-                        <!-- VISUAL STATES -->
-                        <VisualStateManager.VisualStateGroups>
-                            <VisualStateGroup x:Name="CuratedViewStates">
-                                <VisualState x:Name="CuratedViewSmall">
-                                    <VisualState.StateTriggers>
-                                        <AdaptiveTrigger MinWindowWidth="0"/>
-                                    </VisualState.StateTriggers>
-
-                                    <VisualState.Setters>
-                                        <Setter Target="CuratedView.ItemHeight" Value="90"/>
-                                        <Setter Target="CuratedView.DesiredWidth" Value="90"/>
-                                        <Setter Target="CuratedView.Margin" Value="0,0,-20,0"/>
-                                    </VisualState.Setters>
-                                </VisualState>
-
-                                <VisualState x:Name="CuratedViewLarge">
-                                    <VisualState.StateTriggers>
-                                        <AdaptiveTrigger MinWindowWidth="600"/>
-                                    </VisualState.StateTriggers>
-
-                                    <VisualState.Setters>
-                                        <Setter Target="CuratedView.ItemHeight" Value="300"/>
-                                        <Setter Target="CuratedView.DesiredWidth" Value="300"/>
-                                    </VisualState.Setters>
-                                </VisualState>
-                            </VisualStateGroup>
-                        </VisualStateManager.VisualStateGroups>
-                    </Grid>
-                </UserControl>
-            </PivotItem>
-
-            <PivotItem x:Name="SearchPivotItem"
-                       x:Uid="SearchHeader"
-                       Margin="0"
-                       Header="search">
-                <UserControl>
-                    <!--Visual States don't work if not in an UserControl/ContentControl-->
+                    </StackPanel>
                 
-                    <Grid x:Name="SearchPivotItemContent"
-                          x:DeferLoadStrategy="Lazy">
-                        <StackPanel x:Name="SearchPanel" VerticalAlignment="Center">
-                            <FontIcon Glyph="&#xE094;" FontSize="30" Margin="0,10"/>
-                        
-                            <TextBox x:Name="SearchBox" MaxWidth="300"
-                                     KeyUp="SearchBox_KeyUp"></TextBox>
-                        
-                            <TextBlock x:Uid="TextSearchSentenceSuggestion" 
-                                       Text="begin by typing a keyword..." 
-                                       HorizontalAlignment="Center"
-                                       FontSize="22"
-                                       Opacity=".6"/>
-                        
-                            <TextBlock x:Name="WordSuggestion" 
-                                       Text="...landscape"
-                                       Opacity=".6"
-                                       FontSize="22"
-                                       FontWeight="SemiBold"
-                                       Foreground="{StaticResource SystemControlHighlightAccentBrush}"
-                                       HorizontalAlignment="Center"
-                                       Tapped="WordSuggestion_Tapped"/>
-                        </StackPanel>
+                    <TextBlock Text="1.7.0" Opacity=".5"/>
 
-                        <!-- LOADING VIEW -->
-                        <Grid x:Name="SearchLoadingView" 
-                              VerticalAlignment="Center" 
-                              HorizontalAlignment="Center"
-                              Visibility="Collapsed">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="20"/>
-                                <RowDefinition Height="*"/>
-                            </Grid.RowDefinitions>
-                            
-                            <ProgressBar x:Name="SearchProgressPage" IsIndeterminate="True"/>
-                            <TextBlock x:Uid="SearchingPhotos" 
-                                       Text="searching photos from Unsplash..." 
-                                       FontSize="20" 
-                                       Typography.Capitals="SmallCaps"
-                                       Grid.Row="1"/>
+                    <RichTextBlock TextWrapping="Wrap" 
+                                   Margin="0,20,0,0"
+                                   ScrollViewer.VerticalScrollMode="Disabled">
+
+                        <Paragraph Margin="0,12">
+                            <Span FontSize="22" 
+                                  FontWeight="Medium" 
+                                  Foreground="{ThemeResource SystemControlForegroundAccentBrush}">
+                                SLIDESHOW
+                            </Span>
+                            <LineBreak/>
+                            <Span>A new slideshow section has been added,</Span>
+                            <LineBreak/>
+                            <Span>and this a great way to discover new photos.</Span>
+                            <LineBreak/>
+                            <Span>This new feature is a thank you gift</Span>
+                            <LineBreak/>
+                            <Span>for those who support the app financially.</Span>
+                        </Paragraph>
+                    </RichTextBlock>
+                
+                    <Button x:Name="ChangelogDismissButton"
+                            Margin="0,22"
+                            Width="100"
+                            Height="40"
+                            Content="OKAY" 
+                            Tapped="ChangelogDismissButton_Tapped"/>
+                </StackPanel>
+            </FlyoutPresenter>
+
+            <Grid x:Name="BackgroundContainer"
+                  Visibility="Collapsed">
+                <Image x:Name="BackgroundImage" Stretch="UniformToFill"/>
+                <Grid x:Name="BackgroundDimmer" Opacity=".5" Background="Black"/>
+            </Grid>
+        
+            <Pivot x:Name="PagePivot"
+                   Style="{StaticResource PivotCenteredHeadersStyle}"
+                   SelectionChanged="PagePivot_SelectionChanged">
+            
+                <PivotItem x:Name="RecentPhotoPivotItem"
+                           Margin="0"
+                           x:Uid="RecentHeader"
+                           Header="recent">
+
+                    <UserControl x:Name="RecentPhotosPivotItemContent"
+                                 x:DeferLoadStrategy="Lazy">
+                    
+                        <!--Visual States don't work if not in an UserControl/ContentControl-->
+                    
+                        <Grid>
+                            <!-- LOAD VIEW -->
+                            <Grid x:Name="RecentLoadingView" 
+                                  VerticalAlignment="Center" 
+                                  HorizontalAlignment="Center"
+                                  Visibility="Collapsed">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="20"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+                                <ProgressBar x:Name="ProgressPage" IsIndeterminate="True"/>
+                                <TextBlock  x:Uid="LoadingPhotos"
+                                            Text="Loading photos from Unsplash..."
+                                            Typography.Capitals="SmallCaps"
+                                            FontSize="20" Grid.Row="1"/>
+                            </Grid>
+
+                            <StackPanel x:Name="RecentEmptyView"
+                                        Visibility="Collapsed"
+                                        VerticalAlignment="Center"
+                                        HorizontalAlignment="Center">
+
+                                <TextBlock x:Uid="RecentPhotoFetchFailed" 
+                                           Text="Sorry, I couldn't get recent photos from Unsplash :("
+                                           Typography.Capitals="SmallCaps"
+                                           FontSize="20"
+                                           TextWrapping="Wrap"/>
+                                <Button Content="try again" 
+                                        Margin="0,20"
+                                        HorizontalAlignment="Center"/>
+                            </StackPanel>
+
+                            <!-- DATA -->
+                            <controls:AdaptiveGridView x:Name="RecentView"
+                                                       DesiredWidth="300"
+                                                       ItemHeight="300"
+                                                       ItemTemplate="{StaticResource PhotoTemplate}"
+                                                       animations:ReorderGridAnimation.Duration="300"
+                                                       ItemContainerStyle="{StaticResource GridViewItemZeroMarginStyle}"
+                                                       Loaded="GridView_Loaded">
+                            </controls:AdaptiveGridView>
+
+                            <!-- VISUAL STATES -->
+                            <VisualStateManager.VisualStateGroups>
+                                <VisualStateGroup x:Name="RecentViewStates">
+                                    <VisualState x:Name="RecentViewSmall">
+                                        <VisualState.StateTriggers>
+                                            <AdaptiveTrigger MinWindowWidth="0"/>
+                                        </VisualState.StateTriggers>
+
+                                        <VisualState.Setters>
+                                            <Setter Target="RecentView.ItemHeight" Value="90"/>
+                                            <Setter Target="RecentView.DesiredWidth" Value="90"/>
+                                            <Setter Target="RecentView.Margin" Value="0,0,-20,0"/>
+                                        </VisualState.Setters>
+                                    </VisualState>
+
+                                    <VisualState x:Name="RecentViewLarge">
+                                        <VisualState.StateTriggers>
+                                            <AdaptiveTrigger MinWindowWidth="600"/>
+                                        </VisualState.StateTriggers>
+
+                                        <VisualState.Setters>
+                                            <Setter Target="RecentView.ItemHeight" Value="300"/>
+                                            <Setter Target="RecentView.DesiredWidth" Value="300"/>
+                                        </VisualState.Setters>
+                                    </VisualState>
+                                </VisualStateGroup>
+                            </VisualStateManager.VisualStateGroups>
                         </Grid>
+                    </UserControl>
+                </PivotItem>
 
-                        <!--EMPTY VIEW-->
-                        <StackPanel x:Name="SearchEmptyView"
-                                    Visibility="Collapsed"
-                                    VerticalAlignment="Center"
-                                    HorizontalAlignment="Center">
+                <PivotItem x:Name="CuratedPhotosPivotItem"
+                           Margin="0"
+                           x:Uid="CuratedHeader"
+                           Header="curated">
 
-                            <TextBlock x:Uid="NoResultsSearchPhotos" 
-                                       Text="There's no photos for this keyword"
-                                       FontSize="20"
-                                       Typography.Capitals="SmallCaps"
-                                       TextWrapping="Wrap"/>
-                        </StackPanel>
+                    <UserControl x:Name="CuratedPhotosPivotItemContent"
+                                 x:DeferLoadStrategy="Lazy">
+                        <!--Visual States don't work if not in an UserControl/ContentControl-->
+                    
+                        <Grid>
+                    
+                            <!-- LOAD VIEW -->
+                            <Grid x:Name="CuratedLoadingView" 
+                                  VerticalAlignment="Center" 
+                                  HorizontalAlignment="Center"
+                                  Visibility="Collapsed">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="20"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+                            
+                                <ProgressBar x:Name="CuratedProgressPage" IsIndeterminate="True"/>
+                                <TextBlock x:Uid="LoadingPhotos" 
+                                           Typography.Capitals="SmallCaps"
+                                           Text="Loading photos from Unsplash..." 
+                                           FontSize="20" Grid.Row="1"/>
+                            </Grid>
 
-                        <!-- DATA -->
-                        <controls:AdaptiveGridView x:Name="SearchPhotosView"
-                                                   Visibility="Visible"
-                                                   DesiredWidth="300"
-                                                   ItemHeight="300"
-                                                   ItemsSource="{x:Bind _PageDataSource.PhotosSearchResults, Mode=OneWay}"
-                                                   ItemTemplate="{StaticResource PhotoTemplate}"
-                                                   animations:ReorderGridAnimation.Duration="300"
-                                                   ItemContainerStyle="{StaticResource GridViewItemZeroMarginStyle}"
-                                                   Loaded="GridView_Loaded">
-                        </controls:AdaptiveGridView>
+                            <StackPanel x:Name="CuratedEmptyView"
+                                        Visibility="Collapsed"
+                                        VerticalAlignment="Center"
+                                        HorizontalAlignment="Center">
 
-                        <!-- VISUAL STATES -->
-                        <VisualStateManager.VisualStateGroups>
-                            <VisualStateGroup x:Name="SearchPhotosViewStates">
-                                <VisualState x:Name="SearchPhotosViewSmall">
-                                    <VisualState.StateTriggers>
-                                        <AdaptiveTrigger MinWindowWidth="0"/>
-                                    </VisualState.StateTriggers>
+                                <TextBlock x:Uid="CuratedPhotosFetchFailed" 
+                                           Text="Sorry, I couldn't get curated photos from Unsplash :("
+                                           FontSize="20"
+                                           Typography.Capitals="SmallCaps"
+                                           TextWrapping="Wrap"/>
+                                <Button Content="try again" 
+                                        Margin="0,20"
+                                        HorizontalAlignment="Center"/>
+                            </StackPanel>
 
-                                    <VisualState.Setters>
-                                        <Setter Target="SearchPhotosView.ItemHeight" Value="90"/>
-                                        <Setter Target="SearchPhotosView.DesiredWidth" Value="90"/>
-                                        <Setter Target="SearchPhotosView.Margin" Value="0,0,-20,0"/>
-                                    </VisualState.Setters>
-                                </VisualState>
+                            <!-- DATA -->
+                            <controls:AdaptiveGridView x:Name="CuratedView"
+                                                       Visibility="Visible"
+                                                       DesiredWidth="300"
+                                                       ItemHeight="300"
+                                                       ItemTemplate="{StaticResource PhotoTemplate}"
+                                                       animations:ReorderGridAnimation.Duration="300"
+                                                       ItemContainerStyle="{StaticResource GridViewItemZeroMarginStyle}"
+                                                       Loaded="GridView_Loaded">
+                        
+                            </controls:AdaptiveGridView>
 
-                                <VisualState x:Name="SearchPhotosViewLarge">
-                                    <VisualState.StateTriggers>
-                                        <AdaptiveTrigger MinWindowWidth="600"/>
-                                    </VisualState.StateTriggers>
+                            <!-- VISUAL STATES -->
+                            <VisualStateManager.VisualStateGroups>
+                                <VisualStateGroup x:Name="CuratedViewStates">
+                                    <VisualState x:Name="CuratedViewSmall">
+                                        <VisualState.StateTriggers>
+                                            <AdaptiveTrigger MinWindowWidth="0"/>
+                                        </VisualState.StateTriggers>
 
-                                    <VisualState.Setters>
-                                        <Setter Target="SearchPhotosView.ItemHeight" Value="300"/>
-                                        <Setter Target="SearchPhotosView.DesiredWidth" Value="300"/>
-                                    </VisualState.Setters>
-                                </VisualState>
-                            </VisualStateGroup>
-                        </VisualStateManager.VisualStateGroups>
-                    </Grid>
-                </UserControl>
-            </PivotItem>
-        </Pivot>
+                                        <VisualState.Setters>
+                                            <Setter Target="CuratedView.ItemHeight" Value="90"/>
+                                            <Setter Target="CuratedView.DesiredWidth" Value="90"/>
+                                            <Setter Target="CuratedView.Margin" Value="0,0,-20,0"/>
+                                        </VisualState.Setters>
+                                    </VisualState>
+
+                                    <VisualState x:Name="CuratedViewLarge">
+                                        <VisualState.StateTriggers>
+                                            <AdaptiveTrigger MinWindowWidth="600"/>
+                                        </VisualState.StateTriggers>
+
+                                        <VisualState.Setters>
+                                            <Setter Target="CuratedView.ItemHeight" Value="300"/>
+                                            <Setter Target="CuratedView.DesiredWidth" Value="300"/>
+                                        </VisualState.Setters>
+                                    </VisualState>
+                                </VisualStateGroup>
+                            </VisualStateManager.VisualStateGroups>
+                        </Grid>
+                    </UserControl>
+                </PivotItem>
+
+                <PivotItem x:Name="SearchPivotItem"
+                           x:Uid="SearchHeader"
+                           Margin="0"
+                           Header="search">
+                    <UserControl>
+                        <!--Visual States don't work if not in an UserControl/ContentControl-->
+                
+                        <Grid x:Name="SearchPivotItemContent"
+                              x:DeferLoadStrategy="Lazy">
+                            <StackPanel x:Name="SearchPanel" VerticalAlignment="Center">
+                                <FontIcon Glyph="&#xE094;" FontSize="30" Margin="0,10"/>
+                        
+                                <TextBox x:Name="SearchBox" MaxWidth="300"
+                                         KeyUp="SearchBox_KeyUp"></TextBox>
+                        
+                                <TextBlock x:Uid="TextSearchSentenceSuggestion" 
+                                           Text="begin by typing a keyword..." 
+                                           HorizontalAlignment="Center"
+                                           FontSize="22"
+                                           Opacity=".6"/>
+                        
+                                <TextBlock x:Name="WordSuggestion" 
+                                           Text="...landscape"
+                                           Opacity=".6"
+                                           FontSize="22"
+                                           FontWeight="SemiBold"
+                                           Foreground="{StaticResource SystemControlHighlightAccentBrush}"
+                                           HorizontalAlignment="Center"
+                                           Tapped="WordSuggestion_Tapped"/>
+                            </StackPanel>
+
+                            <!-- LOADING VIEW -->
+                            <Grid x:Name="SearchLoadingView" 
+                                  VerticalAlignment="Center" 
+                                  HorizontalAlignment="Center"
+                                  Visibility="Collapsed">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="20"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+                            
+                                <ProgressBar x:Name="SearchProgressPage" IsIndeterminate="True"/>
+                                <TextBlock x:Uid="SearchingPhotos" 
+                                           Text="searching photos from Unsplash..." 
+                                           FontSize="20" 
+                                           Typography.Capitals="SmallCaps"
+                                           Grid.Row="1"/>
+                            </Grid>
+
+                            <!--EMPTY VIEW-->
+                            <StackPanel x:Name="SearchEmptyView"
+                                        Visibility="Collapsed"
+                                        VerticalAlignment="Center"
+                                        HorizontalAlignment="Center">
+
+                                <TextBlock x:Uid="NoResultsSearchPhotos" 
+                                           Text="There's no photos for this keyword"
+                                           FontSize="20"
+                                           Typography.Capitals="SmallCaps"
+                                           TextWrapping="Wrap"/>
+                            </StackPanel>
+
+                            <!-- DATA -->
+                            <controls:AdaptiveGridView x:Name="SearchPhotosView"
+                                                       Visibility="Visible"
+                                                       DesiredWidth="300"
+                                                       ItemHeight="300"
+                                                       ItemsSource="{x:Bind _PageDataSource.PhotosSearchResults, Mode=OneWay}"
+                                                       ItemTemplate="{StaticResource PhotoTemplate}"
+                                                       animations:ReorderGridAnimation.Duration="300"
+                                                       ItemContainerStyle="{StaticResource GridViewItemZeroMarginStyle}"
+                                                       Loaded="GridView_Loaded">
+                            </controls:AdaptiveGridView>
+
+                            <!-- VISUAL STATES -->
+                            <VisualStateManager.VisualStateGroups>
+                                <VisualStateGroup x:Name="SearchPhotosViewStates">
+                                    <VisualState x:Name="SearchPhotosViewSmall">
+                                        <VisualState.StateTriggers>
+                                            <AdaptiveTrigger MinWindowWidth="0"/>
+                                        </VisualState.StateTriggers>
+
+                                        <VisualState.Setters>
+                                            <Setter Target="SearchPhotosView.ItemHeight" Value="90"/>
+                                            <Setter Target="SearchPhotosView.DesiredWidth" Value="90"/>
+                                            <Setter Target="SearchPhotosView.Margin" Value="0,0,-20,0"/>
+                                        </VisualState.Setters>
+                                    </VisualState>
+
+                                    <VisualState x:Name="SearchPhotosViewLarge">
+                                        <VisualState.StateTriggers>
+                                            <AdaptiveTrigger MinWindowWidth="600"/>
+                                        </VisualState.StateTriggers>
+
+                                        <VisualState.Setters>
+                                            <Setter Target="SearchPhotosView.ItemHeight" Value="300"/>
+                                            <Setter Target="SearchPhotosView.DesiredWidth" Value="300"/>
+                                        </VisualState.Setters>
+                                    </VisualState>
+                                </VisualStateGroup>
+                            </VisualStateManager.VisualStateGroups>
+                        </Grid>
+                    </UserControl>
+                </PivotItem>
+            </Pivot>
 
 
-        <CommandBar x:Name="AppBar"
-                    Canvas.ZIndex="3"
-                    RequestedTheme="Light"
-                    Background="Transparent"
-                    VerticalAlignment="Bottom"
-                    ClosedDisplayMode="Compact">
-            <AppBarButton x:Name="CmdShowSearch" x:Uid="CmdShowSearch" Label="show search" Icon="Find" Tapped="CmdShowSearch_Tapped"/>
-            <AppBarButton x:Name="CmdRefresh" x:Uid="CmdRefresh" Label="refresh" Icon="Refresh" Tapped="CmdRefresh_Tapped"/>
-            <CommandBar.SecondaryCommands>
-                <AppBarButton Label="donations" x:Uid="CmdDonations" Tapped="GoToAchievements_Tapped"/>
-                <AppBarButton Label="slideshow" x:Uid="CmdSlideshow" Tapped="GoToSlideshow_Tapped"/>
-                <AppBarButton x:Name="CmdFavorites" x:Uid="CmdFavorites" Label="favorites" Tapped="GoToFavorites_Tapped"/>
-                <AppBarButton x:Name="CmdSettings" x:Uid="CmdSettings" Label="settings" Tapped="CmdSettings_Tapped"/>
-            </CommandBar.SecondaryCommands>
-        </CommandBar>
+            <CommandBar x:Name="PageCommandBar"
+                        Canvas.ZIndex="3"
+                        RequestedTheme="Light"
+                        Background="Transparent"
+                        VerticalAlignment="Bottom"
+                        ClosedDisplayMode="Compact">
+                <AppBarButton x:Name="CmdShowSearch" x:Uid="CmdShowSearch" Label="show search" Icon="Find" Tapped="CmdShowSearch_Tapped"/>
+                <AppBarButton x:Name="CmdRefresh" x:Uid="CmdRefresh" Label="refresh" Icon="Refresh" Tapped="CmdRefresh_Tapped"/>
+                <CommandBar.SecondaryCommands>
+                    <AppBarButton Label="donations" x:Uid="CmdDonations" Tapped="GoToAchievements_Tapped"/>
+                    <AppBarButton Label="slideshow" x:Uid="CmdSlideshow" Tapped="GoToSlideshow_Tapped"/>
+                    <AppBarButton x:Name="CmdFavorites" x:Uid="CmdFavorites" Label="favorites" Tapped="GoToFavorites_Tapped"/>
+                    <AppBarButton x:Name="CmdSettings" x:Uid="CmdSettings" Label="settings" Tapped="CmdSettings_Tapped"/>
+                </CommandBar.SecondaryCommands>
+            </CommandBar>
 
-        <Grid x:Name="AppBarFrozenHost" Canvas.ZIndex="2" Height="75" VerticalAlignment="Bottom"/>
+            <Grid x:Name="AppBarFrozenHost" Canvas.ZIndex="2" Height="75" VerticalAlignment="Bottom"/>
+        </Grid>
     </Grid>
 </Page>

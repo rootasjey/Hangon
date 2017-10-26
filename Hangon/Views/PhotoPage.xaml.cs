@@ -19,6 +19,7 @@ using System.Threading;
 using Windows.UI;
 using Unsplasharp.Models;
 using System.Collections.Generic;
+using Windows.ApplicationModel.Core;
 
 namespace Hangon.Views {
     public sealed partial class PhotoPage : Page {
@@ -59,6 +60,7 @@ namespace Hangon.Views {
         public PhotoPage() {
             InitializeComponent();
             InitializeVariables();
+            InitializeTitleBar();
             ApplyCommandBarBarFrostedGlass();
         }
 
@@ -134,7 +136,56 @@ namespace Hangon.Views {
             }
         }
 
+        private void CmdGoHome_Tapped(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e) {
+            Frame.Navigate(typeof(HomePage));
+        }
+
         #endregion navigation
+
+        #region titlebar
+
+        private void InitializeTitleBar() {
+            App.DeviceType = Windows.System.Profile.AnalyticsInfo.VersionInfo.DeviceFamily;
+
+            if (App.DeviceType == "Windows.Mobile") {
+                TitleBar.Visibility = Visibility.Collapsed;
+                var statusBar = StatusBar.GetForCurrentView();
+                statusBar.HideAsync();
+                return;
+            }
+
+            Window.Current.Activated += Current_Activated;
+            CoreApplicationViewTitleBar coreTitleBar = CoreApplication.GetCurrentView().TitleBar;
+            coreTitleBar.ExtendViewIntoTitleBar = true;
+
+            TitleBar.Height = coreTitleBar.Height;
+            Window.Current.SetTitleBar(TitleBarMainContent);
+
+            coreTitleBar.IsVisibleChanged += CoreTitleBar_IsVisibleChanged;
+            coreTitleBar.LayoutMetricsChanged += CoreTitleBar_LayoutMetricsChanged;
+
+            App.SetTitleBarTheme(ElementTheme.Light);
+        }
+
+        void CoreTitleBar_IsVisibleChanged(CoreApplicationViewTitleBar titleBar, object args) {
+            TitleBar.Visibility = titleBar.IsVisible ? Visibility.Visible : Visibility.Collapsed;
+        }
+
+        private void CoreTitleBar_LayoutMetricsChanged(CoreApplicationViewTitleBar sender, object args) {
+            TitleBar.Height = sender.Height;
+            RightMask.Width = sender.SystemOverlayRightInset;
+        }
+
+        private void Current_Activated(object sender, WindowActivatedEventArgs e) {
+            if (e.WindowActivationState != CoreWindowActivationState.Deactivated) {
+                TitleBarMainContent.Opacity = 1;
+                return;
+            }
+
+            TitleBarMainContent.Opacity = 0.5;
+        }
+
+        #endregion titlebar
 
         #region download
 

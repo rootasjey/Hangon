@@ -21,10 +21,10 @@ _Powered by [Unsplash](https://unsplash.com)_
 ## features
 
 * live tile showing recent photos
-* change periodically wallpaper
-* change periodically lockscreen
-* browse new and featured photos
-* search photos
+* change periodically wallpaper & lockscreen
+* browse photos, users' profiles, and photos' collections
+* search photos via keywords
+* slideshow to discorver random photos
 
 ## setup
 Steps to build and run this project:
@@ -66,5 +66,7 @@ If you want to get your personal API key from Unsplash:
 ## todos
 
 * zoom on photos
-* donations
-* slideshow
+
+## contributions
+
+You can support the development of the app by buying in-app purchases.

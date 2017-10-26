@@ -17,6 +17,8 @@ using Windows.UI;
 using System.Threading;
 using Windows.UI.Xaml.Input;
 using Unsplasharp.Models;
+using Windows.UI.ViewManagement;
+using Windows.ApplicationModel.Core;
 
 namespace Hangon.Views {
     public sealed partial class CollectionPage : Page {
@@ -39,11 +41,13 @@ namespace Hangon.Views {
         public CollectionPage() {
             InitializeComponent();
             InitializeVariables();
+            InitializeTitleBar();
             RestoreLastSelectedPivotIndex();
             ApplyCommandBarBarFrostedGlass();
         }
 
         #region navigation
+
         protected override void OnNavigatedTo(NavigationEventArgs e) {
             CoreWindow.GetForCurrentThread().KeyDown += Page_KeyDown;
 
@@ -62,7 +66,57 @@ namespace Hangon.Views {
             CoreWindow.GetForCurrentThread().KeyDown -= Page_KeyDown;
             base.OnNavigatingFrom(e);
         }
+
+        private void CmdGoHome_Tapped(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e) {
+            Frame.Navigate(typeof(HomePage));
+        }
+
         #endregion navigation
+
+        #region titlebar
+
+        private void InitializeTitleBar() {
+            App.DeviceType = Windows.System.Profile.AnalyticsInfo.VersionInfo.DeviceFamily;
+
+            if (App.DeviceType == "Windows.Mobile") {
+                TitleBar.Visibility = Visibility.Collapsed;
+                var statusBar = StatusBar.GetForCurrentView();
+                statusBar.HideAsync();
+                return;
+            }
+
+            Window.Current.Activated += Current_Activated;
+            CoreApplicationViewTitleBar coreTitleBar = CoreApplication.GetCurrentView().TitleBar;
+            coreTitleBar.ExtendViewIntoTitleBar = true;
+
+            TitleBar.Height = coreTitleBar.Height;
+            Window.Current.SetTitleBar(TitleBarMainContent);
+
+            coreTitleBar.IsVisibleChanged += CoreTitleBar_IsVisibleChanged;
+            coreTitleBar.LayoutMetricsChanged += CoreTitleBar_LayoutMetricsChanged;
+
+            App.SetTitleBarTheme(ElementTheme.Light);
+        }
+
+        void CoreTitleBar_IsVisibleChanged(CoreApplicationViewTitleBar titleBar, object args) {
+            TitleBar.Visibility = titleBar.IsVisible ? Visibility.Visible : Visibility.Collapsed;
+        }
+
+        private void CoreTitleBar_LayoutMetricsChanged(CoreApplicationViewTitleBar sender, object args) {
+            TitleBar.Height = sender.Height;
+            RightMask.Width = sender.SystemOverlayRightInset;
+        }
+
+        private void Current_Activated(object sender, WindowActivatedEventArgs e) {
+            if (e.WindowActivationState != CoreWindowActivationState.Deactivated) {
+                TitleBarMainContent.Opacity = 1;
+                return;
+            }
+
+            TitleBarMainContent.Opacity = 0.5;
+        }
+
+        #endregion titlebar
 
         #region data
         private void InitializeVariables() {
@@ -298,6 +352,7 @@ namespace Hangon.Views {
         #endregion micro-interactions
 
         #region commandbar
+
         void ApplyCommandBarBarFrostedGlass() {
             var glassHost = AppBarFrozenHost;
             var visual = ElementCompositionPreview.GetElementVisual(glassHost);
@@ -341,10 +396,11 @@ namespace Hangon.Views {
 
             glassHost.Offset(0, 27).Start();
 
-            AppBar.Opening += (s, e) => {
+            PageCommandBar.Opening += (s, e) => {
                 glassHost.Offset(0, 0).Start();
             };
-            AppBar.Closing += (s, e) => {
+
+            PageCommandBar.Closing += (s, e) => {
                 glassHost.Offset(0, 27).Start();
             };
         }

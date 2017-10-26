@@ -200,5 +200,14 @@
                 </UserControl>
             </PivotItem>
         </Pivot>
+
+        <CommandBar x:Name="PageCommandBar"
+                    Background="Transparent"
+                    ClosedDisplayMode="Minimal"
+                    VerticalAlignment="Bottom">
+            <CommandBar.SecondaryCommands>
+                <AppBarButton x:Uid="CmdHome" Label="home" Tapped="CmdGoHome_Tapped"/>
+            </CommandBar.SecondaryCommands>
+        </CommandBar>
     </Grid>
 </Page>
