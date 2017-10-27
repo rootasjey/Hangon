@@ -16,7 +16,6 @@ using Windows.UI.Xaml.Input;
 using System.Threading;
 using Windows.UI.Xaml.Media.Imaging;
 using Unsplasharp.Models;
-using Windows.Foundation.Metadata;
 using Windows.UI.ViewManagement;
 using Windows.ApplicationModel.Core;
 
