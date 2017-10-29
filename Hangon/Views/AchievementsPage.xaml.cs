@@ -1,7 +1,9 @@
 ﻿using Hangon.Services;
 using System.Collections.Generic;
+using Windows.ApplicationModel.Core;
 using Windows.Services.Store;
 using Windows.UI.Core;
+using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media.Animation;
@@ -12,6 +14,7 @@ namespace Hangon.Views {
         public AchievementsPage() {
             InitializeComponent();
             InitializePageAnimation();
+            InitializeTitleBar();
             InitializeData();
         }
 
@@ -34,6 +37,49 @@ namespace Hangon.Views {
         }
 
         #endregion navigation
+
+        #region titlebar
+
+        private void InitializeTitleBar() {
+            App.DeviceType = Windows.System.Profile.AnalyticsInfo.VersionInfo.DeviceFamily;
+
+            if (App.DeviceType == "Windows.Mobile") {
+                TitleBar.Visibility = Visibility.Collapsed;
+                var statusBar = StatusBar.GetForCurrentView();
+                statusBar.HideAsync();
+                return;
+            }
+
+            Window.Current.Activated += Current_Activated;
+            CoreApplicationViewTitleBar coreTitleBar = CoreApplication.GetCurrentView().TitleBar;
+            coreTitleBar.ExtendViewIntoTitleBar = true;
+
+            TitleBar.Height = coreTitleBar.Height;
+            Window.Current.SetTitleBar(TitleBarMainContent);
+
+            coreTitleBar.IsVisibleChanged += CoreTitleBar_IsVisibleChanged;
+            coreTitleBar.LayoutMetricsChanged += CoreTitleBar_LayoutMetricsChanged;
+        }
+
+        void CoreTitleBar_IsVisibleChanged(CoreApplicationViewTitleBar titleBar, object args) {
+            TitleBar.Visibility = titleBar.IsVisible ? Visibility.Visible : Visibility.Collapsed;
+        }
+
+        private void CoreTitleBar_LayoutMetricsChanged(CoreApplicationViewTitleBar sender, object args) {
+            TitleBar.Height = sender.Height;
+            RightMask.Width = sender.SystemOverlayRightInset;
+        }
+
+        private void Current_Activated(object sender, WindowActivatedEventArgs e) {
+            if (e.WindowActivationState != CoreWindowActivationState.Deactivated) {
+                TitleBarMainContent.Opacity = 1;
+                return;
+            }
+
+            TitleBarMainContent.Opacity = 0.5;
+        }
+
+        #endregion titlebar
 
         #region animations
 

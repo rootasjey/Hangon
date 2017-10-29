@@ -3,9 +3,11 @@ using Microsoft.Toolkit.Uwp.UI.Animations;
 using System;
 using System.Globalization;
 using System.Threading;
+using Windows.ApplicationModel.Core;
 using Windows.ApplicationModel.Email;
 using Windows.ApplicationModel.Resources;
 using Windows.UI.Core;
+using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media.Animation;
@@ -19,6 +21,7 @@ namespace Hangon.Views {
             InitializeComponent();
             InitializeVariables();
             InitializePageAnimation();
+            InitializeTitleBar();
             LoadData();
 
             AnimatePersonalizationPivot();
@@ -47,6 +50,49 @@ namespace Hangon.Views {
         }
 
         #endregion animations
+
+        #region titlebar
+
+        private void InitializeTitleBar() {
+            App.DeviceType = Windows.System.Profile.AnalyticsInfo.VersionInfo.DeviceFamily;
+
+            if (App.DeviceType == "Windows.Mobile") {
+                TitleBar.Visibility = Visibility.Collapsed;
+                var statusBar = StatusBar.GetForCurrentView();
+                statusBar.HideAsync();
+                return;
+            }
+
+            Window.Current.Activated += Current_Activated;
+            CoreApplicationViewTitleBar coreTitleBar = CoreApplication.GetCurrentView().TitleBar;
+            coreTitleBar.ExtendViewIntoTitleBar = true;
+
+            TitleBar.Height = coreTitleBar.Height;
+            Window.Current.SetTitleBar(TitleBarMainContent);
+
+            coreTitleBar.IsVisibleChanged += CoreTitleBar_IsVisibleChanged;
+            coreTitleBar.LayoutMetricsChanged += CoreTitleBar_LayoutMetricsChanged;
+        }
+
+        void CoreTitleBar_IsVisibleChanged(CoreApplicationViewTitleBar titleBar, object args) {
+            TitleBar.Visibility = titleBar.IsVisible ? Visibility.Visible : Visibility.Collapsed;
+        }
+
+        private void CoreTitleBar_LayoutMetricsChanged(CoreApplicationViewTitleBar sender, object args) {
+            TitleBar.Height = sender.Height;
+            RightMask.Width = sender.SystemOverlayRightInset;
+        }
+
+        private void Current_Activated(object sender, WindowActivatedEventArgs e) {
+            if (e.WindowActivationState != CoreWindowActivationState.Deactivated) {
+                TitleBarMainContent.Opacity = 1;
+                return;
+            }
+
+            TitleBarMainContent.Opacity = 0.5;
+        }
+
+        #endregion titlebar
 
         private void LoadData() {
             WallSwitch.IsOn = BackgroundTasks.IsWallTaskActivated();
@@ -520,7 +566,5 @@ namespace Hangon.Views {
             FlyoutNotification.Visibility = Visibility.Collapsed;
         }
         #endregion notifications
-
-        
     }
 }

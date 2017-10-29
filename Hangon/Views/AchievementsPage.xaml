@@ -42,57 +42,93 @@
     </Page.Resources>
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-        <Pivot x:Name="PagePivot">
-            <PivotItem x:Name="DonationsPivot"
-                       Header="addons">
-                <Grid>
-                    <ListView x:Name="UnlocksListView"
-                              ItemTemplate="{StaticResource AddonTemplate}">
-                        <ListView.ItemContainerStyle>
-                            <Style TargetType="ListViewItem">
-                                <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
-                                <Setter Property="Margin" Value="0,1"/>
-                            </Style>
-                        </ListView.ItemContainerStyle>
-                    </ListView>
+        <Grid.RowDefinitions>
+            <RowDefinition x:Name="TitleBarRow" Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
 
-                    <StackPanel x:Name="DonationsLoadingView"
+        <Grid x:Name="TitleBar" 
+              Background="Transparent" 
+              Grid.Row="0" 
+              Canvas.ZIndex="2"
+              Margin="0,0,0,-37">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Grid x:Name="BackButtonGrid" VerticalAlignment="Top"
+                  Visibility="Collapsed">
+                <Button x:Name="BackButton" Background="Transparent">
+                    <FontIcon Glyph="&#xE096;" Foreground="White"/>
+                </Button>
+            </Grid>
+            <Grid Grid.Column="1" x:Name="TitleBarMainContent" Background="Transparent">
+                <TextBlock Text="Hangon" 
+                           VerticalAlignment="Top"
+                           Visibility="Collapsed"
+                           FontSize="12"
+                           FontFamily="Segoe UI" 
+                           FontWeight="Normal" 
+                           Margin="10,0"/>
+            </Grid>
+            <Grid Grid.Column="3" x:Name="RightMask" Background="Transparent"/>
+        </Grid>
+
+        <Grid x:Name="PageContent" Grid.Row="1">
+            <Pivot x:Name="PagePivot"
+                   Margin="0,27,0,0">
+                <PivotItem x:Name="DonationsPivot"
+                       Header="addons">
+                    <Grid>
+                        <ListView x:Name="UnlocksListView"
+                              ItemTemplate="{StaticResource AddonTemplate}">
+                            <ListView.ItemContainerStyle>
+                                <Style TargetType="ListViewItem">
+                                    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                                    <Setter Property="Margin" Value="0,1"/>
+                                </Style>
+                            </ListView.ItemContainerStyle>
+                        </ListView>
+
+                        <StackPanel x:Name="DonationsLoadingView"
                                     HorizontalAlignment="Center"
                                     VerticalAlignment="Center">
-                        <TextBlock x:Uid="Loadinginapppurchases" 
+                            <TextBlock x:Uid="Loadinginapppurchases" 
                                    Text="loading in-app purchases"
                                     FontSize="24"
                                     TextWrapping="Wrap"/>
-                        <ProgressBar x:Name="ProgressLoadingInAppPurchases"
+                            <ProgressBar x:Name="ProgressLoadingInAppPurchases"
                                          IsIndeterminate="True"/>
-                    </StackPanel>
-                </Grid>
-            </PivotItem>
+                        </StackPanel>
+                    </Grid>
+                </PivotItem>
 
-            <PivotItem x:Name="AboutPivot"
+                <PivotItem x:Name="AboutPivot"
                        Header="why?">
-                <Grid>
-                    <StackPanel>
-                        <TextBlock x:Uid="WhyDonateTitle" 
+                    <Grid>
+                        <StackPanel>
+                            <TextBlock x:Uid="WhyDonateTitle" 
                                     Text="why donate ?"
                                     FontWeight="Light"
                                     FontSize="44"
                                     Margin="0,0,0,12"
                                     Typography.Capitals="SmallCaps"
                                     TextWrapping="Wrap"/>
-                        <TextBlock x:Uid="WhyDonateLine1" 
+                            <TextBlock x:Uid="WhyDonateLine1" 
                                        Text="By donating, you're contributing to the development of Hangon."
                                        Style="{StaticResource TextStyle1}"/>
-                        <TextBlock x:Uid="WhyDonateLine2" 
+                            <TextBlock x:Uid="WhyDonateLine2" 
                                        Text="It takes time for developing such an app, so it always appreciated when I receive some donations to encourage me go further."
                                        Margin="0,10"
                                        Style="{StaticResource TextStyle1}"/>
-                        <TextBlock x:Uid="WhyDonateLine3" 
+                            <TextBlock x:Uid="WhyDonateLine3" 
                                        Text="So in order for me to continue developing the app and make it growing, I'll need your help."
                                        Style="{StaticResource TextStyle1}"/>
-                    </StackPanel>
-                </Grid>
-            </PivotItem>
-        </Pivot>
+                        </StackPanel>
+                    </Grid>
+                </PivotItem>
+            </Pivot>
+        </Grid>
     </Grid>
 </Page>

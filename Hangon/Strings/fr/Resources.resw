@@ -477,4 +477,10 @@
   <data name="LoadingCollections.Text" xml:space="preserve">
     <value>chargement des collections depuis Unsplash...</value>
   </data>
+  <data name="TapToClose.Text" xml:space="preserve">
+    <value>Touchez ici pour fermer</value>
+  </data>
+  <data name="VersionString" xml:space="preserve">
+    <value>Version</value>
+  </data>
 </root>

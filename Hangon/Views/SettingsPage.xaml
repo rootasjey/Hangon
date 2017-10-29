@@ -24,309 +24,345 @@
     </Page.Resources>
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-        <FlyoutPresenter x:Name="FlyoutNotification"
+        <Grid.RowDefinitions>
+            <RowDefinition x:Name="TitleBarRow" Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Grid x:Name="TitleBar" 
+              Background="Transparent" 
+              Grid.Row="0" 
+              Canvas.ZIndex="2"
+              Margin="0,0,0,-37">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Grid x:Name="BackButtonGrid" VerticalAlignment="Top"
+                  Visibility="Collapsed">
+                <Button x:Name="BackButton" Background="Transparent">
+                    <FontIcon Glyph="&#xE096;" Foreground="White"/>
+                </Button>
+            </Grid>
+            <Grid Grid.Column="1" x:Name="TitleBarMainContent" Background="Transparent">
+                <TextBlock Text="Hangon" 
+                           VerticalAlignment="Top"
+                           Visibility="Collapsed"
+                           FontSize="12"
+                           FontFamily="Segoe UI" 
+                           FontWeight="Normal" 
+                           Margin="10,0"/>
+            </Grid>
+            <Grid Grid.Column="3" x:Name="RightMask" Background="Transparent"/>
+        </Grid>
+
+        <Grid x:Name="PageContent" Grid.Row="1">
+            <FlyoutPresenter x:Name="FlyoutNotification"
                          RequestedTheme="Dark"
                          Visibility="Collapsed"
                          Canvas.ZIndex="2"
                          Background="{ThemeResource SystemControlHighlightAccentBrush}" 
                          Height="20" VerticalAlignment="Top"
                          Tapped="FlyoutNotification_Dismiss">
-            <StackPanel>
-                <TextBlock x:Name="FlyoutText" Text="" TextWrapping="Wrap"/>
-            </StackPanel>
-        </FlyoutPresenter>
+                <StackPanel>
+                    <TextBlock x:Name="FlyoutText" Text="" TextWrapping="Wrap"/>
+                </StackPanel>
+            </FlyoutPresenter>
 
-        <Pivot x:Name="PagePivot">
-            <PivotItem x:Name="PersonalizationPivotItem"
+            <Pivot x:Name="PagePivot"
+                   Margin="0,27,0,0">
+                <PivotItem x:Name="PersonalizationPivotItem"
                        x:Uid="PivotPersonalization"
                        Header="personalization">
-                
-                <ScrollViewer Margin="0,20,0,0">
-                    <StackPanel x:Name="PersonalizationContentPanel">
-                        <StackPanel x:Name="LanguagePanel">
-                            <TextBlock Text="language" x:Uid="LanguageLabel"
+
+                    <ScrollViewer Margin="0,20,0,0">
+                        <StackPanel x:Name="PersonalizationContentPanel">
+                            <StackPanel x:Name="LanguagePanel">
+                                <TextBlock Text="language" x:Uid="LanguageLabel"
                                        Style="{StaticResource SettingsTitle}"/>
-                            
-                            <TextBlock Text="Choose your language"
+
+                                <TextBlock Text="Choose your language"
                                        x:Uid="ChooseLanguage"
                                        Opacity=".6"/>
-                            
-                            <ComboBox x:Name="LanguageSelection"
+
+                                <ComboBox x:Name="LanguageSelection"
                                       Loaded="LanguageSelection_Loaded"
                                       SelectionChanged="LanguageSelection_SelectionChanged">
-                                <ComboBoxItem Content="English" Tag="EN"/>
-                                <ComboBoxItem Content="Français" Tag="FR"/>
-                            </ComboBox>
-                        </StackPanel>
+                                    <ComboBoxItem Content="English" Tag="EN"/>
+                                    <ComboBoxItem Content="Français" Tag="FR"/>
+                                </ComboBox>
+                            </StackPanel>
 
-                        <StackPanel x:Name="ThemePanel" Margin="0,20,0,0">
-                            <TextBlock x:Uid="ThemeText" Text="thème" 
+                            <StackPanel x:Name="ThemePanel" Margin="0,20,0,0">
+                                <TextBlock x:Uid="ThemeText" Text="thème" 
                                        Style="{StaticResource SettingsTitle}"/>
-                            <ToggleSwitch x:Name="ThemeSwitch"
+                                <ToggleSwitch x:Name="ThemeSwitch"
                                           x:Uid="ThemeSwitch"
                                           Loaded="ThemeSwitch_Loaded"
                                           OnContent="Thème Clair"
                                           OffContent="Thème Sombre"
                                           Toggled="ThemeSwitch_Toggled"/>
-                        </StackPanel>
+                            </StackPanel>
 
-                        <StackPanel x:Name="DownloadsLocationPanel" Margin="0,20,0,0">
-                            <TextBlock Text="downloads" x:Uid="DownloadText" 
+                            <StackPanel x:Name="DownloadsLocationPanel" Margin="0,20,0,0">
+                                <TextBlock Text="downloads" x:Uid="DownloadText" 
                                        Style="{StaticResource SettingsTitle}"/>
-                            
-                            <TextBlock Text="Save downloads automatically to Pictures library"
+
+                                <TextBlock Text="Save downloads automatically to Pictures library"
                                        x:Uid="AutoSaveDownloadText"
                                        Opacity=".6"/>
-                            <ToggleSwitch x:Name="ToggleAutoSaveDownloads"
+                                <ToggleSwitch x:Name="ToggleAutoSaveDownloads"
                                           Loaded="ToggleAutoSaveDownloads_Loaded"
                                           Toggled="ToggleAutoSaveDownloads_Toggled"/>
-                        </StackPanel>
+                            </StackPanel>
 
-                        <StackPanel x:Name="DownloadResolutionPanel" Margin="0,20,0,0">
-                            <TextBlock Text="Always download photo in the following resolution"
+                            <StackPanel x:Name="DownloadResolutionPanel" Margin="0,20,0,0">
+                                <TextBlock Text="Always download photo in the following resolution"
                                        x:Uid="AutoResolutionDownloadText"
                                        Opacity=".6"/>
-                            <ToggleSwitch x:Name="ToggleAutoDownloadsResolution"
+                                <ToggleSwitch x:Name="ToggleAutoDownloadsResolution"
                                           Loaded="ToggleAutoDownloadsResolution_Loaded"
                                           Toggled="ToggleAutoDownloadsResolution_Toggled"/>
 
-                            <ComboBox x:Name="DefaultPhotoResolution"
+                                <ComboBox x:Name="DefaultPhotoResolution"
                                       Margin="0,10,0,0"
                                       Visibility="Collapsed"
                                       Header="chosen resolution"
                                       Loaded="DefaultPhotoResolution_Loaded"
                                       SelectionChanged="DefaultPhotoResolution_SelectionChanged">
-                                <ComboBoxItem Content="raw" x:Uid="ItemRaw" Tag="raw"/>
-                                <ComboBoxItem Content="full" x:Uid="ItemFull" Tag="full"/>
-                                <ComboBoxItem Content="regular" x:Uid="ItemRegular" Tag="regular"/>
-                                <ComboBoxItem Content="small" x:Uid="ItemSmall" Tag="small"/>
-                            </ComboBox>
+                                    <ComboBoxItem Content="raw" x:Uid="ItemRaw" Tag="raw"/>
+                                    <ComboBoxItem Content="full" x:Uid="ItemFull" Tag="full"/>
+                                    <ComboBoxItem Content="regular" x:Uid="ItemRegular" Tag="regular"/>
+                                    <ComboBoxItem Content="small" x:Uid="ItemSmall" Tag="small"/>
+                                </ComboBox>
+                            </StackPanel>
                         </StackPanel>
-                    </StackPanel>
-                </ScrollViewer>
-            </PivotItem>
-            
-            <PivotItem Header="background tasks"
+                    </ScrollViewer>
+                </PivotItem>
+
+                <PivotItem Header="background tasks"
                        x:Uid="BackgroundTasksHeader">
-                <ScrollViewer>
-                    <StackPanel Margin="0,20,0,40">
-                        <StackPanel>
-                            <TextBlock x:Uid="WallpaperText" Text="wallpaper"
+                    <ScrollViewer>
+                        <StackPanel Margin="0,20,0,40">
+                            <StackPanel>
+                                <TextBlock x:Uid="WallpaperText" Text="wallpaper"
                                        Style="{StaticResource SettingsTitle}"/>
-                            
-                            <TextBlock Text="Periodically update wallpaper" 
+
+                                <TextBlock Text="Periodically update wallpaper" 
                                        x:Uid="PeriodicWallpaperText"
                                        TextWrapping="Wrap" Opacity=".6"/>
-                            
-                            <ToggleSwitch x:Name="WallSwitch"
+
+                                <ToggleSwitch x:Name="WallSwitch"
                                       Toggled="WallSwitch_Toggled"/>
 
-                            <ComboBox x:Name="WallIntervalUpdates"
+                                <ComboBox x:Name="WallIntervalUpdates"
                                       Header="period"
                                       Visibility="Collapsed"
                                       Margin="0, 20"
                                       SelectedIndex="2"
                                       Loaded="WallIntervalUpdates_Loaded">
-                                <ComboBoxItem Content="15 min" x:Uid="ItemFifteenMinutes" Tag="15"/>
-                                <ComboBoxItem Content="half an hour" x:Uid="ItemHalfHour" Tag="30"/>
-                                <ComboBoxItem Content="every hour" x:Uid="ItemHour" Tag="60"/>
-                                <ComboBoxItem Content="every 3 hours" x:Uid="ItemThreeHours" Tag="180"/>
-                                <ComboBoxItem Content="once a day" x:Uid="ItemDay" Tag="1380"/>
-                            </ComboBox>
+                                    <ComboBoxItem Content="15 min" x:Uid="ItemFifteenMinutes" Tag="15"/>
+                                    <ComboBoxItem Content="half an hour" x:Uid="ItemHalfHour" Tag="30"/>
+                                    <ComboBoxItem Content="every hour" x:Uid="ItemHour" Tag="60"/>
+                                    <ComboBoxItem Content="every 3 hours" x:Uid="ItemThreeHours" Tag="180"/>
+                                    <ComboBoxItem Content="once a day" x:Uid="ItemDay" Tag="1380"/>
+                                </ComboBox>
 
-                            <StackPanel x:Name="WallTaskActivity" Margin="0,10" Visibility="Collapsed">
-                                <TextBlock x:Name="LastUpdatedTask" x:Uid="LastUpdatedTask" 
+                                <StackPanel x:Name="WallTaskActivity" Margin="0,10" Visibility="Collapsed">
+                                    <TextBlock x:Name="LastUpdatedTask" x:Uid="LastUpdatedTask" 
                                            Text="Never run" Opacity=".6"/>
-                                
-                                <TextBlock x:Name="LastWallTaskError" 
+
+                                    <TextBlock x:Name="LastWallTaskError" 
                                            x:Uid="LastWallTaskError"
                                            Text="No error" Opacity=".6"/>
 
-                                <StackPanel Margin="0,20,0,20">
-                                    <TextBlock Text="If the task doesn't work properly, restart it"
+                                    <StackPanel Margin="0,20,0,20">
+                                        <TextBlock Text="If the task doesn't work properly, restart it"
                                                x:Uid="TaskNotWorkingText"
                                                TextWrapping="Wrap"
                                                Opacity=".6"/>
-                                    <Button Content="restart" 
+                                        <Button Content="restart" 
                                             x:Uid="ButtonRestart"
                                             Margin="0,10,0,0" 
                                             Tapped="RestartWallTask_Tapped"/>
+                                    </StackPanel>
                                 </StackPanel>
-                            </StackPanel>
-                            
-                        </StackPanel>
 
-                        <StackPanel Margin="0,20">
-                            <TextBlock x:Uid="LockscreenText" Text="lockscreen"
+                            </StackPanel>
+
+                            <StackPanel Margin="0,20">
+                                <TextBlock x:Uid="LockscreenText" Text="lockscreen"
                                        Style="{StaticResource SettingsTitle}"/>
-                            
-                            <TextBlock Text="Periodically update lockscreen background"
+
+                                <TextBlock Text="Periodically update lockscreen background"
                                        x:Uid="PeriodicLockscreenText"
                                        TextWrapping="Wrap" Opacity=".6"/>
-                            
-                            <ToggleSwitch x:Name="LockscreenSwitch"
+
+                                <ToggleSwitch x:Name="LockscreenSwitch"
                                       Toggled="LockscreenSwitch_Toggled"/>
 
 
-                            <ComboBox x:Name="LockscreenIntervalUpdates"
+                                <ComboBox x:Name="LockscreenIntervalUpdates"
                                       Header="period"
                                       x:Uid="LockscreenIntervalUpdates"
                                       Visibility="Collapsed"
                                       Margin="0, 20"
                                       SelectedIndex="2"
                                       Loaded="LockscreenIntervalUpdates_Loaded">
-                                <ComboBoxItem Content="15 min" x:Uid="ItemFifteenMinutes" Tag="15"/>
-                                <ComboBoxItem Content="half an hour" x:Uid="ItemHalfHour" Tag="30"/>
-                                <ComboBoxItem Content="every hour" x:Uid="ItemHour" Tag="60"/>
-                                <ComboBoxItem Content="every 3 hours" x:Uid="ItemThreeHours" Tag="180"/>
-                                <ComboBoxItem Content="once a day" x:Uid="ItemDay" Tag="1380"/>
-                            </ComboBox>
+                                    <ComboBoxItem Content="15 min" x:Uid="ItemFifteenMinutes" Tag="15"/>
+                                    <ComboBoxItem Content="half an hour" x:Uid="ItemHalfHour" Tag="30"/>
+                                    <ComboBoxItem Content="every hour" x:Uid="ItemHour" Tag="60"/>
+                                    <ComboBoxItem Content="every 3 hours" x:Uid="ItemThreeHours" Tag="180"/>
+                                    <ComboBoxItem Content="once a day" x:Uid="ItemDay" Tag="1380"/>
+                                </ComboBox>
 
-                            <StackPanel x:Name="LockscreenTaskActivity" Margin="0,10" Visibility="Collapsed">
-                                <TextBlock x:Name="LastUpdatedLockscreenTask"
+                                <StackPanel x:Name="LockscreenTaskActivity" Margin="0,10" Visibility="Collapsed">
+                                    <TextBlock x:Name="LastUpdatedLockscreenTask"
                                            x:Uid="LastUpdatedTask"
                                            Text="Never run" Opacity=".6"/>
-                                
-                                <TextBlock x:Name="LastLockscreenTaskError"
+
+                                    <TextBlock x:Name="LastLockscreenTaskError"
                                            x:Uid="LastWallTaskError"
                                            Text="No error" Opacity=".6"/>
 
-                                <StackPanel Margin="0,20,0,20">
-                                    <TextBlock Text="If the task doesn't work properly, restart it"
+                                    <StackPanel Margin="0,20,0,20">
+                                        <TextBlock Text="If the task doesn't work properly, restart it"
                                                x:Uid="TaskNotWorkingText"
                                                Opacity=".6"/>
-                                    <Button Content="restart"
+                                        <Button Content="restart"
                                             x:Uid="ButtonRestart"
                                             Margin="0,10,0,0" 
                                             Tapped="RestartLockscreenTask_Tapped"/>
+                                    </StackPanel>
                                 </StackPanel>
                             </StackPanel>
-                        </StackPanel>
 
-                        <StackPanel>
-                            <TextBlock x:Uid="Tile" Text="tile"
+                            <StackPanel>
+                                <TextBlock x:Uid="Tile" Text="tile"
                                        Style="{StaticResource SettingsTitle}"/>
-                            
-                            <TextBlock Text="Periodically update primary tile"
+
+                                <TextBlock Text="Periodically update primary tile"
                                        x:Uid="PeriodicTile"
                                        TextWrapping="Wrap" Opacity=".6"/>
 
-                            <ToggleSwitch x:Name="TileSwitch"
+                                <ToggleSwitch x:Name="TileSwitch"
                                       Toggled="TileSwitch_Toggled"/>
 
 
-                            <ComboBox x:Name="TileIntervalUpdates"
+                                <ComboBox x:Name="TileIntervalUpdates"
                                       x:Uid="TileIntervalUpdates"
                                       Header="period"
                                       Visibility="Collapsed"
                                       Margin="0, 20"
                                       SelectedIndex="2"
                                       Loaded="TileIntervalUpdates_Loaded">
-                                <ComboBoxItem Content="every hour" x:Uid="ItemHour" Tag="60"/>
-                                <ComboBoxItem Content="every 3 hours" x:Uid="ItemThreeHours" Tag="180"/>
-                                <ComboBoxItem Content="every 6 hours" x:Uid="ItemSixHours" Tag="360"/>
-                                <ComboBoxItem Content="once a day" x:Uid="ItemDay" Tag="1380"/>
-                            </ComboBox>
+                                    <ComboBoxItem Content="every hour" x:Uid="ItemHour" Tag="60"/>
+                                    <ComboBoxItem Content="every 3 hours" x:Uid="ItemThreeHours" Tag="180"/>
+                                    <ComboBoxItem Content="every 6 hours" x:Uid="ItemSixHours" Tag="360"/>
+                                    <ComboBoxItem Content="once a day" x:Uid="ItemDay" Tag="1380"/>
+                                </ComboBox>
 
-                            <StackPanel x:Name="TileTaskActivity" Margin="0,10" Visibility="Collapsed">
-                                <TextBlock x:Name="LastUpdatedTileTask"
+                                <StackPanel x:Name="TileTaskActivity" Margin="0,10" Visibility="Collapsed">
+                                    <TextBlock x:Name="LastUpdatedTileTask"
                                            x:Uid="LastUpdatedTask"
                                            Text="Never run" Opacity=".6"/>
 
-                                <TextBlock x:Name="TileTaskError"
+                                    <TextBlock x:Name="TileTaskError"
                                            x:Uid="NoError"
                                            Text="No error" Opacity=".6"/>
 
-                                <StackPanel Margin="0,20,0,20">
-                                    <TextBlock Text="If the task doesn't work properly, restart it"
+                                    <StackPanel Margin="0,20,0,20">
+                                        <TextBlock Text="If the task doesn't work properly, restart it"
                                                x:Uid="TaskNotWorkingText"
                                                Opacity=".6"/>
-                                    <Button Content="restart"
+                                        <Button Content="restart"
                                             x:Uid="ButtonRestart"
                                             Margin="0,10,0,0" 
                                             Tapped="RestartTileTask_Tapped"/>
+                                    </StackPanel>
                                 </StackPanel>
                             </StackPanel>
                         </StackPanel>
-                    </StackPanel>
-                </ScrollViewer>
-            </PivotItem>
+                    </ScrollViewer>
+                </PivotItem>
 
-            <PivotItem Header="feedback" x:Uid="FeedbackPivotItem">
-                <ScrollViewer Margin="0,20,0,0">
-                    <StackPanel>
-                        <TextBlock Text="feedback" x:Uid="FeedbackText" Style="{StaticResource SettingsTitle}"/>
-                        <TextBlock Text="Send an email if you encounter issues or if you've suggestions"
+                <PivotItem Header="feedback" x:Uid="FeedbackPivotItem">
+                    <ScrollViewer Margin="0,20,0,0">
+                        <StackPanel>
+                            <TextBlock Text="feedback" x:Uid="FeedbackText" Style="{StaticResource SettingsTitle}"/>
+                            <TextBlock Text="Send an email if you encounter issues or if you've suggestions"
                                    x:Uid="FeedbackEmailText"
                                    Opacity=".6" TextWrapping="Wrap"/>
-                        
-                        <Button x:Name="FeedbackButton"
+
+                            <Button x:Name="FeedbackButton"
                                 x:Uid="FeedbackButton"
                                 Content="send a suggestion" 
                                 Margin="0,12,0,20" 
                                 Click="FeedbackButton_Click"/>
 
-                        <TextBlock Text="notation" Style="{StaticResource SettingsTitle}"/>
-                        
-                        <TextBlock Text="Don't forget to give the app a note on the store ;)"
+                            <TextBlock Text="notation" Style="{StaticResource SettingsTitle}"/>
+
+                            <TextBlock Text="Don't forget to give the app a note on the store ;)"
                                    x:Uid="NotationSentenceText"
                                    TextWrapping="Wrap"
                                    Opacity=".6"/>
-                        
-                        <Button x:Name="NoteButton" 
+
+                            <Button x:Name="NoteButton" 
                                 x:Uid="NoteButton"
                                 Content="give a note" 
                                 Margin="0,12,0,20" 
                                 Visibility="Visible"
                                 Click="NoteButton_Click"/>
-                    </StackPanel>
-                </ScrollViewer>
-            </PivotItem>
+                        </StackPanel>
+                    </ScrollViewer>
+                </PivotItem>
 
-            <PivotItem Header="contributions" 
+                <PivotItem Header="contributions" 
                        x:Uid="ContributionPivotItem">
-                <Grid Margin="0,20,0,0">
-                    <StackPanel>
-                        <TextBlock Text="images" Style="{StaticResource SettingsTitle}"/>
-                        <RichTextBlock x:Name="ImagesBox" Margin="0,0,0,20" Opacity=".6">
-                            <Paragraph>
-                                <Run x:Uid="PhotosProviderText" Text="All photos are from: "/>
-                                <Hyperlink NavigateUri="https://unsplash.com/">Unsplash</Hyperlink>
-                            </Paragraph>
-                        </RichTextBlock>
-                    </StackPanel>
-                </Grid>
-            </PivotItem>
-            
-            <PivotItem Header="update" x:Uid="UpdatePivotItem">
-                <Grid>
-                    <StackPanel Margin="0,20,0,0">
-                        <TextBlock Text="LAST UPDATE CHANGELOG"
+                    <Grid Margin="0,20,0,0">
+                        <StackPanel>
+                            <TextBlock Text="images" Style="{StaticResource SettingsTitle}"/>
+                            <RichTextBlock x:Name="ImagesBox" Margin="0,0,0,20" Opacity=".6">
+                                <Paragraph>
+                                    <Run x:Uid="PhotosProviderText" Text="All photos are from: "/>
+                                    <Hyperlink NavigateUri="https://unsplash.com/">Unsplash</Hyperlink>
+                                </Paragraph>
+                            </RichTextBlock>
+                        </StackPanel>
+                    </Grid>
+                </PivotItem>
+
+                <PivotItem Header="update" x:Uid="UpdatePivotItem">
+                    <Grid>
+                        <StackPanel Margin="0,20,0,0">
+                            <TextBlock Text="LAST UPDATE CHANGELOG"
                                    FontSize="16"
                                    FontWeight="Medium"/>
 
-                        <TextBlock x:Name="CurrentAppVersionLabel" Opacity=".5" FontWeight="SemiBold"
+                            <TextBlock x:Name="CurrentAppVersionLabel" Opacity=".5" FontWeight="SemiBold"
                                    Margin="0,0,0,20"/>
 
-                        <TextBlock Text="SLIDESHOW"
+                            <TextBlock Text="COLLECTIONS UPDATE"
                                    Style="{StaticResource SettingsTitleColored}"/>
 
-                        <RichTextBlock Opacity=".5">
-                            <Paragraph>
-                                <Span>A new slideshow section has been added,</Span>
-                                <LineBreak/>
-                                <Span>and this a great way to discover new photos.</Span>
-                                <LineBreak/>
-                                <Span>This new feature is a thank you gift</Span>
-                                <LineBreak/>
-                                <Span>for those who support the app financially.</Span>
-                                <LineBreak/>
-                            </Paragraph>
-                        </RichTextBlock>
-                    </StackPanel>
-                </Grid>
-            </PivotItem>
-        </Pivot>
-
+                            <RichTextBlock Opacity=".5">
+                                <Paragraph>
+                                    <Span>A new collections section has been added</Span>
+                                    <LineBreak/>
+                                    <Span>to the home page. It replaces the previous</Span>
+                                    <LineBreak/>
+                                    <Span>curated photos section which, I think, was</Span>
+                                    <LineBreak/>
+                                    <Span>less valuable because it was rarely updated.</Span>
+                                    <LineBreak/>
+                                    <Span>Let me know what you think :)</Span>
+                                </Paragraph>
+                            </RichTextBlock>
+                        </StackPanel>
+                    </Grid>
+                </PivotItem>
+            </Pivot>
+        </Grid>
     </Grid>
 </Page>

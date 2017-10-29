@@ -107,107 +107,142 @@
     </Page.Resources>
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-        <FlyoutPresenter x:Name="FlyoutNotification"
+        <Grid.RowDefinitions>
+            <RowDefinition x:Name="TitleBarRow" Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Grid x:Name="TitleBar" 
+              Background="Transparent" 
+              Grid.Row="0" 
+              Canvas.ZIndex="2"
+              Margin="0,0,0,-37">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Grid x:Name="BackButtonGrid" VerticalAlignment="Top"
+                  Visibility="Collapsed">
+                <Button x:Name="BackButton" Background="Transparent">
+                    <FontIcon Glyph="&#xE096;" Foreground="White"/>
+                </Button>
+            </Grid>
+            <Grid Grid.Column="1" x:Name="TitleBarMainContent" Background="Transparent">
+                <TextBlock Text="Hangon" 
+                           VerticalAlignment="Top"
+                           Visibility="Collapsed"
+                           FontSize="12"
+                           FontFamily="Segoe UI" 
+                           FontWeight="Normal" 
+                           Margin="10,0"/>
+            </Grid>
+            <Grid Grid.Column="3" x:Name="RightMask" Background="Transparent"/>
+        </Grid>
+
+        <Grid x:Name="PageContent" Grid.Row="1">
+            <FlyoutPresenter x:Name="FlyoutNotification"
                          RequestedTheme="Dark"
                          Visibility="Collapsed"
                          Canvas.ZIndex="2"
                          Background="{ThemeResource SystemControlHighlightAccentBrush}" 
                          MinHeight="20" VerticalAlignment="Top"
                          Tapped="FlyoutNotification_Dismiss">
-            <StackPanel MaxWidth="200">
-                <TextBlock x:Name="FlyoutText" Text="" TextWrapping="Wrap"/>
-                <Grid x:Name="ProgressGrid" Visibility="Collapsed">
-                    <ProgressBar x:Name="ProgressIndeterminate"
+                <StackPanel MaxWidth="200">
+                    <TextBlock x:Name="FlyoutText" Text="" TextWrapping="Wrap"/>
+                    <Grid x:Name="ProgressGrid" Visibility="Collapsed">
+                        <ProgressBar x:Name="ProgressIndeterminate"
                                  FlowDirection="RightToLeft" IsIndeterminate="True" Canvas.ZIndex="1"/>
-                    <ProgressBar x:Name="ProgressDeterminate" IsIndeterminate="False" />
-                </Grid>
-            </StackPanel>
-        </FlyoutPresenter>
+                        <ProgressBar x:Name="ProgressDeterminate" IsIndeterminate="False" />
+                    </Grid>
+                </StackPanel>
+            </FlyoutPresenter>
 
-        <Pivot x:Name="PagePivot"
+            <Pivot x:Name="PagePivot"
                Style="{StaticResource PivotCenteredHeadersStyle}">
-            <PivotItem x:Uid="FavoritesHeader" Header="favorites">
-                <UserControl>
-                    <Grid>
-                        <!--LOAD VIEW-->
-                        <StackPanel x:Name="LocalFavoritesLoadingView"
+                <PivotItem x:Uid="FavoritesHeader" Header="favorites">
+                    <UserControl>
+                        <Grid>
+                            <!--LOAD VIEW-->
+                            <StackPanel x:Name="LocalFavoritesLoadingView"
                                     Visibility="Visible"
                                     VerticalAlignment="Center">
 
-                            <FontIcon Glyph="&#xE10C;"
+                                <FontIcon Glyph="&#xE10C;"
                                       FontSize="40"
                                       Margin="0,10"/>
 
-                            <TextBlock x:Uid="LoadingFavoritesLabel" 
+                                <TextBlock x:Uid="LoadingFavoritesLabel" 
                                        Text="Loading your favorites..."
                                        FontSize="20"
                                        HorizontalAlignment="Center"
                                        TextWrapping="Wrap"/>
-                            <ProgressBar IsIndeterminate="True" Margin="0,20"/>
-                        </StackPanel>
+                                <ProgressBar IsIndeterminate="True" Margin="0,20"/>
+                            </StackPanel>
 
-                        <!--EMPTY VIEW-->
-                        <StackPanel x:Name="LocalFavoritesEmptyView"
+                            <!--EMPTY VIEW-->
+                            <StackPanel x:Name="LocalFavoritesEmptyView"
                                     Visibility="Collapsed"
                                     VerticalAlignment="Center">
-                            <FontIcon Glyph="&#xE007;"
+                                <FontIcon Glyph="&#xE007;"
                                       FontSize="40"
                                       Margin="0,10"/>
-                            <TextBlock x:Uid="NoFavoritesLabel" 
+                                <TextBlock x:Uid="NoFavoritesLabel" 
                                        Text="You've no favorites at the moment."
                                        FontSize="24"
                                        HorizontalAlignment="Center"
                                        TextWrapping="Wrap"/>
-                        </StackPanel>
+                            </StackPanel>
 
-                        <!--DATA-->
-                        <controls:AdaptiveGridView x:Name="LocalFavoritesView"
+                            <!--DATA-->
+                            <controls:AdaptiveGridView x:Name="LocalFavoritesView"
                                                        DesiredWidth="300"
                                                        ItemHeight="300"
                                                        ItemTemplate="{StaticResource PhotoTemplate}"
                                                        animations:ReorderGridAnimation.Duration="300"
                                                        ItemContainerStyle="{StaticResource GridViewItemZeroMarginStyle}">
-                        </controls:AdaptiveGridView>
+                            </controls:AdaptiveGridView>
 
-                        <!-- VISUAL STATES -->
-                        <VisualStateManager.VisualStateGroups>
-                            <VisualStateGroup x:Name="LocalFavoritesViewStates">
-                                <VisualState x:Name="LocalFavoritesViewSmall">
-                                    <VisualState.StateTriggers>
-                                        <AdaptiveTrigger MinWindowWidth="0"/>
-                                    </VisualState.StateTriggers>
+                            <!-- VISUAL STATES -->
+                            <VisualStateManager.VisualStateGroups>
+                                <VisualStateGroup x:Name="LocalFavoritesViewStates">
+                                    <VisualState x:Name="LocalFavoritesViewSmall">
+                                        <VisualState.StateTriggers>
+                                            <AdaptiveTrigger MinWindowWidth="0"/>
+                                        </VisualState.StateTriggers>
 
-                                    <VisualState.Setters>
-                                        <Setter Target="LocalFavoritesView.ItemHeight" Value="90"/>
-                                        <Setter Target="LocalFavoritesView.DesiredWidth" Value="90"/>
-                                        <Setter Target="LocalFavoritesView.Margin" Value="0,0,-20,0"/>
-                                    </VisualState.Setters>
-                                </VisualState>
+                                        <VisualState.Setters>
+                                            <Setter Target="LocalFavoritesView.ItemHeight" Value="90"/>
+                                            <Setter Target="LocalFavoritesView.DesiredWidth" Value="90"/>
+                                            <Setter Target="LocalFavoritesView.Margin" Value="0,0,-20,0"/>
+                                        </VisualState.Setters>
+                                    </VisualState>
 
-                                <VisualState x:Name="LocalFavoritesViewLarge">
-                                    <VisualState.StateTriggers>
-                                        <AdaptiveTrigger MinWindowWidth="600"/>
-                                    </VisualState.StateTriggers>
+                                    <VisualState x:Name="LocalFavoritesViewLarge">
+                                        <VisualState.StateTriggers>
+                                            <AdaptiveTrigger MinWindowWidth="600"/>
+                                        </VisualState.StateTriggers>
 
-                                    <VisualState.Setters>
-                                        <Setter Target="LocalFavoritesView.ItemHeight" Value="300"/>
-                                        <Setter Target="LocalFavoritesView.DesiredWidth" Value="300"/>
-                                    </VisualState.Setters>
-                                </VisualState>
-                            </VisualStateGroup>
-                        </VisualStateManager.VisualStateGroups>
-                    </Grid>
-                </UserControl>
-            </PivotItem>
-        </Pivot>
+                                        <VisualState.Setters>
+                                            <Setter Target="LocalFavoritesView.ItemHeight" Value="300"/>
+                                            <Setter Target="LocalFavoritesView.DesiredWidth" Value="300"/>
+                                        </VisualState.Setters>
+                                    </VisualState>
+                                </VisualStateGroup>
+                            </VisualStateManager.VisualStateGroups>
+                        </Grid>
+                    </UserControl>
+                </PivotItem>
+            </Pivot>
 
-        <CommandBar x:Name="PageCommandBar"
+            <CommandBar x:Name="PageCommandBar"
                     Background="Transparent"
                     ClosedDisplayMode="Minimal"
                     VerticalAlignment="Bottom">
-            <CommandBar.SecondaryCommands>
-                <AppBarButton x:Uid="CmdHome" Label="home" Tapped="CmdGoHome_Tapped"/>
-            </CommandBar.SecondaryCommands>
-        </CommandBar>
+                <CommandBar.SecondaryCommands>
+                    <AppBarButton x:Uid="CmdHome" Label="home" Tapped="CmdGoHome_Tapped"/>
+                </CommandBar.SecondaryCommands>
+            </CommandBar>
+        </Grid>
     </Grid>
 </Page>

@@ -257,18 +257,29 @@
                             ScrollViewer.HorizontalScrollMode="Disabled"
                             ScrollViewer.VerticalScrollMode="Disabled"
                             Padding="0,20">
-                    <StackPanel Orientation="Horizontal">
-                        <FontIcon Glyph="&#xE116;" 
-                                  Foreground="{ThemeResource SystemControlHighlightAccentBrush}" 
-                                  FontSize="30" Margin="0,0,12,-6"/>
-                        <TextBlock Text="Slideshow Update" 
-                                   FontSize="36"
-                                   FontWeight="Normal"
-                                   Typography.Capitals="AllSmallCaps"/>
                     
+                    <StackPanel Orientation="Horizontal"
+                                Tapped="CloseChangelogFlyout_Tapped">
+                        <StackPanel>
+                            <TextBlock Text="Collections Update" 
+                                       FontSize="36"
+                                       FontWeight="Normal"
+                                       Typography.Capitals="AllSmallCaps"/>
+                            
+                            <TextBlock x:Name="UpdateVersion" 
+                               Opacity=".5"/>
+                        </StackPanel>
+                        
+                        <FontIcon Glyph="&#xE15C;" 
+                                  Foreground="{ThemeResource SystemControlHighlightAccentBrush}" 
+                                  FontSize="30" Margin="22,-10,0,0"/>
                     </StackPanel>
-                
-                    <TextBlock Text="1.7.0" Opacity=".5"/>
+
+                    <TextBlock x:Uid="TapToClose" 
+                                Text="Tap here to close" 
+                                FontStyle="Italic" 
+                                Foreground="White" 
+                                Opacity=".5"/>
 
                     <RichTextBlock TextWrapping="Wrap" 
                                    Margin="0,20,0,0"
@@ -278,21 +289,23 @@
                             <Span FontSize="22" 
                                   FontWeight="Medium" 
                                   Foreground="{ThemeResource SystemControlForegroundAccentBrush}">
-                                SLIDESHOW
+                                COLLECTIONS
                             </Span>
                             <LineBreak/>
-                            <Span>A new slideshow section has been added,</Span>
+                            <Span>A new collections section has been added</Span>
                             <LineBreak/>
-                            <Span>and this a great way to discover new photos.</Span>
+                            <Span>to the home page. It replaces the previous</Span>
                             <LineBreak/>
-                            <Span>This new feature is a thank you gift</Span>
+                            <Span>curated photos section which, I think, was</Span>
                             <LineBreak/>
-                            <Span>for those who support the app financially.</Span>
+                            <Span>less valuable because it was rarely updated.</Span>
+                            <LineBreak/>
+                            <Span>Let me know what you think :)</Span>
                         </Paragraph>
                     </RichTextBlock>
                 
                     <Button x:Name="ChangelogDismissButton"
-                            Margin="0,22"
+                            Margin="0,26,0,0"
                             Width="100"
                             Height="40"
                             Content="OKAY" 
@@ -307,6 +320,7 @@
             </Grid>
         
             <Pivot x:Name="PagePivot"
+                   Margin="0,27,0,0"
                    Style="{StaticResource PivotCenteredHeadersStyle}"
                    SelectionChanged="PagePivot_SelectionChanged">
             

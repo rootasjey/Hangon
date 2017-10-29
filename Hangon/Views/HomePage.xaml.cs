@@ -62,7 +62,7 @@ namespace Hangon.Views {
             BindAppDataSource();
             RestorePivotPosition();
 
-            CheckIfNewLaunch();
+            ShowUpdateChangelogIfUpdated();
         }
 
         #region navigation
@@ -474,7 +474,7 @@ namespace Hangon.Views {
                     _IsPivotHeaderHidden = true;
 
                 } else if (offset > scrollViewer.VerticalOffset && _IsPivotHeaderHidden) {
-                    PagePivot.Offset(0, 0).Start();
+                    PagePivot.Offset(0, 27).Start();
                     PagePivot.Margin = new Thickness();
                     _IsPivotHeaderHidden = false;
                 }
@@ -1104,9 +1104,14 @@ namespace Hangon.Views {
         #endregion rightTapped flyout
 
         #region update changelog
-        private void CheckIfNewLaunch() {
+
+        private void ShowUpdateChangelogIfUpdated() {
             if (Settings.IsNewUpdatedLaunch()) {
+                UpdateVersion.Text = string.Format("{0} {1}", 
+                    App.ResourceLoader.GetString("VersionString"), Settings.GetAppVersion());
+
                 ShowLastUpdateChangelog();
+
                 Settings.SaveBestPhotoResolution(Wallpaper.GetBestPhotoFormat());
             }
         }
@@ -1123,7 +1128,15 @@ namespace Hangon.Views {
             PagePivot.Blur(10, 500, 500).Start();
         }
 
-        private async void ChangelogDismissButton_Tapped(object sender, TappedRoutedEventArgs e) {
+        private void ChangelogDismissButton_Tapped(object sender, TappedRoutedEventArgs e) {
+            HideUpdateChangelog();
+        }
+
+        private void CloseChangelogFlyout_Tapped(object sender, TappedRoutedEventArgs e) {
+            HideUpdateChangelog();
+        }
+
+        private async void HideUpdateChangelog() {
             var x = (float)UpdateChangeLogFlyout.ActualWidth / 2;
             var y = (float)UpdateChangeLogFlyout.ActualHeight / 2;
 
