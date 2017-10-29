@@ -117,11 +117,8 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="CuratedHeader.Header" xml:space="preserve">
-    <value>sélectionnées</value>
-  </data>
-  <data name="CuratedPhotosFetchFailed.Text" xml:space="preserve">
-    <value>Désolé, je n'ai pas pu récupérer les photos organisées :(</value>
+  <data name="CollectionsPivotItem.Header" xml:space="preserve">
+    <value>collections</value>
   </data>
   <data name="LoadingPhotos.Text" xml:space="preserve">
     <value>Chargement des photos depuis Unplash...</value>
@@ -473,5 +470,11 @@
   </data>
   <data name="CmdHome.Label" xml:space="preserve">
     <value>accueil</value>
+  </data>
+  <data name="CollectionPhotosFetchFailed.Text" xml:space="preserve">
+    <value>Désolé, je n'ai pas pu récupérer les collections :(</value>
+  </data>
+  <data name="LoadingCollections.Text" xml:space="preserve">
+    <value>chargement des collections depuis Unsplash...</value>
   </data>
 </root>

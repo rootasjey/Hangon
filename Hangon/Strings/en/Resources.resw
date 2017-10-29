@@ -120,11 +120,8 @@
   <data name="CollectionPhotosFetchFailed.Text" xml:space="preserve">
     <value>Sorry, I couldn't get the collection's photos :(</value>
   </data>
-  <data name="CuratedHeader.Header" xml:space="preserve">
-    <value>curated</value>
-  </data>
-  <data name="CuratedPhotosFetchFailed.Text" xml:space="preserve">
-    <value>Sorry, I couldn't get curated photos :(</value>
+  <data name="CollectionsPivotItem.Header" xml:space="preserve">
+    <value>collections</value>
   </data>
   <data name="LoadingPhotos.Text" xml:space="preserve">
     <value>Loading photos from Unsplash...</value>
@@ -476,5 +473,8 @@
   </data>
   <data name="CmdHome.Label" xml:space="preserve">
     <value>home</value>
+  </data>
+  <data name="LoadingCollections.Text" xml:space="preserve">
+    <value>loading collections from Unsplash...</value>
   </data>
 </root>

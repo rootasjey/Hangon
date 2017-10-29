@@ -15,6 +15,8 @@ namespace Hangon.Data {
 
         public PhotosList CuratedPhotos { get; set; }
 
+        public CollectionsList HomeCollections { get; set; }
+
         public PhotosList PhotosSearchResults { get; set; }
 
         public PhotosList UserPhotos { get; set; }
@@ -86,6 +88,26 @@ namespace Hangon.Data {
             CuratedPhotos.Clear();
             CuratedPhotos.Page = 0;
             return await CuratedPhotos.Fetch();
+        }
+
+        public async Task<int> FetchRecentCollections() {
+            if (HomeCollections == null) HomeCollections = new CollectionsList();
+
+            var url = GetUrl("collections");
+            if (HomeCollections.Url == url) return 0;
+
+            HomeCollections.Clear();
+            HomeCollections.Page = 0;
+            HomeCollections.Url = url;
+            return await HomeCollections.Fetch();
+        }
+
+        public async Task<int> ReloadRecentCollections() {
+            if (HomeCollections == null) return 0;
+
+            HomeCollections.Clear();
+            HomeCollections.Page = 0;
+            return await HomeCollections.Fetch();
         }
 
         public async Task<int> SearchPhotos(string query) {

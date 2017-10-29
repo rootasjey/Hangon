@@ -29,7 +29,7 @@ namespace Hangon.Views {
 
         private User _CurrentUser { get; set; }
 
-        public static Photo _LastSelectedPhoto { get; set; }
+        public static Photo _LastPhotoSelected { get; set; }
 
         private static Collection _LastCollectionSelected { get; set; }
 
@@ -87,6 +87,96 @@ namespace Hangon.Views {
 
         private void CmdGoHome_Tapped(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e) {
             Frame.Navigate(typeof(HomePage));
+        }
+
+        private void HandleConnectedAnimation(Photo photo) {
+            if (photo == null) return;
+
+            var animationService = ConnectedAnimationService.GetForCurrentView();
+
+            AnimateProfileImage();
+            AnimateBackground();
+            AnimateCollectionCover();
+            AnimatePhotoCover();
+
+
+            void AnimateProfileImage() {
+                var profileAnimation = animationService.GetAnimation("UserProfileImage");
+
+                if (UserImageSource == null || PivotUserData.SelectedIndex != 0) {
+                    profileAnimation?.Cancel();
+                    return;
+                }
+
+                if (profileAnimation != null) {
+                    UserProfileImage.Opacity = 0; // TODO: check opacity effect on animation
+                    UserImageSource.ImageOpened += (s, e) => {
+                        UserProfileImage.Opacity = 1;
+                        profileAnimation.TryStart(UserProfileImage);
+                    };
+                }
+
+                UserImageSource.UriSource = new Uri(_PageDataSource.GetProfileImageLink(_CurrentUser));
+            }
+
+            void AnimateBackground() {
+                var backgroundAnimation = animationService.GetAnimation("PhotoImage");
+
+                if (backgroundAnimation != null) {
+                    ImageBackground.Opacity = 0;
+                    ImageBackground.ImageOpened += (s, e) => {
+                        ImageBackground.Opacity = .6;
+                        backgroundAnimation.TryStart(ImageBackground);
+                        BackgroundBlurEffect.Blur(10, 1000, 1000).Start();
+                    };
+
+                } else {
+                    ImageBackground.Fade(.6f).Start();
+                    BackgroundBlurEffect.Blur(10, 1000, 1000).Start();
+                }
+
+                ImageBackground.Source = new BitmapImage(new Uri(photo.Urls.Regular));
+            }
+
+            void AnimatePhotoCover() {
+                var photoAnimation = animationService.GetAnimation("PhotoImageBack");
+
+                if (photoAnimation == null || _LastPhotoSelected == null) {
+                    photoAnimation?.Cancel();
+                    return;
+                }
+
+                if (_LastPivotIndexSelected == 0) {
+                    UserPhotosListView.Loaded += (s, e) => {
+                        UI.AnimateBackItemToList(UserPhotosListView, _LastPhotoSelected, photoAnimation);
+                    };
+
+                } else if (_LastPivotIndexSelected == 1) {
+                    UserPhotosGridView.Loaded += (s, e) => {
+                        UI.AnimateBackItemToList(UserPhotosGridView, _LastPhotoSelected, photoAnimation);
+                    };
+                }
+            }
+
+            void AnimateCollectionCover() {
+                var collectionCoverAnimation = animationService.GetAnimation("CollectionCoverImage");
+
+                if (collectionCoverAnimation == null || _LastCollectionSelected == null) {
+                    collectionCoverAnimation?.Cancel();
+                    return;
+                }
+
+                if (_LastPivotIndexSelected == 0) {
+                    UserCollectionsListView.Loaded += (s, e) => {
+                        UI.AnimateBackItemToList(UserCollectionsListView, _LastCollectionSelected, collectionCoverAnimation);
+                    };
+
+                } else if (_LastPivotIndexSelected == 2) {
+                    UserCollectionsGrid.Loaded += (s, e) => {
+                        UI.AnimateBackItemToList(UserCollectionsGrid, _LastCollectionSelected, collectionCoverAnimation);
+                    };
+                }
+            }
         }
 
         #endregion navigation
@@ -224,150 +314,6 @@ namespace Hangon.Views {
         }
 
         #endregion data
-        
-        #region micro-interactions
-
-        private void HandleConnectedAnimation(Photo photo) {
-            if (photo == null) return;
-
-            var animationService = ConnectedAnimationService.GetForCurrentView();
-
-            AnimateProfileImage();
-            AnimateBackground();
-            AnimateCollectionCover();
-            AnimatePhotoCover();
-
-
-            void AnimateProfileImage()
-            {
-                var profileAnimation = animationService.GetAnimation("UserProfileImage");
-
-                if (UserImageSource == null || PivotUserData.SelectedIndex != 0) {
-                    profileAnimation?.Cancel();
-                    return;
-                }
-
-                if (profileAnimation != null) {
-                    UserProfileImage.Opacity = 0; // TODO: check opacity effect on animation
-                    UserImageSource.ImageOpened += (s, e) => {
-                        UserProfileImage.Opacity = 1;
-                        profileAnimation.TryStart(UserProfileImage);
-                    };
-                }
-
-                UserImageSource.UriSource = new Uri(_PageDataSource.GetProfileImageLink(_CurrentUser));
-            }
-
-            void AnimateBackground()
-            {
-                var backgroundAnimation = animationService.GetAnimation("PhotoImage");
-
-                if (backgroundAnimation != null) {
-                    ImageBackground.Opacity = 0;
-                    ImageBackground.ImageOpened += (s, e) => {
-                        ImageBackground.Opacity = .6;
-                        backgroundAnimation.TryStart(ImageBackground);
-                        BackgroundBlurEffect.Blur(10, 1000, 1000).Start();
-                    };
-
-                } else {
-                    ImageBackground.Fade(.6f).Start();
-                    BackgroundBlurEffect.Blur(10, 1000, 1000).Start();
-                }
-
-                ImageBackground.Source = new BitmapImage(new Uri(photo.Urls.Regular));
-            }
-
-            void AnimatePhotoCover()
-            {
-                var photoAnimation = animationService.GetAnimation("PhotoImageBack");
-
-                if (photoAnimation == null || _LastSelectedPhoto == null) {
-                    photoAnimation?.Cancel();
-                    return;
-                }
-
-                if (_LastPivotIndexSelected == 0) {
-                    UserPhotosListView.Loaded += (s, e) => {
-                        UI.AnimateBackItemToList(UserPhotosListView, _LastSelectedPhoto, photoAnimation);
-                    };
-
-                } else if (_LastPivotIndexSelected == 1) {
-                    UserPhotosGridView.Loaded += (s, e) => {
-                        UI.AnimateBackItemToList(UserPhotosGridView, _LastSelectedPhoto, photoAnimation);
-                    };
-                }
-            }
-
-            void AnimateCollectionCover()
-            {
-                var collectionCoverAnimation = animationService.GetAnimation("CollectionCoverImage");
-
-                if (collectionCoverAnimation == null || _LastCollectionSelected == null) {
-                    collectionCoverAnimation?.Cancel();
-                    return;
-                }
-
-                if (_LastPivotIndexSelected == 0) {
-                    UserCollectionsListView.Loaded += (s, e) => {
-                        UI.AnimateBackItemToList(UserCollectionsListView, _LastCollectionSelected, collectionCoverAnimation);
-                    };
-
-                } else if (_LastPivotIndexSelected == 2) {
-                    UserCollectionsGrid.Loaded += (s, e) => {
-                        UI.AnimateBackItemToList(UserCollectionsGrid, _LastCollectionSelected, collectionCoverAnimation);
-                    };
-                }
-            }
-        }
-
-        private void UserView_PointerEntered(object sender, Windows.UI.Xaml.Input.PointerRoutedEventArgs e) {
-            var ellipse = (Ellipse)sender;
-            ellipse.Scale(1.1f, 1.1f).Start();
-        }
-
-        private void UserView_PointerExited(object sender, PointerRoutedEventArgs e) {
-            var ellipse = (Ellipse)sender;
-            ellipse.Scale(1f, 1f).Start();
-        }
-
-        private void PhotoItem_PointerEntered(object sender, PointerRoutedEventArgs e) {
-            var panel = (StackPanel)sender;
-            var image = (Image)panel.FindName("PhotoImage");
-
-            if (image == null) return;
-
-            image.Scale(1f, 1f).Start();
-        }
-
-        private void PhotoItem_PointerExited(object sender, PointerRoutedEventArgs e) {
-            var panel = (StackPanel)sender;
-            var image = (Image)panel.FindName("PhotoImage");
-
-            if (image == null) return;
-
-            image.Scale(1f, 1f).Start();
-        }
-
-        private void CollectionItem_PointerEntered(object sender, PointerRoutedEventArgs e) {
-            var panel = (Grid)sender;
-            var image = (Image)panel.FindName("PhotoImage");
-
-            if (image == null) return;
-
-            image.Scale(1.1f, 1.1f).Start();
-        }
-
-        private void CollectionItem_PointerExited(object sender, PointerRoutedEventArgs e) {
-            var panel = (Grid)sender;
-            var image = (Image)panel.FindName("PhotoImage");
-
-            if (image == null) return;
-
-            image.Scale(1f, 1f).Start();
-        }
-
-        #endregion micro-interactions
 
         #region CommandBar
         void ApplyCommandBarBarFrostedGlass() {
@@ -449,6 +395,7 @@ namespace Hangon.Views {
         #endregion CommandBar
 
         #region events
+
         private void Page_KeyDown(CoreWindow sender, KeyEventArgs args) {
             if (Events.IsBackOrEscapeKey(args.VirtualKey) && Frame.CanGoBack) {
                 Frame.GoBack();
@@ -459,9 +406,9 @@ namespace Hangon.Views {
             var photoItem = (StackPanel)sender;
 
             var data = (Photo)photoItem.DataContext;
-            if (data == _LastSelectedPhoto) {
+            if (data == _LastPhotoSelected) {
                 photoItem.Fade(1).Start();
-                _LastSelectedPhoto = null;
+                _LastPhotoSelected = null;
                 return;
             }
 
@@ -505,7 +452,7 @@ namespace Hangon.Views {
             var item = (StackPanel)sender;
             var photo = (Photo)item.DataContext;
 
-            _LastSelectedPhoto = photo;
+            _LastPhotoSelected = photo;
             _LastCollectionSelected = null;
 
             var image = (Image)item.FindName("PhotoImage");
@@ -522,7 +469,7 @@ namespace Hangon.Views {
             var collection = (Collection)item.DataContext;
 
             _LastCollectionSelected = collection;
-            _LastSelectedPhoto = null;
+            _LastPhotoSelected = null;
 
             var image = (Image)item.FindName("PhotoImage");
 
@@ -574,6 +521,51 @@ namespace Hangon.Views {
             HandleConnectedAnimation(_CurrentPhoto);
         }
 
+        private void UserView_PointerEntered(object sender, Windows.UI.Xaml.Input.PointerRoutedEventArgs e) {
+            var ellipse = (Ellipse)sender;
+            ellipse.Scale(1.1f, 1.1f).Start();
+        }
+
+        private void UserView_PointerExited(object sender, PointerRoutedEventArgs e) {
+            var ellipse = (Ellipse)sender;
+            ellipse.Scale(1f, 1f).Start();
+        }
+
+        private void PhotoItem_PointerEntered(object sender, PointerRoutedEventArgs e) {
+            var panel = (StackPanel)sender;
+            var image = (Image)panel.FindName("PhotoImage");
+
+            if (image == null) return;
+
+            image.Scale(1f, 1f).Start();
+        }
+
+        private void PhotoItem_PointerExited(object sender, PointerRoutedEventArgs e) {
+            var panel = (StackPanel)sender;
+            var image = (Image)panel.FindName("PhotoImage");
+
+            if (image == null) return;
+
+            image.Scale(1f, 1f).Start();
+        }
+
+        private void CollectionItem_PointerEntered(object sender, PointerRoutedEventArgs e) {
+            var panel = (Grid)sender;
+            var image = (Image)panel.FindName("PhotoImage");
+
+            if (image == null) return;
+
+            image.Scale(1.1f, 1.1f).Start();
+        }
+
+        private void CollectionItem_PointerExited(object sender, PointerRoutedEventArgs e) {
+            var panel = (Grid)sender;
+            var image = (Image)panel.FindName("PhotoImage");
+
+            if (image == null) return;
+
+            image.Scale(1f, 1f).Start();
+        }
 
         #endregion events
 
@@ -640,7 +632,7 @@ namespace Hangon.Views {
             var panel = (StackPanel)sender;
             var photo = (Photo)panel.DataContext;
 
-            _LastSelectedPhoto = photo;
+            _LastPhotoSelected = photo;
 
             CheckIfPhotoInFavorites(photo);
 
@@ -668,7 +660,7 @@ namespace Hangon.Views {
         private void CmdCopyPhotoLink_Tapped(object sender, TappedRoutedEventArgs e) {
             var successMessage = _ResourcesLoader.GetString("CopyLinkSuccess");
 
-            DataTransfer.Copy(_LastSelectedPhoto.Links.Html);
+            DataTransfer.Copy(_LastPhotoSelected.Links.Html);
             Notify(successMessage);
         }
 
@@ -678,7 +670,7 @@ namespace Hangon.Views {
             var failedMessage = _ResourcesLoader.GetString("WallpaperSetFailed");
 
             ShowProgress(progressMessage);
-            var success = await Wallpaper.SetAsWallpaper(_LastSelectedPhoto, HttpProgressCallback);
+            var success = await Wallpaper.SetAsWallpaper(_LastPhotoSelected, HttpProgressCallback);
             HideProgress();
 
             if (success) Notify(successMessage);
@@ -691,7 +683,7 @@ namespace Hangon.Views {
             var failedMessage = _ResourcesLoader.GetString("LockscreenSetFailed");
 
             ShowProgress(progressMessage);
-            var success = await Wallpaper.SetAsLockscreen(_LastSelectedPhoto, HttpProgressCallback);
+            var success = await Wallpaper.SetAsLockscreen(_LastPhotoSelected, HttpProgressCallback);
             HideProgress();
 
             if (success) Notify(successMessage);
@@ -699,10 +691,10 @@ namespace Hangon.Views {
         }
 
         private async void CmdOpenPhotoInBrowser_Tapped(object sender, TappedRoutedEventArgs e) {
-            if (_LastSelectedPhoto == null || _LastSelectedPhoto.Links == null) return;
+            if (_LastPhotoSelected == null || _LastPhotoSelected.Links == null) return;
 
             var tracking = "?utm_source=Hangon&utm_medium=referral&utm_campaign=" + Credentials.ApplicationId;
-            var userUri = new Uri(string.Format("{0}{1}", _LastSelectedPhoto.Links.Html, tracking));
+            var userUri = new Uri(string.Format("{0}{1}", _LastPhotoSelected.Links.Html, tracking));
             var success = await Windows.System.Launcher.LaunchUriAsync(userUri);
         }
 
@@ -717,11 +709,11 @@ namespace Hangon.Views {
             var result = false;
 
             if (string.IsNullOrEmpty(size)) {
-                result = await Wallpaper.SaveToPicturesLibrary(_LastSelectedPhoto, HttpProgressCallback);
+                result = await Wallpaper.SaveToPicturesLibrary(_LastPhotoSelected, HttpProgressCallback);
 
             } else {
                 string url = getURL();
-                result = await Wallpaper.SaveToPicturesLibrary(_LastSelectedPhoto, HttpProgressCallback, url);
+                result = await Wallpaper.SaveToPicturesLibrary(_LastPhotoSelected, HttpProgressCallback, url);
             }
 
             HideProgress();
@@ -736,15 +728,15 @@ namespace Hangon.Views {
             {
                 switch (size) {
                     case "raw":
-                        return _LastSelectedPhoto.Urls.Raw;
+                        return _LastPhotoSelected.Urls.Raw;
                     case "full":
-                        return _LastSelectedPhoto.Urls.Full;
+                        return _LastPhotoSelected.Urls.Full;
                     case "regular":
-                        return _LastSelectedPhoto.Urls.Regular;
+                        return _LastPhotoSelected.Urls.Regular;
                     case "small":
-                        return _LastSelectedPhoto.Urls.Small;
+                        return _LastPhotoSelected.Urls.Small;
                     default:
-                        return _LastSelectedPhoto.Urls.Regular;
+                        return _LastPhotoSelected.Urls.Regular;
                 }
             }
         }

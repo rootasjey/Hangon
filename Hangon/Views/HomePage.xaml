@@ -30,7 +30,7 @@
                                        PointerEntered="Image_PointerEntered"
                                        PointerExited="Image_PointerExited">
                             <Image.Source>
-                                <BitmapImage DecodePixelWidth="300" UriSource="{x:Bind Urls.Regular}"/>
+                                <BitmapImage UriSource="{x:Bind Urls.Regular}"/>
                             </Image.Source>
                         </Image>
                     </Border>
@@ -65,6 +65,91 @@
                         </VisualStateGroup>
                     </VisualStateManager.VisualStateGroups>
                 </StackPanel>
+            </UserControl>
+        </DataTemplate>
+
+        <DataTemplate x:Key="CollectionTemplate" x:DataType="models:Collection">
+            <UserControl>
+                <Grid x:Name="CollectionItem"
+                      Opacity="0"
+                      Margin="0,0,0,0"
+                      PointerEntered="CollectionItem_PointerEntered"
+                      PointerExited="CollectionItem_PointerExited"
+                      Loaded="CollectionItem_Loaded"
+                      Tapped="CollectionItem_Tapped">
+                    <Border Width="600" Height="300" Background="Black">
+                        <Border.Clip>
+                            <RectangleGeometry Rect="0,0, 600, 300"/>
+                        </Border.Clip>
+
+                        <Image x:Name="PhotoImage"
+                               Opacity=".7"
+                               Width="600"
+                               Height="300"
+                                Stretch="UniformToFill">
+                            <Image.Source>
+                                <BitmapImage DecodePixelWidth="600" UriSource="{x:Bind CoverPhoto.Urls.Regular}"/>
+                            </Image.Source>
+                        </Image>
+                    </Border>
+
+                    <StackPanel VerticalAlignment="Bottom"
+                            HorizontalAlignment="Center"
+                            Padding="0,0,0,10">
+                    
+                        <TextBlock x:Name="CollectionTitle" Text="{x:Bind Title}" 
+                                   FontSize="26"
+                                   FontWeight="Bold"
+                                   Typography.Capitals="SmallCaps"/>
+
+                        <TextBlock Text="{x:Bind PublishedAt}" Opacity=".6"/>
+
+                        <StackPanel Orientation="Horizontal"
+                                Margin="0,10">
+                        <Ellipse
+                            Height="40" Width="40"
+                            PointerEntered="UserView_PointerEntered"
+                            PointerExited="UserView_PointerExited"
+                            Stroke="White"
+                            StrokeThickness="1"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center">
+                            <Ellipse.Fill>
+                                <ImageBrush Stretch="UniformToFill">
+                                    <ImageBrush.ImageSource>
+                                        <BitmapImage UriSource="{x:Bind User.ProfileImage.Small, Converter={StaticResource UriParser}}" />
+                                    </ImageBrush.ImageSource>
+                                </ImageBrush>
+                            </Ellipse.Fill>
+                        </Ellipse>
+                        <TextBlock Text="{x:Bind User.Name}" Margin="5,0,0,0" Opacity=".6" VerticalAlignment="Center"/>
+                    </StackPanel>
+                    </StackPanel>
+
+                <VisualStateManager.VisualStateGroups>
+                    <VisualStateGroup x:Name="CollectionsStates">
+                            <VisualState x:Name="CollectionsSmallSate">
+                            <VisualState.StateTriggers>
+                                <AdaptiveTrigger MinWindowWidth="0"/>
+                            </VisualState.StateTriggers>
+
+                            <VisualState.Setters>
+                                <Setter Target="CollectionTitle.FontSize" Value="20"/>
+                            </VisualState.Setters>
+                        </VisualState>
+
+                            <VisualState x:Name="CollectionsWideSate">
+                            <VisualState.StateTriggers>
+                                <AdaptiveTrigger MinWindowWidth="600"/>
+                            </VisualState.StateTriggers>
+
+                            <VisualState.Setters>
+                                <Setter Target="CollectionTitle.FontSize" Value="26"/>
+                            </VisualState.Setters>
+                        </VisualState>
+                    </VisualStateGroup>
+                </VisualStateManager.VisualStateGroups>
+            </Grid>
             </UserControl>
         </DataTemplate>
 
@@ -274,8 +359,12 @@
                                                        ItemTemplate="{StaticResource PhotoTemplate}"
                                                        animations:ReorderGridAnimation.Duration="300"
                                                        ItemContainerStyle="{StaticResource GridViewItemZeroMarginStyle}"
-                                                       Loaded="GridView_Loaded">
-                            </controls:AdaptiveGridView>
+                                                       Loaded="GridView_Loaded"/>
+
+                            <!--<GridView x:Name="RecentView"
+                                      ItemTemplate="{StaticResource PhotoTemplate}"
+                                      ItemContainerStyle="{StaticResource GridViewItemZeroMarginStyle}"
+                                      Loaded="GridView_Loaded"/>-->
 
                             <!-- VISUAL STATES -->
                             <VisualStateManager.VisualStateGroups>
@@ -309,19 +398,18 @@
                     </UserControl>
                 </PivotItem>
 
-                <PivotItem x:Name="CuratedPhotosPivotItem"
+                <PivotItem x:Name="CollectionsPivotItem"
                            Margin="0"
-                           x:Uid="CuratedHeader"
-                           Header="curated">
+                           x:Uid="CollectionsPivotItem"
+                           Header="collections">
 
-                    <UserControl x:Name="CuratedPhotosPivotItemContent"
+                    <UserControl x:Name="CollectionsPivotItemContent"
                                  x:DeferLoadStrategy="Lazy">
                         <!--Visual States don't work if not in an UserControl/ContentControl-->
                     
                         <Grid>
-                    
                             <!-- LOAD VIEW -->
-                            <Grid x:Name="CuratedLoadingView" 
+                            <Grid x:Name="CollectionsLoadingView" 
                                   VerticalAlignment="Center" 
                                   HorizontalAlignment="Center"
                                   Visibility="Collapsed">
@@ -330,20 +418,20 @@
                                     <RowDefinition Height="*"/>
                                 </Grid.RowDefinitions>
                             
-                                <ProgressBar x:Name="CuratedProgressPage" IsIndeterminate="True"/>
-                                <TextBlock x:Uid="LoadingPhotos" 
+                                <ProgressBar IsIndeterminate="True"/>
+                                <TextBlock x:Uid="LoadingCollections" 
                                            Typography.Capitals="SmallCaps"
-                                           Text="Loading photos from Unsplash..." 
+                                           Text="Loading collections from Unsplash..." 
                                            FontSize="20" Grid.Row="1"/>
                             </Grid>
 
-                            <StackPanel x:Name="CuratedEmptyView"
+                            <StackPanel x:Name="CollectionsEmptyView"
                                         Visibility="Collapsed"
                                         VerticalAlignment="Center"
                                         HorizontalAlignment="Center">
 
-                                <TextBlock x:Uid="CuratedPhotosFetchFailed" 
-                                           Text="Sorry, I couldn't get curated photos from Unsplash :("
+                                <TextBlock x:Uid="CollectionPhotosFetchFailed" 
+                                           Text="Sorry, I couldn't get collections from Unsplash :("
                                            FontSize="20"
                                            Typography.Capitals="SmallCaps"
                                            TextWrapping="Wrap"/>
@@ -353,29 +441,27 @@
                             </StackPanel>
 
                             <!-- DATA -->
-                            <controls:AdaptiveGridView x:Name="CuratedView"
+                            <controls:AdaptiveGridView x:Name="CollectionsView"
                                                        Visibility="Visible"
-                                                       DesiredWidth="300"
+                                                       DesiredWidth="600"
                                                        ItemHeight="300"
-                                                       ItemTemplate="{StaticResource PhotoTemplate}"
+                                                       ItemTemplate="{StaticResource CollectionTemplate}"
                                                        animations:ReorderGridAnimation.Duration="300"
                                                        ItemContainerStyle="{StaticResource GridViewItemZeroMarginStyle}"
-                                                       Loaded="GridView_Loaded">
-                        
-                            </controls:AdaptiveGridView>
+                                                       Loaded="GridView_Loaded"/>
 
                             <!-- VISUAL STATES -->
                             <VisualStateManager.VisualStateGroups>
-                                <VisualStateGroup x:Name="CuratedViewStates">
-                                    <VisualState x:Name="CuratedViewSmall">
+                                <VisualStateGroup x:Name="CollectionsViewStates">
+                                    <VisualState x:Name="CollectionsViewSmall">
                                         <VisualState.StateTriggers>
                                             <AdaptiveTrigger MinWindowWidth="0"/>
                                         </VisualState.StateTriggers>
 
                                         <VisualState.Setters>
-                                            <Setter Target="CuratedView.ItemHeight" Value="90"/>
-                                            <Setter Target="CuratedView.DesiredWidth" Value="90"/>
-                                            <Setter Target="CuratedView.Margin" Value="0,0,-20,0"/>
+                                            <Setter Target="CollectionsView.ItemHeight" Value="200"/>
+                                            <Setter Target="CollectionsView.DesiredWidth" Value="250"/>
+                                            <Setter Target="CollectionsView.Margin" Value="0,0,-20,0"/>
                                         </VisualState.Setters>
                                     </VisualState>
 
@@ -385,8 +471,8 @@
                                         </VisualState.StateTriggers>
 
                                         <VisualState.Setters>
-                                            <Setter Target="CuratedView.ItemHeight" Value="300"/>
-                                            <Setter Target="CuratedView.DesiredWidth" Value="300"/>
+                                            <Setter Target="CollectionsView.ItemHeight" Value="300"/>
+                                            <Setter Target="CollectionsView.DesiredWidth" Value="600"/>
                                         </VisualState.Setters>
                                     </VisualState>
                                 </VisualStateGroup>

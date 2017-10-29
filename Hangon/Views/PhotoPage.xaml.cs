@@ -23,6 +23,7 @@ using Windows.ApplicationModel.Core;
 
 namespace Hangon.Views {
     public sealed partial class PhotoPage : Page {
+
         #region variables
 
         public static Photo _CurrentPhoto { get; set; }
@@ -31,7 +32,7 @@ namespace Hangon.Views {
 
         private DataSource _PageDataSource { get; set; }
 
-        private static IList<Photo> _PageItemsSource { get; set; }
+        private IList<Photo> _PageItemsSource { get; set; }
 
         private Visual _BackgroundVisual { get; set; }
 
@@ -98,10 +99,10 @@ namespace Hangon.Views {
                 // Update last selected photo on previous Page
                 // which may has been changed due to FlipView
                 if (e.SourcePageType == typeof(HomePage)) {
-                    HomePage._LastSelectedPhoto = _CurrentPhoto;
+                    HomePage._LastPhotoSelected = _CurrentPhoto;
 
                 } else if (e.SourcePageType == typeof(UserPage)) {
-                    UserPage._LastSelectedPhoto = _CurrentPhoto;
+                    UserPage._LastPhotoSelected = _CurrentPhoto;
 
                 } else if (e.SourcePageType == typeof(CollectionPage)) {
                     CollectionPage._LastSelectedPhoto = _CurrentPhoto;
@@ -109,8 +110,9 @@ namespace Hangon.Views {
                 } else if (e.SourcePageType == typeof(FavoritesPage)) {
                     FavoritesPage._LastSelectedPhoto = _CurrentPhoto;
                 }
-            }            
+            }
 
+            //PhotosFlipView.ItemsSource = null;
             base.OnNavigatingFrom(e);
         }
 
@@ -419,6 +421,7 @@ namespace Hangon.Views {
         #endregion micro-interactions
 
         #region image composition
+
         private void HandleConnectedAnimation(Image photoImage) {
             if (_CurrentPhoto == null || photoImage == null) return;
 
@@ -585,13 +588,17 @@ namespace Hangon.Views {
         private void PhotosFlipView_SelectionChanged(object sender, SelectionChangedEventArgs e) {
             _CurrentPhoto = (Photo)PhotosFlipView.SelectedItem;
 
+            if (_CurrentPhoto == null) return;
+
             FillPhotoProperties();
             PhotosFlipView.UpdateLayout();
 
             var item = (FlipViewItem)PhotosFlipView.ContainerFromItem(_CurrentPhoto);
-            if (item == null) { return; }
+            if (item == null) return;
 
             var root = (Grid)item.ContentTemplateRoot;
+            if (root == null) return;
+
             var image = (Image)root.FindName("PhotoImage");
 
             _CurrentPhotoImage = image;

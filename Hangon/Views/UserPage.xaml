@@ -48,12 +48,12 @@
 
         <DataTemplate x:Key="CollectionTemplate" x:DataType="data:Collection">
             <Grid x:Name="CollectionItem"
-                    Opacity="0"
-                    Margin="0,0,0,12"
+                  Opacity="0"
+                  Margin="0,0,0,12"
                   PointerEntered="CollectionItem_PointerEntered"
                   PointerExited="CollectionItem_PointerExited"
-                    Loaded="CollectionItem_Loaded"
-                    Tapped="CollectionItem_Tapped">
+                  Loaded="CollectionItem_Loaded"
+                  Tapped="CollectionItem_Tapped">
                 <Border Width="600" Height="300" Background="Black">
                     <Border.Clip>
                         <RectangleGeometry Rect="0,0, 600, 300"/>

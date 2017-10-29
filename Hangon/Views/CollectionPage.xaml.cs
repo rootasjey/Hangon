@@ -71,6 +71,97 @@ namespace Hangon.Views {
             Frame.Navigate(typeof(HomePage));
         }
 
+        private void HandleConnectedAnimations(Collection collection) {
+            if (collection == null) return;
+
+            var animationService = ConnectedAnimationService.GetForCurrentView();
+
+            AnimateCollectionCover();
+            AnimateUserProfileImage();
+            AnimatePhotoImage();
+
+            void AnimateCollectionCover() {
+                var coverAnimation = animationService.GetAnimation("CollectionCoverImage");
+
+                if (_CurrentCollection.CoverPhoto == null) {
+                    coverAnimation.Cancel();
+                    return;
+                }
+
+                if (coverAnimation != null) {
+                    CollectionCoverImage.Opacity = 0;
+                    CollectionCoverImage.ImageOpened += (s, e) => {
+                        CollectionCoverImage.Opacity = .6;
+                        coverAnimation.TryStart(CollectionCoverImage);
+                        BackgroundBlurEffect.Blur(10, 1000, 1000).Start();
+                    };
+
+                } else {
+                    CollectionCoverImage.Fade(.6f).Start();
+                    BackgroundBlurEffect.Blur(10, 1000, 1000).Start();
+                }
+
+                CollectionCoverImage.Source = new BitmapImage(new Uri(_CurrentCollection.CoverPhoto.Urls.Regular));
+            }
+
+            void AnimateUserProfileImage() {
+                var profileAnimation = animationService.GetAnimation("UserProfileImage");
+
+                if (profileAnimation != null) {
+                    UserProfileImage.Opacity = 0; // TODO: check opacity effect on animation
+                    UserImageSource.ImageOpened += (s, e) => {
+                        UserProfileImage.Opacity = 1;
+                        profileAnimation.TryStart(UserProfileImage);
+                    };
+                }
+
+                UserImageSource.UriSource = new Uri(_PageDataSource.GetProfileImageLink(_CurrentCollection.User));
+            }
+
+            void AnimatePhotoImage() {
+                var photoAnimation = animationService.GetAnimation("PhotoImageBack");
+
+                if (photoAnimation == null || _LastSelectedPhoto == null) return;
+
+                if (_LastSelectedPivotIndex == 0) {
+                    PhotosListView.Loaded += (s, e) => {
+                        PhotosListView.ScrollIntoView(_LastSelectedPhoto);
+
+                        var item = (ListViewItem)PhotosListView.ContainerFromItem(_LastSelectedPhoto);
+                        if (item == null) { photoAnimation.Cancel(); return; }
+
+                        var stack = (StackPanel)item.ContentTemplateRoot;
+                        var image = (Image)stack.FindName("PhotoImage");
+                        if (image == null) { photoAnimation.Cancel(); return; }
+
+                        image.Opacity = 0;
+                        image.Loaded += (_s, _e) => {
+                            image.Opacity = 1;
+                            photoAnimation.TryStart(image);
+                        };
+                    };
+
+                } else {
+                    PhotosGridView.Loaded += (s, e) => {
+                        PhotosGridView.ScrollIntoView(_LastSelectedPhoto);
+
+                        var item = (GridViewItem)PhotosGridView.ContainerFromItem(_LastSelectedPhoto);
+                        if (item == null) { photoAnimation.Cancel(); return; }
+
+                        var stack = (StackPanel)item.ContentTemplateRoot;
+                        var image = (Image)stack.FindName("PhotoImage");
+                        if (image == null) { photoAnimation.Cancel(); return; }
+
+                        image.Opacity = 0;
+                        image.Loaded += (_s, _e) => {
+                            image.Opacity = 1;
+                            photoAnimation.TryStart(image);
+                        };
+                    };
+                }
+            }
+        }
+
         #endregion navigation
 
         #region titlebar
@@ -190,102 +281,6 @@ namespace Hangon.Views {
         }
 
         #endregion data
-
-        #region micro-interactions
-        private void HandleConnectedAnimations(Collection collection) {
-            if (collection == null) return;
-
-            var animationService = ConnectedAnimationService.GetForCurrentView();
-
-            AnimateCollectionCover();
-            AnimateUserProfileImage();
-            AnimatePhotoImage();
-
-            void AnimateCollectionCover()
-            {
-                var coverAnimation = animationService.GetAnimation("CollectionCoverImage");
-
-                if (_CurrentCollection.CoverPhoto == null) {
-                    coverAnimation.Cancel();
-                    return;
-                }
-
-                if (coverAnimation != null) {
-                    CollectionCoverImage.Opacity = 0;
-                    CollectionCoverImage.ImageOpened += (s, e) => {
-                        CollectionCoverImage.Opacity = .6;
-                        coverAnimation.TryStart(CollectionCoverImage);
-                        BackgroundBlurEffect.Blur(10, 1000, 1000).Start();
-                    };
-
-                } else {
-                    CollectionCoverImage.Fade(.6f).Start();
-                    BackgroundBlurEffect.Blur(10, 1000, 1000).Start();
-                }
-
-                CollectionCoverImage.Source = new BitmapImage(new Uri(_CurrentCollection.CoverPhoto.Urls.Regular));
-            }
-
-            void AnimateUserProfileImage()
-            {
-                var profileAnimation = animationService.GetAnimation("UserProfileImage");
-
-                if (profileAnimation != null) {
-                    UserProfileImage.Opacity = 0; // TODO: check opacity effect on animation
-                    UserImageSource.ImageOpened += (s, e) => {
-                        UserProfileImage.Opacity = 1;
-                        profileAnimation.TryStart(UserProfileImage);
-                    };
-                }
-                
-                UserImageSource.UriSource = new Uri(_PageDataSource.GetProfileImageLink(_CurrentCollection.User));
-            }
-
-            void AnimatePhotoImage()
-            {
-                var photoAnimation = animationService.GetAnimation("PhotoImageBack");
-
-                if (photoAnimation == null || _LastSelectedPhoto == null) return;
-
-                if (_LastSelectedPivotIndex == 0) {
-                    PhotosListView.Loaded += (s, e) => {
-                        PhotosListView.ScrollIntoView(_LastSelectedPhoto);
-
-                        var item = (ListViewItem)PhotosListView.ContainerFromItem(_LastSelectedPhoto);
-                        if (item == null) { photoAnimation.Cancel(); return; }
-
-                        var stack = (StackPanel)item.ContentTemplateRoot;
-                        var image = (Image)stack.FindName("PhotoImage");
-                        if (image == null) { photoAnimation.Cancel(); return; }
-
-                        image.Opacity = 0;
-                        image.Loaded += (_s, _e) => {
-                            image.Opacity = 1;
-                            photoAnimation.TryStart(image);
-                        };
-                    };
-
-                } else {
-                    PhotosGridView.Loaded += (s, e) => {
-                        PhotosGridView.ScrollIntoView(_LastSelectedPhoto);
-
-                        var item = (GridViewItem)PhotosGridView.ContainerFromItem(_LastSelectedPhoto);
-                        if (item == null) { photoAnimation.Cancel(); return; }
-
-                        var stack = (StackPanel)item.ContentTemplateRoot;
-                        var image = (Image)stack.FindName("PhotoImage");
-                        if (image == null) { photoAnimation.Cancel(); return; }
-
-                        image.Opacity = 0;
-                        image.Loaded += (_s, _e) => {
-                            image.Opacity = 1;
-                            photoAnimation.TryStart(image);
-                        };
-                    };
-                }
-            }
-        }
-        #endregion micro-interactions
 
         #region events
         private void Page_KeyDown(CoreWindow sender, KeyEventArgs args) {
